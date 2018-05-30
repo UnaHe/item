@@ -1,0 +1,650 @@
+{{partial("layout/header")}}
+<link rel="stylesheet" type="text/css" href="/client/daterangepicker.css">
+<!-- <link rel="stylesheet" type="text/css" href="/client/fullcalendar.print.css"> -->
+<script>
+var eventObjects = {};
+var eventObjectsRemoved = [];
+</script>
+<style>
+.external-event{
+  margin-bottom: 10px;
+}
+#calendar{
+  background-color: #fff;
+  padding:6px;
+}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"DoctorSchedule"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{"DoctorSchedule"|_}}</li>
+        </ol>
+      </div>
+      <div class="topbar-right pt30">
+      <select class="multiselect" id="department_id" onchange="selectDepartment(this.value)" required="">
+                    <option value="" selected="selected">请选择科室</option>
+                      {%for i in departmentList%}
+                      <option value="{{i['id']}}">{{i['item']}}</option>
+                      {%endfor%}
+                    </select> <button class="btn btn-info ladda-button" data-style="expand-left" id="saveBtn"><span class="ladda-label">保存</span></button>
+
+      </div>
+
+    </div>
+    <div id="content">
+      <div class="row">
+      <div class="col-md-12">
+          <div id='calendar'></div>
+        </div>
+          </div>
+        <button class="btn btn-info btn-gradient" data-toggle="modal" data-target="#alertModal" id="removeBtn" style="display: none"> Alert Modal </button>
+        <button class="btn bg-purple2 bg-gradient" data-toggle="modal" data-target="#formModal" id="addBtn" style="display: none"> Form Modal </button>
+        <button class="btn bg-purple2 bg-gradient" data-toggle="modal" data-target="#editFormModal" id="editBtn" style="display: none"> Form Modal </button>
+
+
+  </section>
+<div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa fa-lock pr5"></i> Schedule</div>
+      </div>
+      <div class="modal-body">
+        <form class="cmxform form-horizontal" id="scheduleForm" role="form" onsubmit="return false">
+          <div class="text-center" id="login-avatar" style="font-size: 16px;font-weight: bold;"></div>
+          <div class="form-group">
+                  <label class="col-md-2 control-label">时间段</label>
+                  <div class="col-md-12">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control mtn" id="timepicker" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="addEvent={};">取消</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addEventSchedule()">增加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editFormModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa fa-lock pr5"></i> Schedule </div>
+      </div>
+      <div class="modal-body">
+        <form class="cmxform form-horizontal" role="form">
+          <div class="text-center" id="editTitle" style="font-size: 16px;font-weight: bold;"></div>
+          <div class="form-group">
+                  <label class="col-md-2 control-label">开始时间</label>
+                  <div class="col-md-10">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control timepicker mtn" name="timepicker" id="editTimepicker1" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-2 control-label">结束时间</label>
+                  <div class="col-md-10">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control timepicker mtn" name="timepicker" id="editTimepicker2" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-gradient mr5 btn-xs" data-dismiss="modal" id="delScheduleBtn"><i class="fa fa-times"></i> 删除 </button>　　　　　　　　　
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editEventSchedule()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{partial ("layout/footer")}}
+<!-- Page Plugins -->
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/daterange/moment.min.js"></script> 
+<link rel="stylesheet" type="text/css" href="/client/fullcalendar.min.css">
+<script type="text/javascript" src="/client/moment.min.js"></script>
+<script type="text/javascript" src="/client/fullcalendar.min.js"></script>
+<script type="text/javascript" src="/client/locale-all.js"></script>
+
+
+<script type="text/javascript" src="/client/daterangepicker.js"></script> 
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/timepicker/bootstrap-timepicker.min.js"></script> 
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/ladda/ladda.min.js"></script> 
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/calendar/gcal.js"></script>
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/multiselect/bootstrap-multiselect.js"></script>
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/colorpicker/bootstrap-colorpicker.js"></script>
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
+<script type="text/javascript">
+var eventsCount = 0;
+var inProcess = 0;
+function addEventSchedule(){
+  var splitTag = addEvent.id.split('-')[0]
+  var _time = $('#timepicker').val();
+    var _timeArr = _time.split(' - ')
+    var _startTime = Date.parse(_timeArr[0])
+    var _endTime = Date.parse(_timeArr[1])
+  var count=eventsCount;
+        while (true){
+          if (eventObjects[splitTag+"-"+count]==undefined){
+            break;
+          }else{
+            count++;
+          }
+        }
+    var sTime = _endTime-_startTime;
+    if (sTime<=0){
+        alert("结束时间必须大于开始时间")
+        return
+    }
+    if (sTime<=86400000){
+      var _event = $.extend(true, {}, addEvent);
+      var _day = moment.unix(_startTime/1000).format('YYYY/MM/DD')
+      var momentT = $('#calendar').fullCalendar('getDate')
+      _event.start = $.fullCalendar.moment(_timeArr[0])
+      _event.end = $.fullCalendar.moment(_timeArr[1])
+      if (_event.end<=_event.start){
+        alert("结束时间必须大于开始时间")
+        return
+      }
+
+      _event.date = _day
+      _event.id = splitTag+"-"+count;
+      _event._id = splitTag+"-"+count;
+      _event.changed = 1;
+      eventObjects[_event.id] = _event;
+      $('#calendar').fullCalendar('renderEvent', _event, true);
+    }else{
+        var days = parseInt((_endTime -_startTime)/86400000);
+        var eventArray = [];
+        for (var d=0;d<=days;d++){
+          var _event = $.extend({}, addEvent);
+          var _day = moment.unix((_startTime + 86400000 * d)/1000).format('YYYY/MM/DD')
+          var _startDate = moment.unix((_startTime + 86400000 * d)/1000).format('HH:mm')
+          var _endDate = moment.unix((_endTime + 86400000 * d)/1000).format('HH:mm')
+      _event.start = $.fullCalendar.moment(_day + " "+_startDate)
+      _event.end = $.fullCalendar.moment(_day + " "+_endDate)
+      if (_event.end<=_event.start){
+        alert("结束时间必须大于开始时间")
+        return
+      }
+      _event.date = _day;
+      _event.id = splitTag+"-"+count;
+      _event._id = splitTag+"-"+count;
+      _event.changed = 1;
+      eventObjects[_event.id] = _event;
+      count++;
+      eventArray.push(_event)
+        }
+        $('#calendar').fullCalendar('renderEvents', eventArray, true);
+    }
+}
+function editEventSchedule(){
+  // var _event = $.extend(true, {}, editEvent);
+  // var startDate = moment.unix((editEventSchedule.start-3600000*8)/1000).format('YYYY/MM/DD HH:mm');
+  // var endDate = moment.unix((editEvent.end-3600000*8)/1000).format('YYYY/MM/DD HH:mm')
+  // console.log(startDate , endDate)
+  // return
+  var timeStart = $('#editTimepicker1').val();
+  var timeEnd = $('#editTimepicker2').val();
+  var _event = $.extend({}, editEvent);
+  _event.changed = 1;
+      _event.start = $.fullCalendar.moment(_event.date+" "+timeStart)
+      _event.end = $.fullCalendar.moment(_event.date+" "+timeEnd)
+      if (_event.end<=_event.start){
+        alert("结束时间必须大于开始时间")
+        return
+      }
+      // _event.start = new Date(_event.date + " "+ timeStart).toString();
+      // _event.end = new Date(_event.date + " "+ timeEnd).toString();
+      eventObjects[_event.id] = _event;
+      // console.log("_event:",_event)
+      // _event.start = _timeArr[0];
+      // _event.end = _timeArr[1];
+      // _event.id = splitTag+"-"+count;
+      // _event._id = splitTag+"-"+count;
+      $('#calendar').fullCalendar('updateEvent', _event);
+      editEvent = {}
+}
+function FCexternals() {
+
+    if ($('#external-events').length) {
+      $('#external-events .external-event').each(function(index) {
+        // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+        // it doesn't need to have a start or end
+        var count=0;
+        while (true){
+          if (eventObjects[$(this).attr('data-id')+"-"+count]==undefined){
+            break;
+          }else{
+            count++;
+          }
+        }
+        var eventObject = {
+          title: $.trim($(this).text()), // use the element's text as the event title
+          color: $(this).attr('data-color'),
+          id: ($(this).attr('data-id')+"-"+count),
+          job: ($(this).attr('data-job')),
+          dId: ($(this).attr('data-id')),
+          event: "",
+          event_level: 0,
+          schedule_id: "",
+          allDay: false,
+          date: "",
+          changed: 1,
+        };
+
+        // store the Event Object in the DOM element so we can get to it later
+        $(this).data('eventObject', eventObject);
+        // make the event draggable using jQuery UI
+        $(this).draggable({
+          zIndex: 999,
+          revert: true,      // will cause the event to go back to its
+          revertDuration: 0  //  original position after the drag
+        });
+      });
+    }
+}
+function selectDepartment(department_id){
+      if (department_id==""){
+        eventObjects = {}
+        $('#external-events').remove()
+        $('#calendar').fullCalendar( 'removeEvents' );
+        count = 0;
+      }else{
+        $('#loadingImg').remove();
+        $('<span id="loadingImg"></span>').html('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" width="20" />').insertBefore($('#department_id'));
+        $('.multiselect').attr('disabled','disabled');
+        $('.btn').attr('disabled','disabled');
+        $.ajax('/doctor/ajaxdoctorlist', {
+                data: {
+                  department_id: department_id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    if (data.errcode == 0)
+                    {
+                        if (data.data.length>0){
+                            $('#calendar').fullCalendar( 'removeEvents' )
+                            eventObjects = {}
+                            initialDoctor(data.data)
+                      }else{
+                        $('.btn').removeAttr('disabled');
+                        alert('请先添加医生');
+                      }
+                    }else{
+                      alert(data.errmsg);
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#loadingImg').remove();
+                }
+            });
+      }
+    }
+var multiselectConfig = {enableFiltering: true,maxHeight: 220,buttonWidth:"200px"};
+var editEvent= {};
+var addEvent = {};
+function initialDoctor(doctor){
+  if (!$('#external-events').length) {
+      $('#content').prepend('<div id="external-events"></div>');
+    }else{
+      $('#external-events').html('')
+    }
+    for (var i=0;i<doctor.length;i++){
+      $("#external-events").append("<div class='external-event' data-color='"+(doctor[i]['doctor_color']?doctor[i]['doctor_color']:"")+"' data-id='"+doctor[i]['doctor_id']+"' data-job='"+doctor[i]['doctor_job_title']+"'>" + doctor[i]['doctor_name'] + "</div>");
+    }
+    $('#calendar').fullCalendar( 'refetchEvents' )
+    // $('.external-event').bind('click',function(){
+    //   $('#login-avatar').html($(this).html() + "<br /><br /><span style='font-size:12px;color:grey'>"+$(this).attr('data-job')+"</span>");
+    //   $('#editBtn').trigger('click')
+    // });
+}
+
+
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+
+    // Init Calendar Plugin
+  var _eventsStart,_eventsEnd;
+  $('#calendar').fullCalendar({
+    header: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'month,agendaWeek,agendaDay,listMonth'
+    },
+    locale:'zh-cn',
+    firstDay:1,
+    timezone:'Asia/Shanghai',
+    buttonIcons: false, // show the prev/next text
+      weekNumbers: true,
+      navLinks: true, // can click day/week names to navigate views
+    editable: true,
+    timeFormat:"HH:mm",
+    // weekMode :"liquid",
+          eventAfterRender : function(event, element, view) {
+            var fstart  = $.fullCalendar.formatDate(event.start, "HH:mm");
+            var fend  = $.fullCalendar.formatDate(event.end, "HH:mm");
+          //element.html('<a href=#><div>Time: ' + fstart + "-" +  fend + '</div><div>Room:' + event.confname + '</div><div style=color:#E5E5E5>Host:' +  event.fullname + "</div></a>");
+          var confbg='';
+          if(event.confid==1){
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }else if(event.confid==2){
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }else if(event.confid==3){
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }else if(event.confid==4){
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }else if(event.confid==5){
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }else if(event.confid==6){
+            confbg = confbg + '<span class="fc-event-bg"></span>'; 
+          }else{
+            confbg = confbg + '<span class="fc-event-bg"></span>';
+          }
+          var titlebg = event.eventLevel? '<span class="fc-event-conf" style="background:'+  event.confcolor +'">M1</span>':'';
+          if(view.name=="month"){
+            var evtcontent = '<div class="fc-event-vert"><a style="color:#fff">';
+            // evtcontent = evtcontent + confbg;
+            evtcontent = evtcontent + '<span class="fc-event-titlebg">'+titlebg +  fstart + " - " +  fend +  '</span>';
+            evtcontent = evtcontent + '<span > ' +  event.title + ' </span>';
+            if (event.event){
+            evtcontent = evtcontent + '<span>(' +  event.event + ')</span>';
+          }
+            evtcontent = evtcontent + '</a><div class="ui-resizable-handle ui-resizable-e"></div></div>';
+            element.html(evtcontent);
+          }else if(view.name=="agendaWeek"){
+            var evtcontent = '<a style="color:#fff">';
+            evtcontent = evtcontent + confbg;
+            evtcontent = evtcontent + '<span class="fc-event-time">'+titlebg +  fstart + " - " +  fend +  '</span>';
+            evtcontent = evtcontent + '<span>' +  event.title +'</span>';
+            if (event.event){
+            evtcontent = evtcontent + '<span>(' +  event.event + ')</span>';
+          }
+            //evtcontent = evtcontent + '<span>' +  event.fullname + '</span>';
+            evtcontent = evtcontent + '</a><span class="ui-icon ui-icon-arrowthick-2-n-s"><div class="ui-resizable-handle ui-resizable-s"></div></span>';
+            element.html(evtcontent);
+          }else if(view.name=="agendaDay"){
+            var evtcontent = '<a style="color:#fff">';
+            evtcontent = evtcontent + confbg;
+            evtcontent = evtcontent + '<span class="fc-event-time">'+titlebg +  fstart + " - " +  fend +  '</span>';
+            evtcontent = evtcontent + '<span>' +  event.title +'</span>';
+            if (event.event){
+            evtcontent = evtcontent + '<span>(' +  event.event + ')</span>';
+          }
+            evtcontent = evtcontent + '</a><span class="ui-icon ui-icon-arrow-2-n-s"><div class="ui-resizable-handle ui-resizable-s"></div></span>';
+            element.html(evtcontent);
+          }
+          },
+
+    droppable: true, // this allows things to be dropped onto the calendar !!!
+    drop: function(date, allDay, jsEvent, ui ) { // this function is called when something is dropped
+      // retrieve the dropped element's stored Event Object
+      var originalEventObject = $(this).data('eventObject');
+      var copiedEventObject = $.extend({}, originalEventObject);
+      // we need to copy it, so that multiple events don't have a reference to the same object
+      // assign it the date that was reported
+      addEvent = copiedEventObject;
+      $('#login-avatar').html(copiedEventObject.title + "<br /><br /><span style='font-size:12px;color:grey'>"+copiedEventObject.job+"</span>")
+      // $(this).remove();
+      FCexternals();
+      $('#addBtn').trigger('click')
+    },
+    // eventResize: function(event, delta, revertFunc) {
+    //     console.log("eventResize:",event);
+    //     eventObjects[event.id] = event;
+    //     console.log("eventObjects:",eventObjects);
+    // },
+    eventDrop: function(event, delta, revertFunc) {
+      var copiedEventObject = $.extend({}, event);
+      // console.log("start UTC :",new Date(copiedEventObject.start).toUTCString())
+      // console.log("start:",new Date(copiedEventObject.start).toString())
+      // return
+      var _day = moment.unix((event.start-28800000)/1000).format('YYYY-MM-DD');
+      var startTime = moment.unix((event.start-28800000)/1000).format('YYYY-MM-DD HH:mm');
+      var endTime = moment.unix((event.end-28800000)/1000).format('YYYY-MM-DD HH:mm');
+      copiedEventObject.start = $.fullCalendar.moment(startTime)
+      copiedEventObject.end = $.fullCalendar.moment(endTime)
+      copiedEventObject.date = _day
+      copiedEventObject.changed = 1
+      eventObjects[event.id] = copiedEventObject;
+      $('#calendar').fullCalendar('updateEvent', copiedEventObject);
+    },
+    eventClick: function(calEvent, jsEvent, view) {
+      if (inProcess==1){
+        return
+      }
+      editEvent = $.extend({}, calEvent);
+      // console.log("start UTC :",new Date(copiedEventObject.start).toUTCString())
+      // console.log("start:",new Date(copiedEventObject.start).toString())
+      // return
+      // editEvent.start = new Date(editEvent.start).toString()
+      // editEvent.end = new Date(editEvent.end).toString()
+      var _start = editEvent.start;
+      var _end = editEvent.end;
+      if (editEvent.start._isUTC){
+        _start -= 28800000;
+        _end -= 28800000;
+      }
+      var startDate = moment.unix(_start/1000).format('HH:mm');
+      var endDate = moment.unix(_end/1000).format('HH:mm')
+      $('#editTitle').html(editEvent.title + "<br /><br /><span style='font-size:12px;color:grey'>"+editEvent.job+"</span><br /><p align='center'>"+editEvent.date+"</p>")
+      $("#editTimepicker1").timepicker('setTime' , startDate)
+      $("#editTimepicker2").timepicker('setTime' , endDate)
+      $('#editBtn').trigger('click')
+    },
+    viewRender: function(view, element) {
+      var department_id = $("#department_id").val();
+      if (department_id>0){
+        $('#calendar').fullCalendar( 'refetchEvents' )
+        $('.multiselect').attr('disabled','disabled');
+        $('#saveBtn').attr('disabled','disabled');
+        $('<span id="calendarLoadingImg"></span>').html('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" width="20" />').insertBefore($('.fc-left'));
+        // $('.external-event').removeClass('ui-draggable ui-draggable-handle');
+        //Do something
+      }
+    },
+    events: function(start, end, timezone, callback) {
+      if (inProcess==1){
+        return;
+      }
+      var department_id = $("#department_id").val();
+      if (department_id>0){
+        $('.fc-button').hide();
+        $('.multiselect').attr('disabled','disabled');
+        $('#saveBtn').attr('disabled','disabled');
+        $.ajax({
+            url: '/doctor/ajaxschedulelist',
+            dataType: 'json',
+            data: {
+                // our hypothetical feed requires UNIX timestamps
+                department_id: department_id,
+                start: start.unix(),
+                end: end.unix(),
+            },
+            type: 'post',
+            success: function(doc) {
+                var events = [];
+                if (doc.data.res.length>0){
+                  eventsCount = doc.data.length;
+                  $(doc.data.res).each(function(index) {
+                    var _e = {
+                        title: $(this).attr('title'),
+                        job: $(this).attr('job'),
+                        dId: $(this).attr('dId'),
+                        event: $(this).attr('event'),
+                        event_level: $(this).attr('event_level'),
+                        schedule_id: $(this).attr('schedule_id'),
+                        start: $.fullCalendar.moment($(this).attr('start')),
+                        end: $.fullCalendar.moment($(this).attr('end')),
+                        date: $(this).attr('date'),
+                        id: $(this).attr('dId')+"-"+index,
+                        changed: 0
+                    }
+                    events.push(_e);
+                    eventObjects[_e.id] = _e
+                });
+                }
+                  callback(events);
+                // $('.fc-button').show();
+                // $('#calendarLoadingImg').remove()
+            },
+            complete:function(){
+              $('.fc-button').show();
+              $('#calendarLoadingImg').remove()
+              $('.multiselect').removeAttr('disabled');
+              $('.btn').removeAttr('disabled');
+              FCexternals();
+            }
+        });
+      }
+    }
+  });
+
+  FCexternals();
+    $('.multiselect').multiselect(multiselectConfig);
+    $('#delScheduleBtn').bind('click',function(){
+      if (editEvent){
+          if (editEvent.schedule_id!=""){
+           eventObjectsRemoved.push(editEvent.schedule_id)
+           }
+      $('#calendar').fullCalendar( 'removeEvents' , editEvent.id )
+        delete eventObjects[editEvent.id]
+      }
+    })
+    $('#timepicker').daterangepicker({
+      timePicker:true,
+    "timePicker24Hour": true,
+    locale: {
+        "format": 'YYYY/MM/DD H:mm',
+        "separator": " - ",
+        "applyLabel": "确定",
+        "cancelLabel": "取消",
+        "weekLabel": "W",
+        "daysOfWeek": [
+            "日",
+            "一",
+            "二",
+            "三",
+            "四",
+            "五",
+            "六"
+        ],
+        "monthNames": [
+            "一月",
+            "二月",
+            "三月",
+            "四月",
+            "五月",
+            "六月",
+            "七月",
+            "八月",
+            "九月",
+            "十月",
+            "十一月",
+            "十二月"
+        ],
+        "firstDay": 1
+    }
+  });
+    $('.timepicker').timepicker({
+                minuteStep: 1,
+                showInputs: false,
+                modalBackdrop: true,
+                showMeridian: false
+            });
+$("#saveBtn").bind("click",function(){
+  var department_id = $("#department_id").val();
+  if (department_id==""){
+    alert("科室信息错误");
+    return;
+  }
+  var postObject = [];
+    for (var key in eventObjects) {
+   var obj = eventObjects[key];
+   var _obj = {};
+      _obj.start = obj.start/1000;
+      _obj.end = obj.end/1000;
+      _obj.id = obj.dId;
+      _obj.date = obj.date;
+      _obj.schedule_id = obj.schedule_id;
+      _obj.changed = obj.changed;
+      postObject.push(_obj)
+  }
+  if (postObject.length==0){
+    return
+  }
+  inProcess = 1;
+  $('#loadingImg').remove();
+        $('<span id="loadingImg"></span>').html('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" width="20" />').insertBefore($('#department_id'));
+        $('.multiselect').attr('disabled','disabled');
+    $(this).attr('disabled','disabled');
+    $('.fc-button').hide();
+    $('#calendar').fullCalendar('option', {
+    droppable:false,
+    editable: false
+});
+    console.log(JSON.stringify(postObject));
+    $.ajax('/doctor/schedule', {
+                data: {
+                  department_id: department_id,
+                  data: JSON.stringify(postObject),
+                  removed: '{"r":'+JSON.stringify(eventObjectsRemoved)+'}',
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    if (data.errcode == 0)
+                    {
+                      $('#calendar').fullCalendar( 'removeEvents' )
+                        $('#calendar').fullCalendar( 'refetchEvents' )
+                    }
+                    inProcess = 0;
+                    alert(data.errmsg);
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.multiselect').removeAttr('disabled');
+                  $('#loadingImg').remove();
+                  $('.fc-button').show();
+                  $('#calendar').fullCalendar('option', {
+    droppable:true,
+    editable: true
+});
+                  inProcess = 0;
+                }
+
+            });
+  // var postData = [];
+});
+
+});
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+{{partial("layout/header")}}
+  <!-- Start: Content -->
+  <section id="content_wrapper">
+
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="/">{{"projectList"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div id="widget-dropdown" class="row">
+          {%for i in itemProjectList%}
+        <div class="col-sm-4">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20 project" data-id="{{i['project_id']}}" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-grey"></i></div>
+              <h2 class="mt15 lh15 text-grey2"><b>{{i['project_name']}}</b></h2>
+              <h5 class="text-muted">{%if i['project_status']==1%}正常{%else%}关闭{%endif%}</h5>
+            </div>
+          </div>
+        </div>
+          {%endfor%}
+      </div>
+      </div>
+  </section>
+  {{partial("layout/footer")}}
+
+<!-- Theme Javascript --> 
+
+<script type="text/javascript">
+jQuery(document).ready(function () {
+	 "use strict";
+     // Init Theme Core
+//     Core.init();
+
+     $('.project').bind('click',function(){
+         $.ajax('/project/panel', {
+             data: {project_id:$(this).attr('data-id')},
+             type: 'post',
+             dataType: 'json',
+             success: function(data) {
+                 if (data.code===0){
+                     location.href='/project/panel';
+                     return;
+                 }
+                 alert(data.msg);
+             },
+             error:function(){
+                 alert("验证异常，请刷新重试！");
+             },
+         });
+     });
+
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+{{partial("layout/header")}}
+<style>
+.conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"polygonsortHandle"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{'polygonsortManage'|_}}</li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-user_add"></span> {{"polygonsortHandle"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+              <input type="hidden" id="project_polygon_sort_id" class="formData" value="{{details['project_polygon_sort_id']}}" />
+                <div class="form-group">
+                  <label>楼层</label>
+                  <div class="col-md-13">
+                    <select class="handlemultiselect formData" id="map_id" required="">
+                        <option value="">选择楼层</option>
+                      {%for i in mapList%}
+                      <option value="{{i['map_id']}}"{%if i["map_id"]==details['map_id']%} selected{%endif%}>{{i['map_name']}}</option>
+                      {%endfor%}
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label>点位</label>
+                  <div class="col-md-13">
+                    <select class="handlemultiselect formData" id="map_gid" required="">
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label>时间段</label>
+                  <input id="timeBucket" name="timeBucket" type="text" class="form-control date formData" maxlength="10" autocomplete="off" value="{%if details['project_polygon_sort_startTime']%}{{date('Y/m/d H:i',details['project_polygon_sort_startTime'])}} - {{date('Y/m/d H:i',details['project_polygon_sort_endTime'])}}{%endif%}" readonly>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button"
+                            data-style="expand-left" id="subBtn"><span
+                            class="ladda-label"><i class="fa fa-save"></i> {{'save'|_}}</span>
+                    </button>
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+<link rel="stylesheet" type="text/css" href="/client/daterangepicker.css">
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+<script type="text/javascript" src="/client/moment.min.js"></script>
+<script type="text/javascript" src="/client/daterangepicker.js"></script>
+{{javascript_include('client/vendor/plugins/timepicker/bootstrap-timepicker.min.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: true,maxHeight: 320 , buttonWidth:'320px'};
+var localeRange = {
+    "format": 'YYYY/MM/DD HH:mm',
+    "separator": " - ",
+    "applyLabel": "确定",
+    "cancelLabel": "清除",
+    "weekLabel": "W",
+    "daysOfWeek": [
+        "日",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六"
+    ],
+    "monthNames": [
+        "一月",
+        "二月",
+        "三月",
+        "四月",
+        "五月",
+        "六月",
+        "七月",
+        "八月",
+        "九月",
+        "十月",
+        "十一月",
+        "十二月"
+    ],
+    "firstDay": 1
+};
+function submitHandler(){
+    var postData = {};
+    $('.formData').each(function(){
+        postData[this.id] = $.trim(this.value);
+    });
+    if (!postData.map_gid){
+        alert('请选择点位');
+        return;
+    }
+
+    if (postData.timeBucket===''){
+        alert('请选择时间');
+        return;
+    }
+    var l = Ladda.create(document.querySelector('#'+this.id));
+    l.start();
+            $.ajax('/polygonsort/handle', {
+                data: postData,
+                type: 'post',
+                dataType: 'json',
+                success: function(data){
+                  console.log(data)
+                    alert(data.msg);
+                    if (data.code == 0)
+                    {
+                        location.href= '/polygonsort/list';
+                    }else{
+                        l.stop();
+                    }
+                },
+                error: function()
+                {
+                    alert('操作失败，请重试s');
+                    l.stop();
+                },
+                complete:function(){
+                  $('#subBtn').removeAttr('disabled');
+                  $('#subLoading').remove();
+                }
+            });
+            return false;
+}
+$(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+
+    $('.handlemultiselect').multiselect(multiselectConfig);
+
+    $('#map_id').bind('change',function(){
+        if (this.value>0) {
+            $('.multiselect').attr('disabled', 'disabled');
+            $.ajax('/polygon/ajaxgetlistbymapid', {
+                data: {mapId: this.value},
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data);
+                    var html = '';
+                    if (data.code === 0) {
+                        html+='<option value="">选择点位</option>';
+                        for(var i=0;i<data.data.length;i++){
+                            var selected = '';
+                            if (data.data[i].map_gid=='{{details["map_gid"]}}') selected = ' selected';
+                            html+= '<option value="'+data.data[i].map_gid+'"'+selected+'>'+data.data[i].name+'</option>';
+                        }
+                    }
+                    $('#map_gid').html(html).multiselect('rebuild');
+                },
+                error: function () {
+                    alert('服务器错误');
+                },
+                complete: function () {
+                    $('.multiselect').removeAttr('disabled');
+                }
+            });
+        }else{
+            $('#map_gid').html('').multiselect('rebuild');
+        }
+    });
+    $('#timeBucket').daterangepicker({
+        autoUpdateInput: false,
+        timePicker:true,
+        "timePicker24Hour": true,
+        locale: localeRange,
+    });
+
+    $('#timeBucket').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format(localeRange.format) + ' - ' + picker.endDate.format(localeRange.format));
+    });
+    $('#timeBucket').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+    });
+
+    $('#subBtn').bind('click',submitHandler);
+
+    {%if details['map_id']>0%}
+    $('#map_id').trigger('change');
+    {%endif%}
+
+    
+});
+
+</script>
+
+</body>
+</html>

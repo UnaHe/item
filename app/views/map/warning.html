@@ -1,0 +1,136 @@
+{{partial("layout/header")}}
+{{stylesheet_link("leaflet/leaflet1.0.3.css")}}
+    {{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
+    <style>
+    .btIcon{
+      cursor: pointer;
+    }
+    </style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"MapWarning"|_}}</a></li>
+            <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
+                    class="glyphicon glyphicon-home"></span></a></li>
+            <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+          <div class="col-md-12">
+          <div class="col-md-8" id="map"></div><div class="col-md-4">
+          <div class="panel featurePanel" id="ibeaconPanel">
+            <div class="panel-heading"> <span class="panel-title"><span class="glyphicons glyphicons-bluetooth"></span> 救援列表 </span>
+            </div>
+            <div class="panel-body">
+                <table class="table table-hover" id="warningListTable">
+                    <tbody>
+                    {%for i in warningList%}
+                    <tr id="warning_{{i['warning_id']}}">
+                        <td style="text-align: left;width:1%" nowrap="" class="small">{{date("Y-m-d H:i",i['warning_time'])}}</td>
+                        <td nowrap="">{%if i['warning_status']==0%}等待救援{%elseif i['warning_status']==1%}正在救援{%endif%}</td>
+                        <td nowrap style="width:1%">
+                            <button type="button" class="btn btn-info btn-xs viewBtn" data-id="{{i['warning_id']}}">
+                                {{"View"|_}}
+                            </button>
+                        </td>
+                    </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+          </div>
+                </div>
+          </div>
+        </div>
+    </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include("leaflet/leaflet1.0.3.js")}}
+{{javascript_include("leaflet/L.Icon.Pulse.js")}}
+{{javascript_include("leaflet/leaflet.polylineDecorator.js")}}
+{{javascript_include("leaflet/MovingMarker.js")}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">;
+var len = 0.002197;
+var warningMarker;
+var warningListJson = {{warningListJson}};
+var sh = $(window).height()-400;
+
+var redPulse = {heartbeat: 2,color:"red"};
+var greyPulse = {heartbeat: 2,color:"grey"};
+var greenPulse = {heartbeat: false,color:"green"};
+var pulsingIcon = L.icon.pulse(redPulse);
+$('#map').css({'height':sh+'px'});
+    $('#details').css({'height':sh+'px'});
+    var mapId = '{{filter['map_id']}}';
+    var center = [0,0];
+    {%if clientMapSetting[4] is defined%}
+    center = '{{clientMapSetting[4]}}'.split('|');
+    {%endif%}
+var maxBounds = L.latLngBounds([-len*'{{clientMapSetting[3]}}',-len*'{{clientMapSetting[2]}}'], [len*'{{clientMapSetting[3]}}',len*'{{clientMapSetting[2]}}']);
+var params = {
+    format: 'image/jpg',
+    minZoom: '{{clientMapSetting[0]}}',
+    maxZoom: '{{clientMapSetting[1]}}',
+    detectRetina: true,
+    attribution: ""
+};
+var map = L.map('map', {
+    center: center,
+    zoom: '{{clientMapSetting[0]}}',
+//    maxBounds:maxBounds,
+    zoomControl: true
+});
+var lastMapId;
+var mapLayer;
+function viewWarning(){
+    console.log($(this).attr('data-id'));
+    if (warningListJson[$(this).attr('data-id')]===undefined){
+        alert('数据读取失败，请刷新页面重试！');
+        return;
+    }
+    var data = warningListJson[$(this).attr('data-id')];
+    if (data.map_id!=lastMapId) {
+        if (mapLayer!==undefined && map.hasLayer(mapLayer)) {
+            map.removeLayer(mapLayer);
+        }
+        mapLayer = L.tileLayer('https://signposs1.oss-cn-shenzhen.aliyuncs.com/maps/' + data.map_id + '/zh_CN/{z}/{x}/{y}.jpg', params);
+        map.addLayer(mapLayer);
+        lastMapId = data.map_id;
+    }
+    if (warningMarker!==undefined && map.hasLayer(warningMarker)){
+        map.removeLayer(warningMarker);
+    }
+    warningMarker =L.marker([data.warning_lat,data.warning_lng], {
+        icon: pulsingIcon,
+    });
+
+    map.addLayer(warningMarker).panTo([data.warning_lat,data.warning_lng]);
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+
+    $('.viewBtn').bind('click',viewWarning);
+
+      socket.on('new_msg', function(msg){
+          console.log(msg);
+          msg = eval("("+msg+")");
+          if (msg.cmd==='warningUpdate'){
+              warningListJson[msg.context.warning_id] = msg.context;
+              console.log(msg.context);
+              $('#warningListTable tbody').append('<tr id="warning_'+msg.context.warning_id+'"><td style="text-align: left;width:1%" nowrap="" class="small">'+msg.context.warning_time+'</td><td nowrap="">等待救援</td><td nowrap style="width:1%"><button type="button" class="btn btn-info btn-xs viewBtn" data-id="'+msg.context.warning_id+'">{{"View"|_}}</button></td></tr>');
+              $('.viewBtn').unbind('click').bind('click',viewWarning);
+          }
+      });
+});
+
+</script>
+
+</body>
+</html>

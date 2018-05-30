@@ -1,0 +1,107 @@
+{{partial("layout/header")}}
+  <!-- Start: Content -->
+  <section id="content_wrapper">
+
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="/">{{"Dashboard"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div id="widget-dropdown" class="row">
+        {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+          {%if ((cpAclNew['resource']['doctor'] is defined) AND ('handle' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+          <div class="col-sm-3">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/handle';" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
+              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-user_add"><b></b></h2>
+              <h5 class="text-muted">{{"DoctorCreate"|_}}</h5>
+            </div>
+          </div>
+        </div>
+        {%endif%}
+            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('list' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+            <div class="col-sm-3">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/list';" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
+              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-group"><b></b></h2>
+              <h5 class="text-muted">{{"DoctorList"|_}}</h5>
+            </div>
+          </div>
+        </div>
+            {%endif%}
+            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('schedule' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+            <div class="col-sm-3">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
+              <h2 class="mt15 lh15 text-purple fa fa-calendar"><b></b></h2>
+              <h5 class="text-muted">{{"DoctorSchedule"|_}}</h5>
+            </div>
+          </div>
+        </div>
+            {%endif%}
+            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('job' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+            <div class="col-sm-3">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
+              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-certificate"><b></b></h2>
+              <h5 class="text-muted">{{"DoctorJob"|_}}</h5>
+            </div>
+          </div>
+        </div>
+        {%endif%}
+        {%endif%}
+        {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+        {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+        <div class="col-sm-3">
+          <div class="panel panel-overflow mb10">
+            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctordepartment/department';" style="cursor: pointer;">
+              <div class="icon-bg"><i class="glyphicons glyphicons-share text-info"></i></div>
+              <h2 class="mt15 lh15 text-info glyphicons glyphicons-building"><b></b></h2>
+              <h5 class="text-muted">{{"DoctorDepartmentInfo"|_}}</h5>
+            </div>
+          </div>
+        </div>
+            {%endif%}
+        {%endif%}
+      </div>
+  </section>
+  {{partial("layout/footer")}}
+
+<!-- Theme Javascript --> 
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function () {
+	 "use strict";
+     // Init Theme Core
+
+
+     $('.project').bind('click',function(){
+         $.ajax('/project/panel', {
+             data: {project_id:$(this).attr('data-id')},
+             type: 'post',
+             dataType: 'json',
+             success: function(data) {
+                 if (data.code===0){
+                     location.href= '/project/panel';
+                     return;
+                 }
+                 alert(data.msg);
+             },
+             error:function(){
+                 alert("验证异常，请刷新重试！");
+             },
+         });
+     });
+
+  });
+</script>
+</body>
+</html>

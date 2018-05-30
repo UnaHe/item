@@ -1,0 +1,419 @@
+{{partial("layout/header")}}
+<link rel="stylesheet" type="text/css" href="/client/daterangepicker.css">
+<style>
+.fa-edit{
+  cursor: pointer;
+}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"DoctorSchedule"|_}}</a></li>
+        </ol>
+      </div>
+      <div class="topbar-right pt30"><button type="button" class="btn btn-danger btn-sm updateEquipment">更新排班显示屏</button>
+      </div>
+
+    </div>
+    <div id="content">
+      <div class="row">
+      <div class="col-md-12" style="margin-bottom: 10px;"><form method="get">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control mtn" id="date" name="date" value="{{defaultDate}}" style="width:300px;">　<select class="multiselect" id="department_id" name="department_id">
+                    <option value="" selected="selected">请选择科室</option>
+                      {%for i in departmentList%}
+                      <option value="{{i['id']}}"{%if filter['department_id']==i['id']%} selected=""{%endif%}>{{i['item']}}</option>
+                      {%endfor%}
+                    </select>　<input class="btn btn-info btn-sm" data-style="expand-left" type="submit" value="查询">{%if doctorList is defined%}　<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#formModal">添加排班</button>{%endif%}
+                    </div></form>
+      </div>
+      <div class="col-md-12">
+      <div class="panel">
+            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-list-alt"></span> {{"DoctorSchedule"|_}} </span></div>
+            <div class="panel-body">
+              <table class="table table-hover table-bordered">
+              {%if times is defined%}
+                                     {%for k,i in times%}
+                                     <tr>
+                                     <td style="width: 200px;text-align: center;vertical-align: middle;>">{{k}}</td><td colspan="{{columes|length}}">
+                                     {%for t,s in i%}
+                                     <div class="fc-event fc-event-hori" style="background-color: rgb(149, 229, 231); border-color: rgb(149, 229, 231); width: 140px;color:#000;padding:6px;float: left" unselectable="on"><div class="fc-event-inner"><span class="fc-event-title" style="font-weight: bold;font-size: 14px;">{{s['name']}}</span></div>
+                                     {%for d in s['time']%}
+                                     <div class="fc-event-inner">{{d['times']}}　<i class="fa fa-edit" data-date='{{k}}' data-name="{{s['name']}}" data-times="{{d['times']}}" data-id="{{d['id']}}"></i>
+</div>
+                                     {%endfor%}</div>
+                                     {%endfor%}</td></tr>
+                                     {%endfor%}
+                                </tbody>{%endif%}
+              </table>
+            </div>
+          </div>
+          </div>
+        <button class="btn btn-info btn-gradient" data-toggle="modal" data-target="#alertModal" id="removeBtn" style="display: none"> Alert Modal </button>
+        <button class="btn bg-purple2 bg-gradient" data-toggle="modal" data-target="#formModal" id="addBtn" style="display: none"> Form Modal </button>
+        <button class="btn bg-purple2 bg-gradient" data-toggle="modal" data-target="#editFormModal" id="editBtn" style="display: none"> Form Modal </button>
+
+
+  </section>{%if doctorList is defined%}
+<div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa fa-lock pr5"></i> 添加排班 </div>
+      </div>
+      <div class="modal-body">
+        <form class="cmxform form-horizontal" id="scheduleForm" role="form" onsubmit="return false">
+        <div class="alert alert-theme" id="name">重复时间段将会合并</div>
+          <div class="form-group">
+                  <label class="col-md-2 control-label">医生　</label>
+                  <div class="col-md-12">
+                    <select class="multiselect" id="add_doctor_id">
+                    <option value="" selected="selected">请选择医生</option>
+                      {%for i in doctorList%}
+                      <option value="{{i['doctor_id']}}">{{i['doctor_name']}}</option>
+                      {%endfor%}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-2 control-label">时间段</label>
+                  <div class="col-md-12">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control mtn" id="newtimepicker" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="addEventSchedule()">增加</button>
+      </div>
+    </div>
+  </div>
+</div>{%endif%}
+
+<div class="modal fade" id="editFormModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="fa fa-lock pr5"></i> Schedule </div>
+      </div>
+      <div class="modal-body">
+        <form class="cmxform form-horizontal" role="form">
+          <div class="text-center" id="editTitle" style="font-size: 16px;font-weight: bold;"></div>
+          <div class="form-group">
+                  <label class="col-md-2 control-label">开始时间</label>
+                  <div class="col-md-10">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control timepicker mtn" name="timepicker" id="editTimepicker1" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-2 control-label">结束时间</label>
+                  <div class="col-md-10">
+                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                      <input type="text" class="form-control timepicker mtn" name="timepicker" id="editTimepicker2" style="width:100%;">
+                    </div>
+                  </div>
+                </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-gradient mr5 btn-xs" data-dismiss="modal" id="delScheduleBtn" data-id=""><i class="fa fa-times"></i> 删除 </button>　　　　　　　　　
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary"  id="subEditBtn" data-id="" data-date="">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{partial ("layout/footer")}}
+<!-- Page Plugins -->
+<script type="text/javascript" src="/client/moment.min.js"></script>
+<script type="text/javascript" src="/client/daterangepicker.js"></script>
+{{javascript_include('client/vendor/plugins/timepicker/bootstrap-timepicker.min.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: true,maxHeight: 320,buttonWidth:"300px"};
+function addEventSchedule(){
+  var doctor_id = $('#add_doctor_id').val();
+  var department_id = $('#department_id').val();
+  var times = $.trim($('#newtimepicker').val());
+  if (times=='' || doctor_id==''){
+    alert('请填写完整');
+    return;
+  }
+  $.ajax('/{{routerProjectId}}/doctor/schedule', {
+                data: {
+                  department_id: department_id,
+                  doctor_id: doctor_id,
+                  times:times,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data);
+                  alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                       location.reload();
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.btn').removeAttr('disabled');
+                }
+              })
+}
+function editEventSchedule(){
+  var id = $('#add_doctor_id').val();
+  var department_id = $('#department_id').val();
+  var times = $.trim($('#newtimepicker').val());
+  if (times=='' || doctor_id==''){
+    alert('请填写完整');
+    return;
+  }
+  $.ajax('/{{routerProjectId}}/doctor/schedule', {
+                data: {
+                  department_id: department_id,
+                  doctor_id: doctor_id,
+                  times:times,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data);
+                  alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                       location.reload();
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.btn').removeAttr('disabled');
+                }
+              })
+}
+var locale = {
+        "format": 'YYYY/MM/DD',
+        "separator": " - ",
+        "applyLabel": "确定",
+        "cancelLabel": "取消",
+        "weekLabel": "W",
+        "daysOfWeek": [
+            "日",
+            "一",
+            "二",
+            "三",
+            "四",
+            "五",
+            "六"
+        ],
+        "monthNames": [
+            "一月",
+            "二月",
+            "三月",
+            "四月",
+            "五月",
+            "六月",
+            "七月",
+            "八月",
+            "九月",
+            "十月",
+            "十一月",
+            "十二月"
+        ],
+        "firstDay": 1
+    };
+var localeRange = {
+        "format": 'YYYY/MM/DD HH:mm',
+        "separator": " - ",
+        "applyLabel": "确定",
+        "cancelLabel": "取消",
+        "weekLabel": "W",
+        "daysOfWeek": [
+            "日",
+            "一",
+            "二",
+            "三",
+            "四",
+            "五",
+            "六"
+        ],
+        "monthNames": [
+            "一月",
+            "二月",
+            "三月",
+            "四月",
+            "五月",
+            "六月",
+            "七月",
+            "八月",
+            "九月",
+            "十月",
+            "十一月",
+            "十二月"
+        ],
+        "firstDay": 1
+    };
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+
+    $('#delScheduleBtn').bind('click',function(){
+       var id = $(this).attr('data-id');
+       console.log(id);
+       if (id>0){
+        if (confirm('确定删除此排班计划？')){
+          $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="20" />').insertBefore($(this));
+      $('.btn').attr('disabled','disabled');
+      $.ajax('/{{routerProjectId}}/doctor/ajaxscheduledelete', {
+                data: {
+                  id: id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data);
+                  alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                       location.reload();
+                    }else{
+                      $('.btn').removeAttr('disabled');
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.loadImg').remove();
+                }
+              })
+        }
+
+       }
+    })
+
+    $('.timepicker').timepicker({
+                minuteStep: 1,
+                showInputs: false,
+                modalBackdrop: true,
+                disableFocus: true,
+                showMeridian: false,
+            });
+
+    $('.multiselect').multiselect(multiselectConfig);
+    $('#date').daterangepicker({
+    "timePicker24Hour": true,
+    locale: locale
+  });
+    $('#newtimepicker').daterangepicker({
+      timePicker:true,
+    "timePicker24Hour": true,
+    locale: localeRange
+  });
+    $('.fa-edit').bind('click',function(){
+      var _id = $(this).attr('data-id');
+      var _times = $(this).attr('data-times');
+      _times = _times.split(' - ');
+      $('#editTimepicker1').val(_times[0]);
+      $('#editTimepicker2').val(_times[1]);
+      $('#editTitle').html($(this).attr('data-name')+'<br />'+$(this).attr('data-date'));
+      $('#delScheduleBtn').attr('data-id',_id);
+      $('#subEditBtn').attr('data-id',_id);
+      $('#subEditBtn').attr('data-date',$(this).attr('data-date'));
+      $('#editBtn').trigger('click');
+    });
+
+    $('#subEditBtn').bind('click',function(){
+      var id=$(this).attr('data-id');
+      var date=$(this).attr('data-date');
+      var startTime = $.trim($('#editTimepicker1').val());
+      var endTime = $.trim($('#editTimepicker2').val());
+      var _startTime = moment(date +' '+startTime).unix();
+      var _endTime = moment(date +' '+endTime).unix();
+      if (_endTime<=_startTime){
+        alert('时间段不正确');
+        return;
+      }
+      $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="" />').insertBefore($(this));
+      $('.btn').attr('disabled','disabled');
+      $.ajax('/{{routerProjectId}}/doctor/ajaxscheduleupdate', {
+                data: {
+                  id: id,
+                  startTime: _startTime,
+                  endTime: _endTime,
+                  date:date,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data);
+                  alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                       location.reload();
+                    }else{
+                      $('.btn').removeAttr('disabled');
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.loadImg').remove();
+                }
+              })
+    });
+
+    $('.updateEquipment').bind('click',function(){
+      if (confirm("确定更新排班显示屏？")){
+        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="" />').insertBefore($(this));
+      $('.btn').attr('disabled','disabled');
+        $.ajax('/{{routerProjectId}}/doctor/ajaxscheduleequipmentupdate', {
+                data: {},
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data);
+                  alert(data.errmsg);
+                  $('.btn').removeAttr('disabled');
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                    $('.btn').removeAttr('disabled');
+                },
+                complete:function(){
+                  $('.loadImg').remove();
+                }
+              })
+      }
+    })
+});
+
+
+</script>
+
+</body>
+</html>

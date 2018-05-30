@@ -1,0 +1,89 @@
+{{partial("layout/header")}}
+<style type="text/css">
+.table td .small{
+  font-size: 12px;
+}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"polygonsortList"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel">
+            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-keys"></span> {{"polygonsortList"|_}} </span> <div class="topbar-right" style="margin-right: 10px;"> <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button"
+                              data-style="expand-left" id="sendToEquipment" style="margin: 5px 0 0 15px;"><span
+                    class="ladda-label"><i class="fa fa-send"></i> 推送至设备</span>
+            </button></div></div>
+            <div class="panel-body">
+              <table class="table table-hover">
+                <thead>
+                    <th nowrap="">{{'Name'|_}}</th>
+                                    <th nowrap="">时间段</th>
+                                    <th style="width:10%" nowrap="">操作</th>
+                </thead>
+                                <tbody>
+                                     {%for i in polygonSort['data']%}
+                                     <tr>
+                                         <td nowrap="">{{i['name']}} [ {{i['map_name']}} ] </td>
+                                         <td nowrap>{%if i['project_polygon_sort_endTime']>time()%}{{date("Y-m-d H:i",i['project_polygon_sort_startTime'])}} ~ {{date("Y-m-d H:i",i['project_polygon_sort_endTime'])}}{%else%}<span style="color: red;">已失效</span>{%endif%}</td>
+                                         <td nowrap>
+                      <button type="button" class="btn btn-default btn-xs editBtn" data-id="{{i['project_polygon_sort_id']}}">{{"edit"|_}}</button>
+                    </td>
+                                     </tr>
+                                     {%endfor%}
+                                </tbody>
+              </table>
+              <div>
+                    </div>
+
+            </div>
+          </div>
+
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: true,maxHeight: 320 , buttonWidth:'320px'};
+jQuery(document).ready(function () {
+   "use strict";
+    $('#map_id').multiselect(multiselectConfig);
+     // Init Theme Core
+    $('.editBtn').bind('click',function(){
+      var id = $(this).attr('data-id');
+      location.href = '/polygonsort/handle?id='+id;
+    });
+    $('#sendToEquipment').bind('click',function(){
+        if(confirm('确定更新设备排序？')) {
+            $.ajax('https://apiequipment.signp.cn/polygonsort', {
+                data: {project_id: '{{user["project_id"]}}'},
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.errcode == 0) {
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    // console.log(xhr.status, thrownError);
+                }
+            });
+        }
+    });
+});
+
+</script>
+
+</body>
+</html>

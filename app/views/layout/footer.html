@@ -1,0 +1,57 @@
+</div>
+<!-- End #Main --> 
+<!-- jQuery --> 
+{{javascript_include('client/vendor/jquery/jquery_ui/jquery-ui.min.js')}}
+{{javascript_include('client/vendor/bootstrap/js/bootstrap.min.js')}}
+{{javascript_include('client/js/json2.js')}}
+{{javascript_include('socket.io/socket.io-1.4.5.js')}}
+{{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/js/main.js')}}
+<script>
+		var socket = io('https://socket1.signp.cn');
+       socket.on('connect', function(){
+   	socket.emit('login', 'item|client|{{user["item_account_id"]}}');
+   });
+  //  socket.on('new_msg', function(msg){
+		// alert('有新的访客');
+		// location.href='/visit/list';
+  //  });
+$(document).ready(function(){
+    "use strict";
+    Core.init();
+    // Init Theme Core
+	$('#homePage').bind('click',function(){
+        $.ajax('/index/panel', {
+            data: {project_id:0},
+            type: 'post',
+            dataType: 'json',
+            success: function(data) {
+                if (data.code===0){
+                    location.href= '/';
+                }
+            },
+            error:function(){
+            },
+        });
+	});
+	$('#projectNow').bind('change',function(){
+        $.ajax('/index/panel', {
+            data: {project_id:this.value},
+            type: 'post',
+            dataType: 'json',
+            success: function(data) {
+                if (data.code===0){
+                    location.href= '/';
+                }
+            },
+            error:function(){
+            },
+        });
+    });
+    $('#projectNow').multiselect({enableFiltering: true,maxHeight: 220,buttonWidth:"400px"});
+});
+window.oncontextmenu = function () {
+    return false;
+};
+</script>

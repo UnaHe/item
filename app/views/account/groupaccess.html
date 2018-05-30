@@ -1,0 +1,133 @@
+{{partial("layout/header")}}
+<style>
+.conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"AccountGroupAccess"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{"AccountManage"|_}}</li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-file"></span> {{"AccountGroupAccess"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform">
+              <div class="form-group">
+              <label class="control-label">选择分组</label>
+                    <select class="form-control" id="editDepart">
+                    <option value="0"></option>
+                            {%for i in groupList%}
+                            <option value="{{i['client_group_id']}}"{%if filter['group_id']==i['client_group_id']%} selected=""{%endif%}>{{i['client_group_name']}}</option>
+                            {%endfor%}
+                    </select>
+                </div>
+                {%if resource is defined%}
+                {%for k,i in resource%}
+                <div class="form-group mb25">
+                  <label class="col-md-12 control-label">{{i['name']}}</label>
+                  <div class="col-md-12 pt5">
+                  {%for a in i['actions']%}
+                    <div class="cBox cBox-teal cBox-inline">
+                      <input type="checkbox" data-controller="{{k}}" id="{{k}}_{{a['action']}}" value="{{a['action']}}"{%if a['allowed']%} checked=""{%endif%}>
+                      <label for="{{k}}_{{a['action']}}">{{a['name']}}</label>
+                    </div>
+                    {%if a['bind'] is defined%}
+                    {%for b in a['bind']%}
+                    <input type="hidden" class="{{k}}_{{a['action']}}_bind" value="{{b}}">
+                    {%endfor%}
+                    {%endif%}
+                  {%endfor%}
+                  </div><br /><br /><br />
+                </div>
+                {%endfor%}
+                <div class="form-group">
+                  <input class="submit btn bg-purple pull-right" type="button" id="subBtn" value="{{"Submit"|_}}">
+                </div>
+                {%endif%}
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+
+function submitHandler(){
+            var groupId = $('#editDepart').val();
+            if (groupId==0){
+              alert('请选择分组!');
+              return;
+            }
+            var accessList = [];
+            $('input[type=checkbox]').each(function(){
+              if (this.checked){
+                var controller = $(this).attr('data-controller');
+              accessList.push({"controller":controller , "action":this.value})
+              $('.'+controller+'_'+this.value+'_bind').each(function(){
+                accessList.push({"controller":controller , "action":this.value})
+              })
+              }
+            })
+            if (accessList.length==0){
+              if (!confirm("确定不授予任何权限？")){
+                return
+              }
+            }
+            $('.btn').attr('disabled', 'disabled');
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/{{routerProjectId}}/account/groupaccess', {
+                data: {
+                    data: JSON.stringify(accessList),
+                    groupId: groupId,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                        location.reload();
+                    }else{
+                      $('.btn').removeAttr('disabled');
+                    }
+                },
+                error: function(data)
+                {
+                    alert('服务器错误');
+                    $('.btn').removeAttr('disabled');
+                },
+                complete:function(){
+                  $('#subLoading').remove();
+                }
+            });
+  return false;
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+    var depart = $('#editDepart');
+        depart.change(function(event)
+        {
+            depart.attr('disabled','disabled');
+            location.href='/{{routerProjectId}}/account/groupaccess?group_id='+depart.val();
+        });
+    $('#subBtn').bind('click',submitHandler);
+});
+
+</script>
+
+</body>
+</html>

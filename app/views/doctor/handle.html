@@ -1,0 +1,245 @@
+{{partial("layout/header")}}
+<style>
+.conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{%if details['doctor_id'] is defined%}{{"DoctorEdit"|_}}{%else%}{{"DoctorCreate"|_}}{%endif%}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{'DoctorManage'|_}}</li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-user_add"></span> {%if details['doctor_id'] is defined%}{{"DoctorEdit"|_}}{%else%}{{"DoctorCreate"|_}}{%endif%} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+              <input type="hidden" id="doctor_id" value="{%if details['doctor_id'] is defined%}{{details['doctor_id']}}{%endif%}" />
+              <div class="form-group">
+                  <label>{{"Photo"|_}}</label>
+                  <div style="margin: 6px;display: {%if details['doctor_photo'] is defined%}block{%else%}none{%endif%};" id="previewDiv"><a href="" target="_blank" id="previewImageUrl"><img src="" width="100" id="previewImage" /></a> <button type="button" class="btn btn-info btn-gradient btn-xs" style="margin-left: 30px;" onclick="removeImage()">remove image</button><input type="hidden" id="doctor_photo" value="">
+</div>
+                  <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
+                        <div class="progress-bar" role="progressbar" id="thumbnailProgress" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                      </div>
+                  <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()" >
+                </div>
+                <div class="form-group">
+                  <label>{{"DoctorName"|_}}</label>
+                  <input id="doctor_name" name="doctor_name" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details["doctor_name"]}}{%endif%}">
+                </div>
+                <div class="form-group">
+                  <label>{{"DoctorJobTitle"|_}}</label>
+                  <div class="col-md-13">
+                    <select class="multiselect single" id="job_id" required="">
+                      {%for i in jobList%}
+                      <option value="{{i['doctor_job_id']}}"{%if details['doctor_job_id'] is defined AND i['doctor_job_id']==details['doctor_job_id']%} selected{%endif%}>{{i['doctor_job_title']}}</option>
+                      {%endfor%}
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label>{{"DoctorDepartment"|_}}</label>
+                  <div class="col-md-13">
+                    <select class="multiselect" id="department_id" multiple="multiple" required="">
+                      {%for i in departmentList%}
+                      <option value="{{i['department_id']}}"{%if details is defined%} {{i['selected']}}{%endif%}>{{i['department_name']}}</option>
+                      {%endfor%}
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label>{{"Status"|_}}</label>
+                  <div class="col-md-13">
+                    <select class="multiselect single" id="status">
+                    {%for k,i in doctorStatusArray%}
+                    <option value="{{k}}"{%if details is defined AND k==details['doctor_status']%} selected{%endif%}>{{i}}</option>
+                    {%endfor%}
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label>{{"EntryTime"|_}} (请切换至英文输入状态)</label>
+                  <input id="entry_time" name="entry_time" type="text" class="form-control date" maxlength="10" autocomplete="off" value="{%if details is defined AND details['doctor_entry_time']%}{{date("Y/m/d",details['doctor_entry_time'])}}{%endif%}">
+                </div>
+                <div class="form-group">
+                  <label>{{"Intro"|_}}</label>
+                  <textarea id="doctor_intro" name="doctor_intro" required="">{%if details is defined%}{{details["doctor_intro"]}}{%endif%}</textarea>
+                </div>
+                <div class="form-group">
+                  <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+
+var multiselectConfig = {maxHeight: 220,buttonWidth:"200px"};
+function UpLoadFile() {
+        var xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('text/plain; charset=utf-8');
+        // FormData 对象
+        var formData = new FormData();
+        var files = document.getElementById('thumbnail').files;
+        if (files[0] ==undefined){
+            alert("No file chosen")
+            return;
+        }
+        var totalBytes = files[0].size;
+        // $("#userfile").attr("disabled","disabled");
+        $("#thumbnail").attr("disabled","disabled");
+
+        formData.set('part', 'doctor_photo');
+        formData.set('Filedata', files[0]);
+        // XMLHttpRequest 对象
+        xhr.upload.onprogress = function (ev) {
+            var percent = 0;
+            if (ev.lengthComputable) {
+                percent = parseInt(100 * ev.loaded / ev.total);
+                $("#thumbnailProgress").width(percent + "%");
+            }
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState==4){
+            if (xhr.status == 200) {
+              $("#previewImage").attr("src" , xhr.responseText);
+              $("#previewImageUrl").attr("href" , xhr.responseText);
+              $("#doctor_photo").val(xhr.responseText);
+              $("#previewDiv").show();
+              // fileInput.replaceWith(fileInput.val('').clone(true));
+            }else{
+              alert(xhr.responseText)
+            }
+        }
+        $("#thumbnailProgress").width("0%");
+        $('#thumbnail').removeAttr("disabled");
+        }
+        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
+        xhr.send(formData);
+    }
+    function removeImage(){
+       $("#previewImage").attr("src" , "");
+       var fileInput = $('#thumbnail');
+      fileInput.replaceWith(fileInput.val('').clone(true));
+      $("#previewImageUrl").attr("href" , '');
+       $("#previewDiv").hide();
+    }
+function submitHandler(){
+        var doctor_intro = $.trim(CKEDITOR.instances['doctor_intro'].getData());
+        var doctor_id      = parseInt($('#doctor_id').val()),
+            doctor_name     = $.trim($('#doctor_name').val()),
+            department_id = $('#department_id').val(),
+            job_id        = $.trim($('#job_id').val()),
+            thumbnail        = $.trim($('#doctor_photo').val()),
+            entry_time        = $.trim($('#entry_time').val()),
+            status        = $('#status').val();
+            if (!job_id){
+              alert('请选择职称');
+              return false;
+            }
+            $('#subBtn').attr('disabled', 'disabled');
+            $('#subLoading').remove();
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/{{routerProjectId}}/doctor/handle', {
+                data: {
+                  doctor_id      : doctor_id,
+                  doctor_name     : doctor_name,
+                  department_id : department_id.join(','),
+                  job_id    : job_id,
+                  doctor_intro   : doctor_intro,
+                  doctor_photo    : thumbnail,
+                  entry_time    : entry_time,
+                  status    : status,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data)
+                    alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                        location.replace('/{{routerProjectId}}/doctor/list');
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#subBtn').removeAttr('disabled');
+                  $('#subLoading').remove();
+                }
+            });
+            return false;
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+    var baseImageUrl = '{{url.getStaticBaseUri()}}';
+    {%if details is defined%}
+    $('#doctor_id').val('{{details["doctor_id"]}}');
+    $('#status').val('{{details["doctor_status"]}}');
+    {%if details["doctor_photo"]%}
+    {%if details['doctor_photo_source']=='locale'%}
+    baseImageUrl = '/';
+    {%endif%}
+              $("#previewImageUrl").attr("href" , baseImageUrl+'{{details["doctor_photo"]}}');
+              $("#previewDiv").show();
+              $('#previewImage').attr('src',baseImageUrl+'{{details["doctor_photo"]}}');
+              $('#doctor_photo').val('{{details["doctor_photo"]}}');
+    {%endif%}
+    {%endif%}
+    $('#department_id').multiselect({
+    includeSelectAllOption: false
+  });
+    $.validator.addMethod("needsSelection", function(value, element) {
+        return $(element).multiselect("getChecked").length > 0;
+    });
+
+   var validator = $("#altForm").validate({
+      submitHandler:submitHandler,
+    ignore: ':hidden:not("#department_id")',
+    rules: {
+      department_id: "required needsSelection",
+                doctor_intro: {
+                    required: function() 
+                    {
+                    CKEDITOR.instances.doctor_intro.updateElement();
+                    }
+                    }
+                },
+                errorPlacement: function(error, element) 
+                {
+                    if (element.attr("name") == "doctor_intro") 
+                   {
+                    error.insertAfter("textarea#doctor_intro");
+                    } else {
+                    error.insertAfter(element);
+                    }
+                }
+            });
+    CKEDITOR.replace( 'doctor_intro');
+    $('.single').multiselect(multiselectConfig);
+    $('#entry_time').mask('9999/99/99');
+});
+
+</script>
+
+</body>
+</html>

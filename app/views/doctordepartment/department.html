@@ -1,0 +1,191 @@
+{{partial("layout/header")}}
+<style>
+.conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"DoctorDepartmentManage"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{"DoctorDepartmentManage"|_}}</li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-file"></span> {{"DoctorDepartmentManage"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+              <div class="form-group">
+              <label class="control-label">要编辑的科室 </label><p align="right" style="display: none;" id="delDepartment"><input class="btn btn-danger pull-right btn-xs" type="button" id="delBtn" value="{{"Delete"|_}}"></p>
+                    <select class="form-control" id="editDepart" class="col-md-10">
+                    <option value="0"></option>
+                            {%for i in departmentList%}
+                            <option value="{{i['id']}}">{{i['item']}}</option>
+                            {%endfor%}
+                    </select>
+                </div>
+                <div class="alert alert-danger">不选择编辑的科室则为添加科室!</div>
+                <div class="form-group">
+              <label class="control-label">{{'MapName'|_}} </label>
+                    <select class="form-control" id="map_id" class="col-md-10" required="">
+                    <option value="0"></option>
+                            {%for i in mapList%}
+                            <option value="{{i['map_id']}}">{{i['map_name']}}</option>
+                            {%endfor%}
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label class="control-label">{{"DoctorDepartmentName"|_}}</label>
+                  <input id="name" name="name" type="text" class="form-control" autocomplete="off" required="">
+                </div>
+                <div class="form-group">
+              <label class="control-label">上级科室</label>
+                    <select class="form-control" id="pid">
+                    <option value="0" selected="">---</option>
+                            {%for i in departmentList%}
+                            <option value="{{i['id']}}">{{i['item']}}</option>
+                            {%endfor%}
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label>{{"Intro"|_}}</label>
+                  <textarea id="intro" name="intro" required=""></textarea>
+                </div>
+                <div class="form-group">
+                  <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/js/utility/spin.min.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: true,maxHeight: 220,buttonWidth:"200px"};
+function submitHandler(){
+  var name = $.trim($('#name').val());
+            var department_id = $('#editDepart').val();
+            var map_id = $('#map_id').val();
+            var pid = $('#pid').val();
+            pid = pid == ''?0:pid;
+            var intro = $.trim(CKEDITOR.instances['intro'].getData());
+            $('.btn').attr('disabled','disabled');
+             $('select').attr('disabled','disabled');
+            $('<img src="{{url.getStaticBaseUri()}}oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/{{routerProjectId}}/doctordepartment/department', {
+                data: {
+                    name: name,
+                    department_id: department_id,
+                    pid: pid,
+                    intro: intro,
+                    map_id: map_id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                        location.reload();
+                    }
+                },
+                error: function(data)
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#subLoading').remove();
+                  $('.btn').removeAttr('disabled');
+                  $('select').removeAttr('disabled');
+                }
+            });
+  return false;
+}
+var cateList = {{cates}};
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+
+    $("#sort_order").spinner({
+      min: 0,
+      max: 2500,
+      step: 1,
+      start: 0,
+      //numberFormat: "C"
+    });
+
+
+    $('#altForm').validate({submitHandler:submitHandler,ignore: []});
+    var depart = $('#editDepart');
+        depart.change(function(event)
+        {
+            // Values
+            var _deparmentId = this.value;
+            $('#delDepartment').hide().unbind('click');
+            if (_deparmentId == 0) {
+                $('#altForm')[0].reset();
+                $('.btn').removeAttr('disabled');
+                $('select').removeAttr('disabled');
+                CKEDITOR.instances['intro'].setData('')
+                return false;
+            }
+
+            $('#delDepartment').css('display','inline').bind('click',function(){
+              if (confirm('删除 '+cateList[_deparmentId]['name'] +' ? 其科室医生将处于无科室状态!')){
+                $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" width="20" id="delLoading" />').insertAfter($(this));
+                $('.btn').attr('disabled','disabled');
+                $('select').attr('disabled','disabled');
+                $.ajax('/{{routerProjectId}}/doctordepartment/ajaxdeletedepartment', {
+                data: {
+                    department_id: _deparmentId,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                        location.reload();
+                    }
+                },
+                error: function(data)
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#delLoading').remove();
+                  $('.btn').removeAttr('disabled');
+                  $('select').removeAttr('disabled');
+                }
+            });
+              }
+            });
+            $('#name').val(_deparmentId > 0 ? cateList[_deparmentId]['name'] : '');
+            $('#pid').val(_deparmentId > 0 ? cateList[_deparmentId]['pid'] : 0);
+            $('#map_id').val(_deparmentId > 0 ? cateList[_deparmentId]['map_id'] : 0);
+            $('#intro').val(_deparmentId !='' ? CKEDITOR.instances['intro'].setData(cateList[_deparmentId]['intro']) : '');
+        });
+        CKEDITOR.replace( 'intro');
+    // $('.multiselect').multiselect(multiselectConfig);
+
+});
+
+</script>
+
+</body>
+</html>

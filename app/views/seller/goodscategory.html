@@ -1,0 +1,111 @@
+{{partial("layout/header")}}
+<style>
+    .conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active"><a href="#">商家主营类别</a></li>
+                <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+                <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+                <li class="crumb-trail">类别管理</li>
+            </ol>
+        </div>
+    </div>
+    <div id="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-file"></span> 商家主营类别 </span> </div>
+                    <div class="panel-body">
+                        <form class="cmxform" id="altForm">
+                            <div class="form-group">
+                                <label class="control-label">要编辑的类别</label>
+                                <select class="form-control" id="editDepart">
+                                    <option value="0"></option>
+                                    {%for i in GoodsCategoryList%}
+                                    <option value="{{i['goods_category_id']}}">{{i['goods_name']}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                            <div class="alert alert-danger">不选择编辑的类别则为添加类别!</div>
+                            <div class="form-group">
+                                <label class="control-label">商家类别</label>
+                                <input id="name" name="name" type="text" class="form-control" autocomplete="off" required="">
+                            </div>
+                            <div class="form-group">
+                                <input class="submit btn bg-purple pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+    function submitHandler(){
+        var goods_name = $.trim($('#name').val());
+        var goods_category_id = $('#editDepart').val();
+        $('#subBtn').attr('disabled','disabled');
+        $('#subBtn').parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="20" />');
+        $.ajax('/{{routerProjectId}}/seller/goodscategory', {
+            data: {
+                goods_category_id: goods_category_id,
+                goods_name: goods_name,
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function(data)
+            {
+                if (data.errcode == 0)
+                {
+                    alert('操作成功');
+                    location.reload();
+                }
+                else
+                {
+                    alert(data.errmsg);
+                }
+                $('#subBtn').removeAttr('disabled');
+                $('.loadImg').remove();
+            },
+            error: function(data)
+            {
+                alert('服务器错误');
+                $('#subBtn').removeAttr('disabled');
+                $('.loadImg').remove();
+            }
+        });
+        return false;
+    }
+    var GoodsCategoryListJson = {{GoodsCategoryListJson}};
+    jQuery(document).ready(function () {
+        "use strict";
+        // Init Theme Core
+        Core.init();
+
+        $('#altForm').validate({submitHandler:submitHandler,ignore: ''});
+        var depart = $('#editDepart');
+        depart.change(function(event)
+        {
+            // Values
+            if (this.value == 0) {
+                $('#altForm')[0].reset();
+                return false;
+            }
+            $('#name').val(this.value > 0 ? GoodsCategoryListJson[this.value]['goods_name'] : '');
+        });
+        // $('.multiselect').multiselect(multiselectConfig);
+
+    });
+
+</script>
+
+</body>
+</html>

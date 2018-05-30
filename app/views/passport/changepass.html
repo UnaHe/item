@@ -1,0 +1,94 @@
+{{partial("layout/header")}}
+<style>
+    .conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active"><a href="#">修改密码</a></li>
+        </div>
+    </div>
+    <div id="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <span class="panel-title">
+                            <span class="glyphicons glyphicons-user_add"></span>
+                            修改密码
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <form class="cmxform" id="altForm">
+                            <div class="form-group">
+                                <label>原密码</label>
+                                <input id="old_pass" name="old_pass" type="password" class="form-control" autocomplete="off" required minlength="6" >
+                            </div>
+                            <div class="form-group">
+                                <label>新密码</label>
+                                <input id="new_pass" name="new_pass" type="password" class="form-control" autocomplete="off" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label>确认密码</label>
+                                <input id="comfirm_pass" name="comfirm_pass" type="password" class="form-control" autocomplete="off" required minlength="6" equalTo="#new_pass">
+                            </div>
+                            <div class="form-group">
+                              <input class="submit btn btn-info pull-right" type="submit" id="subBtn"  value="{{"Submit"|_}}">
+                            </div>
+                      </form>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+    function submitHandler(){
+        var old_pass      = $.trim($('#old_pass').val()),
+            new_pass     = $.trim($('#new_pass').val());
+            $('#subBtn').attr('disabled', 'disabled');
+            $('#subLoading').remove();
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/passport/changepass', {
+                data: {
+                    old_pass      : old_pass,
+                    new_pass     : new_pass
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.msg);
+                    if (data.code == 0)
+                    {
+                        location.href = "/passport/logout";
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#subBtn').removeAttr('disabled');
+                  $('#subLoading').remove();
+                }
+            });
+            return false;
+    }
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+    $('#altForm').validate({submitHandler:submitHandler,ignore: []});
+});
+
+</script>
+
+</body>
+</html>

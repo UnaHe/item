@@ -1,0 +1,88 @@
+{{partial("layout/header")}}
+<style>
+  .equipmentEdit{cursor: pointer;}
+</style>
+<script type="text/javascript" src="/client/pagers.js"></script>
+<section id="content_wrapper">
+  <div id="topbar">
+    <div class="topbar-left">
+      <ol class="breadcrumb">
+        <li class="crumb-active"><a href="/equipment/infrared">{{'infraredList'|_}}</a></li>
+        <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+        <li class="crumb-link"><a href="/">{{"projectList"|_}}</a></li>
+        <li class="crumb-trail">{{"equipmentManage"|_}}</li>
+      </ol>
+    </div>
+  </div>
+  <div id="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel invoice-panel">
+          <div class="panel-heading panel-visible"> <span class="panel-title"> <span class="glyphicons glyphicons-show_big_thumbnails"></span> {{'infraredList'|_}}</span>
+          </div>
+          <div class="panel-body pn" id="invoice-item">
+            <div class="col-md-12 va-m p30">
+              <div class="row" id="invoice-info">
+                {%for i in equipment['data']%}
+                <div class="col-md-2">
+                  <div class="panel panel-alt">
+                    <div class="panel-heading"> <span class="panel-title"> <i class="glyphicons glyphicons-ipad"></i></span>
+                      <div class="panel-btns pull-right ml10"><button type="button" class="btn btn-xs btn-danger btn-gradient mr5 equipmentUpdate" data-id="{{i['equipment_id']}}">更新设备</button>  </div>
+                    </div>
+                    <div class="panel-body">
+                      
+                        <img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="200">
+                        <address>
+                        <strong>{{i['equipment_remark']}}</strong><br><br>
+                        <abbr title="{{i['equipment_code']}}">{{i['equipment_code']}}</abbr>
+                        <br><br>
+                        <button type="button" class="btn btn-xs btn-default btn-gradient mr5 equipmentEdit" data-id="{{i['equipment_id']}}"> <i class="fa fa-edit pr5"></i> 编辑设备</button><br><br><button type="button" class="btn btn-xs btn-default btn-gradient mr5 equipmentAreaEdit" data-id="{{i['equipment_id']}}"> <i class="fa fa-edit pr5"></i> 编辑点击区域</button>
+                      </address>
+                    </div>
+                  </div>
+                </div>
+                {%endfor%}
+              </div>
+            </div>
+            <script language="JavaScript">
+                var pg = new showPages('pg');pg.pageCount = {{equipment['pageCount']}};pg.printHtml();
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+    $(document).ready(function(){
+        $('.equipmentEdit').bind('click',function(){
+            location.href='/equipment/infraredhandle?id='+$(this).attr('data-id');
+        })
+
+        $('.equipmentAreaEdit').bind('click',function(){
+            location.href='/equipment/infraredareahandle?id='+$(this).attr('data-id');
+        })
+
+        $('.equipmentUpdate').bind('click',function(){
+            if (confirm('确定更新此设备信息？')){
+                $('.btn').attr('disabled','disabled');
+                $.ajax('/equipment/ajaxequipmentupdate', {
+                    data: {id:$(this).attr('data-id')},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(data)
+                    {
+                        alert(data.msg);
+                        $('.btn').removeAttr('disabled');
+                    },
+                    error: function()
+                    {
+                        alert('推送失败，请重试');
+                        $('.btn').removeAttr('disabled');
+                    },
+                });
+            }
+        });
+    });
+</script>
+{{partial("layout/footer")}}

@@ -1,0 +1,114 @@
+{{partial("layout/header")}}
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{%if categoryDetails is defined%}{{categoryDetails['name']}}{%else%}{{"ArticleList"|_}}{%endif%}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          {%if categoryDetails is defined%}<li class="crumb-trail">{{"ArticleList"|_}}</li>{%endif%}
+        </ol>
+      </div>
+      <div class="topbar-right pt30"><button type="button" class="btn btn-success btn-sm updateEquipment" onclick="location.href='/{{routerProjectId}}/article/handle{%if categoryDetails is defined%}?article_category_id={{categoryDetails['article_category_id']}}{%endif%}';">添加文章</button>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel">
+            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-list-alt"></span> {%if categoryDetails is defined%}{{categoryDetails['name']}}{%else%}{{"ArticleList"|_}}{%endif%} </span> <div class="topbar-right" style="margin-right: 10px;">
+      <select class="multiselect" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/{{routerProjectId}}/article/list?article_category_id='+this.value;">
+                    <option value="">全部文章</option>
+                      {%for i in articleCategory%}
+                      <option value="{{i['id']}}"{%if filter['article_category_id']==i['id']%}  selected="selected"{%endif%}>{{i['item']}}</option>
+                      {%endfor%}
+                    </select>
+      </div></div>
+            <div class="panel-body">
+              <table class="table table-hover">
+                <thead>
+                                    <th style="text-align: left">标题</th>
+                                    <th style="width:1%" nowrap="">分类</th>
+                                    <th style="width:1%" nowrap="">状态</th>
+                                    <th style="width:1%" nowrap="">发布时间</th>
+                                    <th style="width:1%" nowrap="">语言</th>
+                                    <th style="width:1%" nowrap="">操作</th>
+                </thead>
+                                <tbody>
+                                     {%for i in list%}
+                                     <tr id="article_{{i['article_id']}}">
+                                         <td style="text-align: left">{{i['article_title']}}</td>
+                                         <td nowrap="">{{i['cate_name']}}</td>
+                                         <td nowrap>
+                                          {%if i['article_status']==1%}<span class="label label-success">发布</span>
+                      {%elseif i['article_status']==0%}<span class="label label-default">关闭</span>
+                      {%endif%}
+                     </td>
+                                         <td nowrap>{{date("Y-m-d",i['article_create_at'])}}</td>
+                                         <td nowrap>{%if i['article_locale']=='zh_CN'%}中文{%elseif i['article_locale']=='en_US'%}English{%endif%}</td>
+                                         <td nowrap>
+                      <button type="button" class="btn btn-info btn-gradient btn-xs" onclick="location.href ='/{{routerProjectId}}/article/handle?article_id={{i['article_id']}}';">{{"Edit"|_}}</button><button type="button" class="btn btn-default btn-gradient btn-xs deleteBtn" data-id="{{i['article_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                    </td>
+                                     </tr>
+                                     {%endfor%}
+                                </tbody>
+              </table>
+            </div>
+          </div>
+
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
+<script type="text/javascript">
+function deleteArticle(id){
+  console.log('deleteArticle:',id)
+  $('.btn').attr('disabled','disabled');
+  $.ajax('/{{routerProjectId}}/article/ajaxdelete', {
+                data: {
+                  article_id:id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                  console.log(data)
+                    if (data.errcode == 0)
+                    {
+                        $('#article_'+id).remove()
+                    }else{
+                      alert(data.errmsg);
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.btn').removeAttr('disabled');
+                }
+            });
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+
+    $('.deleteBtn').each(function(){
+      $(this).on('click',function(){
+        if (confirm("确定要删除此文章？")){
+          $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" width="20" />');
+          deleteArticle($(this).attr('data-id'))
+        }
+      });
+    })
+
+});
+
+</script>
+
+</body>
+</html>

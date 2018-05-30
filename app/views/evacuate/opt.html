@@ -1,0 +1,88 @@
+{{partial("layout/header")}}
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"evacuateOpt"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-lock"></span> {{"evacuateOpt"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+                  <div class="form-group">
+                      <label> 情况说明 </label>
+                      <input type="text" class="form-control postData" id="remark" value="紧急通知：女士们先生们，现在医院发生火警，请您从最近的消防通道疏散到一楼，请不要乘坐电梯，听从医院服务人员的指挥，感谢您的配合！">
+                  </div>
+                <div class="form-group">
+                  <label> 请输入密码 </label>
+                  <input type="password" class="form-control postData" id="evacutePass">
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button"
+                          data-style="expand-left" id="subBtn"><span
+                          class="ladda-label"><i class="fa fa-share"></i> {{'push'|_}}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+
+function submitHandler(){
+    var postData = {
+        evacutePass:$.trim($('#evacutePass').val()),
+        remark:$.trim($('#remark').val()),
+    };
+    if (postData.evacutePass===''){
+        alert('请填写密码!');
+        return false;
+    }
+    var _text = '确定紧急疏散？';
+    if (1=='{{user["projectDetails"]["project_emergency_evacuation"]}}'){
+        _text = '确定撤销紧急疏散？';
+    }
+    if (confirm(_text)){
+        var l = Ladda.create(document.querySelector('#' + this.id));
+        l.start();
+        $.ajax('/evacuate/opt', {
+            data: postData,
+            type: 'post',
+            dataType: 'json',
+            success: function(data)
+            {
+                alert(data.msg);
+                if (data.code == 0 ){
+                    location.href='/';
+                }
+                l.stop();
+            },
+            error: function()
+            {
+                alert('推送失败，请重试');
+                l.stop();
+            },
+        });
+    }
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    $('#subBtn').bind('click',submitHandler);
+
+});
+
+</script>
+
+</body>
+</html>

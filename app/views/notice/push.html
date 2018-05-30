@@ -1,0 +1,120 @@
+{{partial("layout/header")}}
+<style>
+.preview{width: 100%}
+.preview span{
+  text-align: center;
+  margin:6px;
+}
+.preview span img{
+  margin-top: 6px;
+  width:100px;
+}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"NoticePush"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-link"><a href="#">{{"NoticeManage"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-message_new"></span> {{"NoticePush"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+                <div class="form-group">
+                  <label for="content_cn">内容</label>
+                  <textarea id="content_cn" name="content_cn" type="text" class="form-control postData" rows="6" required="">{{noticeDetails['notice_content_zh_CN']}}</textarea>
+                </div>
+                <div class="form-group">
+                  <label>{{"NoticeLevel"|_}}</label>
+                  <div class="col-md-13">
+                    <select class="multiselect postData" id="level">
+                    <option value="3">临时信息</option>
+                    <option value="1">紧急信息</option>
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label> {{'NoticeTimeout'|_}} </label><span style="margin-left: 30px;">(单位：秒)</span>
+                  <input type="text" class="form-control postData" id="notice_timeout" maxlength="10" value="10" autocomplete="off" required="">
+                </div>
+                <div class="form-group mb25">
+                  <div class="col-md-12 pt5">
+                    <div class="cBox cBox-teal cBox-inline">
+                      <input type="checkbox" id="toMobile" value="" checked>
+                      <label for="toMobile" style="color:#000;font-size:14px;">同时推送至全部移动端</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button"
+                          data-style="expand-left" id="subBtn"><span
+                          class="ladda-label"><i class="fa fa-share"></i> {{'push'|_}}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: true,maxHeight: 320,buttonWidth:"400px"};
+
+function submitHandler(){
+    var postData = {};
+    $('.postData').each(function(){
+        postData[this.id] = $.trim(this.value);
+    });
+    if (postData.content_cn===''){
+        alert('请填写推送内容!')
+        return false;
+    }
+    postData.toMobile = $('#toMobile').prop('checked')?1:0;
+    if (confirm('确定推送信息？')){
+        var l = Ladda.create(document.querySelector('#' + this.id));
+        l.start();
+        $.ajax('/notice/push', {
+            data: postData,
+            type: 'post',
+            dataType: 'json',
+            success: function(data)
+            {
+                alert(data.msg);
+                if (data.code == 0 ){
+                    location.href='/notice/log';
+                }
+                l.stop();
+            },
+            error: function()
+            {
+                alert('推送失败，请重试');
+                l.stop();
+            },
+        });
+    }
+}
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    $('#subBtn').bind('click',submitHandler);
+    $('#level').multiselect(multiselectConfig);
+
+});
+
+</script>
+
+</body>
+</html>

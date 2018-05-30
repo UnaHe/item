@@ -1,0 +1,115 @@
+{{partial("layout/header")}}
+<style type="text/css">
+.table td .small{
+  font-size: 12px;
+}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"AccountList"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel">
+            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-keys"></span> {{"AccountList"|_}} </span> </div>
+            <div class="panel-body">
+              <table class="table table-hover">
+                <thead>
+                    <th style="width:1%" nowrap=""></th>
+                    <th style="width:1%" nowrap="">{{'Name'|_}}</th>
+                    <th style="width:1%" nowrap="">{{'NickName'|_}}</th>
+                                    <th style="width:1%" nowrap="">分组</th>
+                                    <th style="width:1%" nowrap="">状态</th>
+                                    <th style="width:1%" nowrap="">创建时间</th>
+                                    <th style="width:1%" nowrap="">操作</th>
+                </thead>
+                                <tbody>
+                                     {%for i in accountList%}
+                                     <tr>
+                                     <td nowrap="" class="small">{%if i['client_image']%}<img src="{{i['client_image']}}" width="50" />{%endif%} </td>
+                                         <td nowrap=""><input type="text" value="{{i['client_realname']}}" id="name_{{i['client_wx_openid']}}" /> </td>
+                                         <td nowrap="" class="small">{{i['client_name']}} </td>
+                                         <td nowrap=""><select class="multiselect" id="group_{{i['client_wx_openid']}}">
+                      {%for g in groupList%}
+                      <option value="{{g['client_group_id']}}"{%if i['client_group_id']==g['client_group_id']%}  selected="selected"{%endif%}>{{g['client_group_name']}}</option>
+                      {%endfor%}
+                    </select></td>
+                                         <td nowrap>
+                                         <select class="multiselect" id="status_{{i['client_wx_openid']}}">
+                      <option value="1"{%if i['client_status']==1%}  selected="selected"{%endif%}>正常</option>
+                      <option value="0"{%if i['client_status']==0%}  selected="selected"{%endif%}>禁用</option>
+                    </select>
+                     </td>
+                                         <td nowrap class="small">{{date("Y-m-d H:i",i['client_create_at'])}}</td>
+                                         <td nowrap>
+                      <button type="button" class="btn btn-default btn-xs editBtn" data-id="{{i['client_wx_openid']}}">{{"Edit"|_}}</button>
+                    </td>
+                                     </tr>
+                                     {%endfor%}
+                                </tbody>
+              </table>
+              <div>
+                    </div>
+
+            </div>
+          </div>
+
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var multiselectConfig = {enableFiltering: false,maxHeight: 320};
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+    $('.multiselect').multiselect(multiselectConfig);
+    $('.editBtn').bind('click',function(){
+      var openid = $(this).attr('data-id');
+      var name = $.trim($('#name_'+openid).val());
+      var group_id = $('#group_'+openid).val()
+      var status = $('#status_'+openid).val()
+      if (name==''){
+        alert('请填写名称');
+        return;
+      }
+      if (confirm('确定编辑人员？')){
+        $('.btn').attr('disabled','disabled');
+        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="20" />').insertBefore($(this));
+        $.ajax('/{{routerProjectId}}/account/ajaxhandle', {
+                                    data: {
+                                        openid:openid,
+                                        name:name,
+                                        group_id:group_id,
+                                        status:status,
+                                    },
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function(data) {
+                                           alert(data.errmsg);
+                                    },
+                                    complete: function() {
+                                      $('.btn').removeAttr('disabled');
+                                      $('.loadImg').remove();
+                                    }
+                                });
+      }
+    })
+});
+
+</script>
+
+</body>
+</html>

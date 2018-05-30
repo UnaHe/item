@@ -1,0 +1,110 @@
+{{partial("layout/header")}}
+<script type="text/javascript" src="/console/pagers.js"></script>
+<section id="content_wrapper">
+    <div id="topbar">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active"><a href="#">{{"ScenicEvents"|_}}</a></li>
+                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
+                        class="glyphicon glyphicon-home"></span></a></li>
+                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
+                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
+            </ol>
+        </div>
+        <div class="topbar-right pt30">
+            <button type="button" class="btn btn-success btn-sm updateEquipment"
+                    onclick="location.href='/{{routerProjectId}}/scenic/eventshandle';">添加活动
+            </button>
+        </div>
+    </div>
+    <div id="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel">
+                    <div class="panel-heading"><span class="panel-title"> <span
+                            class="glyphicon glyphicon-list-alt"></span> {{"ScenicEvents"|_}} </span>
+                        <div class="topbar-right" style="margin-right: 10px;">
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-hover">
+                            <thead>
+                            <th style="width:1%" nowrap="">活动时间</th>
+                            <th style="text-align: left" nowrap="">活动名称</th>
+                            <th style="width:1%" nowrap="">地点</th>
+                            <th style="width:1%" nowrap="">操作</th>
+                            </thead>
+                            <tbody>
+                            {%for i in projectEvents['data']%}
+                            <tr id="events_{{i['project_events_id']}}">
+                                <td style="text-align: left" nowrap="" class="small">{{date("Y-m-d H:i",i['project_events_time_start'])}} - {{date("Y-m-d H:i",i['project_events_time_end'])}}</td>
+                                <td nowrap="">{{i['project_events_theme']}}{%if i['project_events_theme_en']%}{{i['project_events_theme_en']}}{%endif%}</td>
+                                <td nowrap="">{{i['map_polygon_name']}}</td>
+                                <td nowrap>
+                                    <button type="button" class="btn btn-info btn-gradient btn-xs"
+                                            onclick="location.href ='/{{routerProjectId}}/scenic/eventshandle?id={{i['project_events_id']}}';">
+                                        {{"Edit"|_}}
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-xs deleteBtn ladda-button"
+                                            data-id="{{i['project_events_id']}}" id="deleteBtn_{{i['project_events_id']}}"
+                                            style="margin-left: 10px" data-style="expand-left"><span
+                                            class="ladda-label">{{"Delete"|_}}</span></button>
+                                </td>
+                            </tr>
+                            {%endfor%}
+                            </tbody>
+                        </table>
+                        <script language="JavaScript">
+                            var pg = new showPages('pg');pg.pageCount = {{projectEvents['pageCount']}};pg.printHtml();
+                        </script>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
+<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        "use strict";
+        // Init Theme Core
+        Core.init();
+
+        $('.deleteBtn').each(function () {
+            $(this).on('click', function () {
+                if (confirm("确定要删除此活动？")) {
+                    var id = $(this).attr('data-id');
+                    var l = Ladda.create(document.querySelector('#' + this.id));
+                    l.start();
+                    $.ajax('/{{routerProjectId}}/scenic/eventsdelete', {
+                        data: {
+                            id: id,
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (data) {
+                            alert(data.errmsg);
+                            if (data.errcode == 0) {
+                                $('#events_' + id).remove();
+                            }
+                            l.stop();
+                        },
+                        error: function () {
+                            alert('服务器错误');
+                            l.stop();
+                        },
+                    });
+                }
+            });
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

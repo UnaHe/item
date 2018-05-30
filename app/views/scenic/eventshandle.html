@@ -1,0 +1,289 @@
+{{partial("layout/header")}}
+<link rel="stylesheet" type="text/css" href="/client/daterangepicker.css">
+<style>
+    .conditionalPart {
+        display: none
+    }
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active"><a href="#">{{"ScenicEventsHandle"|_}}</a></li>
+                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
+                        class="glyphicon glyphicon-home"></span></a></li>
+                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
+                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
+            </ol>
+        </div>
+    </div>
+    <div id="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel">
+                    <div class="panel-body">
+                        <form class="cmxform" id="altForm">
+                            <div class="form-group">
+                                <label>{{"ScenicEventsName"|_}} </label>
+                                <input id="title" name="title" type="text" class="form-control" autocomplete="off" required="" value="{{projectEventsDetails['project_events_theme']}}">
+                            </div>
+                            <div class="form-group">
+                                <label>活动头图</label> <span>(大小限制 100KB)</span>
+                                <div style="margin: 6px;display: none;" id="previewDiv"><a href="" target="_blank" id="previewImageUrl"><img src="" width="100" id="previewImage" /></a> <button type="button" class="btn btn-info btn-gradient btn-xs" style="margin-left: 30px;" onclick="removeImage()">remove image</button><input type="hidden" id="article_icon" value="">
+                                </div>
+                                <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
+                                    <div class="progress-bar" role="progressbar" id="thumbnailProgress" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"> <span class="sr-only">45% Complete</span> </div>
+                                </div>
+                                <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()">
+                            </div>
+                            <div class="form-group">
+                                <label>活动地点</label>
+                                <div class="col-md-13">
+                                    <select class="multiselect" id="map_gid" required="">
+                                        <option value=""></option>
+                                        {%for i in mapPolygon['data']%}
+                                        <option value="{{i['map_gid']}}"{%if projectEventsDetails['project_events_map_gid']==i['map_gid']%} selected{%endif%}>{{i['name']}}</option>
+                                        {%endfor%}
+                                    </select> </div>
+                            </div>
+                            <div class="form-group">
+                                <label>活动时间</label>
+                                    <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar "></i> </span>
+                                        <input type="text" class="form-control mtn" id="newtimepicker" style="width:100%;" value="{{projectEventsDetails['timeRange']}}" required>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label>中文介绍</label>
+                                <textarea id="content_cn" name="content_cn" class="ckeditor" required="">{{projectEventsDetails["project_events_content"]}}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label> {{"ScenicEventsNameEn"|_}} </label>
+                                <input id="title_en" name="title_en" type="text" class="form-control" autocomplete="off" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>英文介绍</label>
+                                <textarea id="content_en" name="content_en">{{projectEventsDetails["project_events_content_en"]}}</textarea>
+                            </div>
+                            <!--<div class="form-group">-->
+                                <!--<label>{{"ArticleLanguage"|_}}</label>-->
+                                <!--<div class="col-md-13">-->
+                                    <!--<select class="multiselect" id="language">-->
+                                        <!--<option value="zh_CN"{%if projectEventsDetails['project_events_locale']=='zh_CN'%} selected{%endif%}>中文</option>-->
+                                        <!--<option value="en_US"{%if projectEventsDetails['project_events_locale']=='en_US'%} selected{%endif%}>English</option>-->
+                                    <!--</select></div>-->
+                            <!--</div>-->
+                            <div class="form-group col-md-12">
+                                <button class="submit btn btn-info pull-right ladda-button" id="subBtn"
+                                        data-style="expand-left"><span class="ladda-label">{{"Submit"|_}}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
+<script type="text/javascript" src="/client/moment.min.js"></script>
+<script type="text/javascript" src="/client/daterangepicker.js"></script>
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+    var localeRange = {
+        "format": 'YYYY/MM/DD HH:mm',
+        "separator": " - ",
+        "applyLabel": "确定",
+        "cancelLabel": "取消",
+        "weekLabel": "W",
+        "daysOfWeek": [
+            "日",
+            "一",
+            "二",
+            "三",
+            "四",
+            "五",
+            "六"
+        ],
+        "monthNames": [
+            "一月",
+            "二月",
+            "三月",
+            "四月",
+            "五月",
+            "六月",
+            "七月",
+            "八月",
+            "九月",
+            "十月",
+            "十一月",
+            "十二月"
+        ],
+        "firstDay": 1
+    };
+    function bytesToSize(bytes) {
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    };
+
+    function UpLoadFile() {
+        var xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('text/plain; charset=utf-8');
+        // FormData 对象
+        var formData = new FormData();
+        var files = document.getElementById('thumbnail').files;
+        if (files[0] ==undefined){
+            alert("No file chosen")
+            return;
+        }
+        var totalBytes = files[0].size;
+        if (totalBytes>102400){
+            alert('缩略图文件过大');
+            return;
+        }
+        // $("#userfile").attr("disabled","disabled");
+        $("#thumbnail").attr("disabled","disabled");
+
+        formData.set('part', 'clientEvents');
+        formData.set('Filedata', files[0]);
+        // XMLHttpRequest 对象
+        xhr.upload.onprogress = function (ev) {
+            var percent = 0;
+            if (ev.lengthComputable) {
+                percent = parseInt(100 * ev.loaded / ev.total);
+                $("#thumbnailProgress").width(percent + "%");
+            }
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState==4){
+                if (xhr.status == 200) {
+                    $("#previewImage").attr("src" , xhr.responseText);
+                    $("#previewImageUrl").attr("href" , xhr.responseText);
+                    $("#article_icon").val(xhr.responseText);
+                    $("#previewDiv").show();
+                    // fileInput.replaceWith(fileInput.val('').clone(true));
+                }else{
+                    alert(xhr.responseText)
+                }
+            }
+            $("#thumbnailProgress").width("0%");
+            $('#thumbnail').removeAttr("disabled");
+        }
+        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
+        xhr.send(formData);
+    }
+
+    function removeVoice() {
+        var fileInput = $('#thumbnail');
+        fileInput.replaceWith(fileInput.val('').clone(true));
+        $("#previewImageUrl").attr("href", '');
+        $("#previewDiv").hide();
+
+    }
+
+    function submitHandler() {
+        var content_cn = $.trim(CKEDITOR.instances['content_cn'].getData());
+        var content_en = $.trim(CKEDITOR.instances['content_en'].getData());
+        var title = $.trim($('#title').val());
+        var title_en = $.trim($('#title_en').val());
+        var map_gid = $.trim($('#map_gid').val());
+        var timeRange = $.trim($('#newtimepicker').val());
+        var topImage = $.trim($('#article_icon').val());
+        if (topImage===''){
+            alert('请选择头图');
+            return false;
+        }
+        var l = Ladda.create(document.querySelector('#subBtn'));
+        l.start();
+        $.ajax('/{{routerProjectId}}/scenic/eventshandle', {
+            data: {
+                id: '{{projectEventsDetails['project_events_id']}}',
+                title: title,
+                title_en: title_en,
+                map_gid: map_gid,
+                timeRange: timeRange,
+                content_cn: content_cn,
+                content_en: content_en,
+                topImage: topImage,
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                alert(data.errmsg);
+                if (data.errcode == 0) {
+                        location.replace('/{{routerProjectId}}/scenic/events');
+                }
+                l.stop();
+            },
+            error: function () {
+                alert('服务器错误');
+                l.stop();
+            },
+        });
+        return false;
+    }
+
+    jQuery(document).ready(function () {
+        "use strict";
+        // Init Theme Core
+        Core.init();
+        {%if projectEventsDetails["project_events_top_image"]%}
+        $("#previewImageUrl").attr("href" , '{{url.getStaticBaseUri()}}{{projectEventsDetails["project_events_top_image"]}}');
+        $("#previewDiv").show();
+        $('#previewImage').attr('src','{{url.getStaticBaseUri()}}{{projectEventsDetails["project_events_top_image"]}}');
+        $('#article_icon').val('{{url.getStaticBaseUri()}}{{projectEventsDetails["project_events_top_image"]}}');
+//        $('#thumbnail').val('{{projectEventsDetails["project_events_top_image"]}}');
+        {%endif%}
+        $("#altForm").validate({
+            submitHandler: submitHandler,
+            ignore:[],
+            rules: {
+                content_cn: {
+                    required: function(textarea) {
+                        CKEDITOR.instances[textarea.id].updateElement(); // update textarea
+                        var editorcontent = textarea.value.replace(/<[^>]*>/gi, ''); // strip tags
+                        return editorcontent.length === 0;
+                    }
+                },
+            },
+            errorPlacement: function (error, element) {
+                if (element.attr("name") == "content_cn") {
+                    error.insertAfter("textarea#"+element.attr("name"));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        CKEDITOR.replace('content_cn', {
+            extraPlugins: 'uploadimage',
+            filebrowserImageUploadUrl: '/{{routerProjectId}}/upload/upload?part=client_events',
+        });
+        CKEDITOR.replace('content_en', {
+            extraPlugins: 'uploadimage',
+            filebrowserImageUploadUrl: '/{{routerProjectId}}/upload/upload?part=client_events',
+        });
+
+        $('.multiselect').multiselect({enableFiltering: true,maxHeight: 320 ,buttonWidth:"400px"});
+
+        $('#newtimepicker').daterangepicker({
+            timePicker:true,
+            "timePicker24Hour": true,
+            locale: localeRange
+        });
+
+
+    });
+
+</script>
+
+</body>
+</html>

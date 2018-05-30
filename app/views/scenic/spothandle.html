@@ -1,0 +1,197 @@
+{{partial("layout/header")}}
+<style>
+    .conditionalPart {
+        display: none
+    }
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+        <div class="topbar-left">
+            <ol class="breadcrumb">
+                <li class="crumb-active"><a href="#">{{"SpotHandle"|_}}</a></li>
+                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
+                        class="glyphicon glyphicon-home"></span></a></li>
+                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
+                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
+            </ol>
+        </div>
+    </div>
+    <div id="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel">
+                    <div class="panel-heading"><span class="panel-title" style="font-size:16px;"> <span
+                            class="glyphicons glyphicons-unchecked"></span> {{mapPolygonDetails['name']}} </span></div>
+                    <div class="panel-body">
+                        <form class="cmxform" id="altForm">
+                            <div class="form-group">
+                                <label>{{"VoiceDescription"|_}}</label> <span>(大小限制 100KB)</span>
+                                <div style="margin: 6px;display: none;" id="previewDiv"><a href="" target="_blank"
+                                                                                           id="previewImageUrl"></a>
+                                    <button type="button" class="btn btn-info btn-gradient btn-xs"
+                                            style="margin-left: 30px;" onclick="removeVoice()">{{'delete'|_}}
+                                    </button>
+                                    <input type="hidden" id="voiceUrl" value="">
+                                </div>
+                                <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
+                                    <div class="progress-bar" role="progressbar" id="thumbnailProgress"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: 0%;"><span class="sr-only">45% Complete</span>
+                                    </div>
+                                </div>
+                                <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple
+                                       onchange="UpLoadFile()">
+                            </div>
+                            <div class="form-group">
+                                <label>{{"ScenicDescription"|_}}</label>
+                                <textarea id="article_content" name="article_content" required="">{{mapPolygonDetails["map_polygon_description_content"]}}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <input class="submit btn bg-purple pull-right" type="submit" id="subBtn" value="{{"
+                                       Submit"|_}}">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+
+    function bytesToSize(bytes) {
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    };
+
+    function UpLoadFile() {
+        var xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('text/plain; charset=utf-8');
+        // FormData 对象
+        var formData = new FormData();
+        var files = document.getElementById('thumbnail').files;
+        if (files[0] == undefined) {
+            alert("No file chosen")
+            return;
+        }
+        var totalBytes = files[0].size;
+//        if (totalBytes>102400){
+//          alert('缩略图文件过大');
+//          return;
+//        }
+        // $("#userfile").attr("disabled","disabled");
+        $("#thumbnail").attr("disabled", "disabled");
+
+        formData.set('part', 'voice');
+        formData.set('Filedata', files[0]);
+        // XMLHttpRequest 对象
+        xhr.upload.onprogress = function (ev) {
+            var percent = 0;
+            if (ev.lengthComputable) {
+                percent = parseInt(100 * ev.loaded / ev.total);
+                $("#thumbnailProgress").width(percent + "%");
+            }
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    $("#previewImageUrl").attr("href", xhr.responseText).html(xhr.responseText);
+                    $("#voiceUrl").val(xhr.responseText);
+                    $("#previewDiv").show();
+                } else {
+                    alert(xhr.responseText);
+                    $('#thumbnail').val('');
+                }
+            }
+            $("#thumbnailProgress").width("0%");
+            $('#thumbnail').removeAttr("disabled");
+        };
+        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
+        xhr.send(formData);
+    }
+
+    function removeVoice() {
+        var fileInput = $('#thumbnail');
+        fileInput.replaceWith(fileInput.val('').clone(true));
+        $("#previewImageUrl").attr("href", '');
+        $("#previewDiv").hide();
+
+    }
+
+    function submitHandler() {
+        var content = $.trim(CKEDITOR.instances['article_content'].getData());
+        var voiceUrl = $.trim($('#voiceUrl').val());
+        $('#subBtn').attr('disabled', 'disabled');
+        $('#subBtn').parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , "width":"20")}}');
+        $.ajax('/{{routerProjectId}}/scenic/spothandle', {
+            data: {
+                id: '{{mapPolygonDetails['map_polygon_id']}}',
+                content: content,
+                voiceUrl: voiceUrl,
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                if (data.errcode == 0) {
+                    alert('操作成功');
+//                        location.replace('/{{routerProjectId}}/scenic/spots?map_id={{mapPolygonDetails['map_id']}}');
+                } else {
+                    alert(data.errmsg);
+                }
+            },
+            error: function () {
+                alert('服务器错误');
+            },
+            complete: function () {
+                $('#subBtn').removeAttr('disabled');
+            }
+        });
+        return false;
+    }
+
+    jQuery(document).ready(function () {
+        "use strict";
+        // Init Theme Core
+        Core.init();
+        {% if mapPolygonDetails["map_polygon_description_voice"] %}
+        $("#previewImageUrl").attr("href", '{{url.getStaticBaseUri()}}{{mapPolygonDetails["map_polygon_description_voice"]}}').html('{{mapPolygonDetails["map_polygon_description_voice"]}}');
+        $("#previewDiv").show();
+        $('#voiceUrl').val('{{mapPolygonDetails["map_polygon_description_voice"]}}');
+        {%endif %}
+        $("#altForm").validate({
+            submitHandler: submitHandler,
+            ignore: [],
+            rules: {
+                article_content: {
+                    required: function () {
+                        CKEDITOR.instances.article_content.updateElement();
+                    }
+                }
+            },
+            errorPlacement: function (error, element) {
+                if (element.attr("name") == "article_content") {
+                    error.insertAfter("textarea#article_content");
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+        CKEDITOR.replace('article_content', {
+            extraPlugins: 'uploadimage',
+            filebrowserImageUploadUrl: '/{{routerProjectId}}/upload/upload?part=client_spots',
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

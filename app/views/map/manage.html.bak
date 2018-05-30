@@ -1,0 +1,416 @@
+{{partial("layout/header")}}
+{{stylesheet_link("leaflet/leaflet.css")}}
+    {{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
+    <style>
+    .btIcon{
+      cursor: pointer;
+    }
+    .modal-content{
+    }
+    </style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"MapManage"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel">
+<div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-map-marker"></span> {{"MapManage"|_}} </span> <div class="topbar-right" style="margin-right: 10px;">
+      <select class="multiselect" id="department_id" onchange="$('.btn').attr('disabled','disabled');location.href='/{{routerProjectId}}/map/manage?map_id='+this.value;">
+                    <option value="">选择楼层</option>
+                      {%for i in mapList%}
+                      <option value="{{i['map_id']}}"{%if filter['map_id']==i['map_id']%}  selected="selected"{%endif%}>{{i['map_name']}}</option>
+                      {%endfor%}
+                    </select>
+      </div> </div>
+          </div>
+          </div>
+          <div class="col-md-12">
+          <div class="col-md-8" id="map"></div><div class="col-md-4"{%if filter['map_id'] is empty%} style="display: none"{%endif%}>
+          <div class="panel featurePanel" id="introPanel" style="display: block;">
+            <div class="panel-heading"> <span class="panel-title"><span class="glyphicons glyphicons-pencil"></span> </span></div>
+            <div class="panel-body">
+            <div class="alert alert-theme">请点击设备、文字或图标进行相关设置</div>
+            </div>
+          </div>
+          <div class="panel featurePanel" id="noticePanel" style="display: none;">
+            <div class="panel-heading"> <span class="panel-title"><span class="glyphicons glyphicons-message_new"></span> {{'NoticePush'|_}} </span></div>
+            <div class="panel-body">
+            <div class="alert alert-theme" id="equipmentName"></div><input id="equipment_id" name="equipment_id" type="hidden" />
+                    <form class="cmxform" id="altForm">
+                <div class="form-group">
+                  <label for="content_cn">{{'ContentCN'|_}}</label>
+                  <textarea id="content_cn" name="content_cn" type="text" class="form-control" required=""></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="content_en">{{'ContentEN'|_}}</label> ( 选填 )
+                  <textarea id="content_en" name="content_en" type="text" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                  <label>{{"NoticeLevel"|_}}</label>
+                  <div class="col-md-13">
+                    <select class="multiselect" id="notice_level">
+                    <option value="3">临时信息</option>
+                    <option value="1">紧急信息</option>
+                    </select></div>
+                </div>
+                <div class="form-group">
+                  <label> {{'NoticeTimeout'|_}} </label><span style="margin-left: 30px;">(单位：秒)</span>
+                  <input type="text" class="form-control" id="notice_timeout" maxlength="10" value="10" autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{'Send'|_}}">
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="panel featurePanel" id="ibeaconPanel" style="display: none;">
+            <div class="panel-heading"> <span class="panel-title"><span class="glyphicons glyphicons-bluetooth"></span> {{'IbeaconRssiSet'|_}} </span>
+            </div>
+            <div class="panel-body">
+            <div class="alert alert-theme" id="ibeaconName"></div><input id="ibeacon_id" name="ibeacon_id" type="hidden" />
+                <div class="form-group">
+                  <label> {{'Rssi'|_}} </label><span style="margin-left: 30px;">(-40 ~ -80 之间)</span>
+                  <input type="text" class="form-control" id="rssi" maxlength="3" value="" autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <input class="submit btn btn-info pull-right" type="submit" id="setBtn" value="{{'Set'|_}}">
+                </div>
+            </div>
+          </div>
+                </div>
+          </div>
+        </div>
+
+  </section>
+<button class="btn bg-orange2 bg-gradient" data-toggle="modal" id="polygonEditBtn" data-target="#defaultModal" style="display: none;"></button>
+<div class="modal fade" id="defaultModal" tabindex="-1" role="dialog" aria-hidden="true">
+<input type="hidden" id="map_gid" value="" />
+<input type="hidden" id="polygonId" value="" />
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">信息编辑</h4>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info alert-dismissable" id="editTitle"></div>
+        <div class="form-group">
+                  <label for="introContentCN">中文{{'Content'|_}}</label>
+                  <textarea id="introContentCN" type="text" class="form-control" rows="6" required=""></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="introContentEN">英文{{'Content'|_}}</label>
+                  <textarea id="introContentEN" type="text" class="form-control" rows="6" required=""></textarea>
+                </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" id="polygonSaveBtn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{partial ("layout/footer")}}
+{{javascript_include("leaflet/leaflet.js")}}
+{{javascript_include("leaflet/L.Icon.Pulse.js")}}
+{{javascript_include("leaflet/leaflet.polylineDecorator.js")}}
+{{javascript_include("leaflet/MovingMarker.js")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
+{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+var screenIconOnline = L.icon({
+            iconUrl: 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/screen_on.png',
+            iconAnchor: [15, 15],
+            iconSize: [30, 30],
+            className:"btIcon"
+        });
+var screenIconOffline = L.icon({
+            iconUrl: 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/screen_off.png',
+            iconAnchor: [15, 15],
+            iconSize: [30, 30],
+            className:"btIcon"
+        });
+var btIconOnline = L.icon({
+            iconUrl: 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/bt_on.png',
+            iconAnchor: [0, 0],
+            iconSize: [20, 20],
+            popupAnchor: [10,0],
+            className:"btIcon"
+        });
+var btIconOffline = L.icon({
+            iconUrl: 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/bt_off.png',
+            iconAnchor: [0, 0],
+            iconSize: [20, 20],
+            popupAnchor: [10,0],
+            className:"btIcon"
+        });
+var screenLayerGroup = L.layerGroup();
+var btLayerGroup = L.layerGroup();
+var len = 0.002197;
+var s = typeof panne;
+console.log(s)
+function changepoint(point) {
+        var newpoint = [];
+        var replacePoint = point.replace('POINT(', '');
+        replacePoint = replacePoint.replace(')', '');
+        replacePoint = replacePoint.replace(' ', ',');
+        replacePoint = replacePoint.split(",");
+        newpoint[0] = replacePoint[1];
+        newpoint[1] = replacePoint[0];
+        return newpoint;
+}
+    function sendNoticeHandler(){
+            var content_cn    = $.trim($('#content_cn').val()),
+            content_en    = $.trim($('#content_en').val()),
+            level = $('#notice_level').val(),
+            equipment_id = $('#equipment_id').val(),
+            timeout = parseInt($('#notice_timeout').val());
+            if (!equipment_id){
+              alert('请选择设备');
+              return false;
+            }
+            if (isNaN(timeout) || timeout<=0){
+              alert('显示时间不正确');
+              return false;
+            }
+            $('.btn').attr('disabled', 'disabled');
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/{{routerProjectId}}/notice/ajaxsendnotice', {
+                data: {
+                  equipment_id: equipment_id,
+                  content_cn     : content_cn,
+                  content_en     : content_en,
+                  level : level,
+                  timeout    : timeout,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('.btn').removeAttr('disabled');
+                  $('#subLoading').remove();
+                }
+            });
+            return false;
+}
+var ibeaconListArr = {};
+var popupArr = {};
+var polygon = L.layerGroup();
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+    {%if filter['map_id']>0%}
+    var sh = document.body.clientHeight-320;
+    $('#map').css({'height':sh+'px'});
+    $('#details').css({'height':sh+'px'});
+    var mapId = '{{filter['map_id']}}';
+    var center = [0,0];
+    {%if clientMapSetting[4] is defined%}
+    center = '{{clientMapSetting[4]}}'.split('|')
+    {%endif%}
+    console.log(center)
+    var map = L.map('map', {
+    center: center,
+    zoom: '{{clientMapSetting[0]}}',
+    zoomControl: true
+});
+    var maxBounds = L.latLngBounds([-len*'{{clientMapSetting[3]}}',-len*'{{clientMapSetting[2]}}'], [len*'{{clientMapSetting[3]}}',len*'{{clientMapSetting[2]}}']);
+    var params = {
+        layers: 'th3:map_polygon_old',
+        format: 'image/png',
+        // styles: polygonStyle,
+        minZoom: '{{clientMapSetting[0]}}',
+        maxZoom: '{{clientMapSetting[1]}}',
+        detectRetina: true,
+        // tms: true,
+        viewparams: "map_id:" + mapId + ";rotate:0",
+        attribution: ""
+    };
+
+    // map.setMaxBounds(maxBounds);
+    L.tileLayer('https://signposs1.oss-cn-shenzhen.aliyuncs.com/maps/'+mapId+'/zh_CN/{z}/{x}/{y}.png',params).addTo(map);
+    $.ajax('/{{routerProjectId}}/polygon/ajaxgetbymapid', {
+            data: {
+                mapId: '{{filter['map_id']}}'
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                polygon.addLayer(L.geoJson(data, {
+                    style: {color: 'rgba(0,0,0,0)'},
+                    className:"btIcon",
+                    onEachFeature: function (feature, layer) {
+                        layer.bindPopup(
+                            '<strong style="font-size:16px;">' + feature.properties.name + '</strong>').on('click',function(){
+                              $('#polygonEditBtn').trigger('click');
+                              $('#editTitle').html(feature.properties.name);
+                  $('#map_gid').val(feature.properties.map_gid);
+                  $('#polygonId').val(feature.properties.id);
+                  CKEDITOR.instances['introContentCN'].setData(feature.properties.company_intro);
+                  CKEDITOR.instances['introContentEN'].setData(feature.properties.company_intro_en);
+                  // $('.featurePanel').hide();
+                  // $('#contentPanel').show();
+                });
+                    }
+                })).addTo(map);
+            },
+            complete: function () {
+            }
+        });
+{%endif%}
+    $('.multiselect').multiselect({enableFiltering: true,maxHeight: 420,buttonWidth:"400px"});
+    {%if equipmentList is defined%}
+    {%for i in equipmentList%}
+    screenLayerGroup.addLayer(L.marker(changepoint('{{i['point']}}'), {
+                    icon: {%if i['online']==true%}screenIconOnline{%else%}screenIconOffline{%endif%}
+                }).on('click',function(){
+                  $('#equipment_id').val('{{i['equipment_id']}}');
+                  $('#equipmentName').html('{{i['map_point_name']}}');
+                  $('.featurePanel').hide();
+                  $('#noticePanel').show();
+                }).bindPopup('{{i['map_point_name']}}'));
+    {%endfor%}
+      screenLayerGroup.addTo(map);
+    {%endif%}
+    {%if ibeaconList is defined%}
+    {%for i in ibeaconList%}
+    var _icon = {%if i['online']==1%}btIconOnline{%else%}btIconOffline{%endif%};
+      if (ibeaconListArr['{{i['map_id']}}_{{i['point_id']}}']!=undefined){
+        ibeaconListArr['{{i['map_id']}}_{{i['point_id']}}']+=20;
+        popupArr['{{i['map_id']}}_{{i['point_id']}}']-=20;
+        _icon = L.icon({
+            iconUrl: 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/bt_{%if i['online']==1%}on{%else%}off{%endif%}.png',
+            iconAnchor: [ibeaconListArr['{{i['map_id']}}_{{i['point_id']}}'], 0],
+            iconSize: [20, 20],
+            popupAnchor: [popupArr['{{i['map_id']}}_{{i['point_id']}}'],0],
+            className:"btIcon"
+        });
+    }else{
+        ibeaconListArr['{{i['map_id']}}_{{i['point_id']}}'] = 0;
+        popupArr['{{i['map_id']}}_{{i['point_id']}}'] = 10;
+    }
+    btLayerGroup.addLayer(L.marker(changepoint('{{i['point']}}'), {
+                    icon: _icon,
+                    riseOnHover:true,
+                }).on('click',function(){
+                  $('#ibeaconName').html('名称：{{i['map_point_name']}}<br />major:{{i['major']}}<br />minor:{{i['minor']}}');
+                  $('#rssi').val('{{i['rssi']}}');
+                  $('#ibeacon_id').val('{{i['ibeacon_id']}}');
+                  $('.featurePanel').hide();
+                  $('#ibeaconPanel').show();
+                }).bindPopup('名称：{{i['map_point_name']}}<br />major:{{i['major']}}<br />minor:{{i['minor']}}<br />rssi:{{i['rssi']}}'));
+    {%endfor%}
+      btLayerGroup.addTo(map);
+    {%endif%}
+
+    $("#altForm").validate({
+      submitHandler:sendNoticeHandler,
+    ignore:[],
+            });
+    $('#setBtn').bind('click',function(){
+      var rssi = $.trim($('#rssi').val())
+      var ibeacon_id = $.trim($('#ibeacon_id').val())
+      if (!ibeacon_id){
+        alert('此设备不是蓝牙设备!');
+        return
+      }
+      if (rssi<-80 || rssi>-40){
+        alert('Rssi设置不正确');
+        return
+      }
+      $('.btn').attr('disabled','disabled');
+      $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right subLoading" />').insertAfter($(this));
+            $.ajax('/{{routerProjectId}}/map/ajaxsetibeaconrssi', {
+                data: {
+                  ibeacon_id: ibeacon_id,
+                  rssi      : rssi,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    $('.btn').removeAttr('disabled');
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                    $('.btn').removeAttr('disabled');
+                },
+                complete:function(){
+                  $('.subLoading').remove();
+                }
+            });
+    })
+    $('#polygonSaveBtn').on('click',function(){
+      var map_gid = $('#map_gid').val(),polygonId = $('#polygonId').val();
+      var contentCN = $.trim(CKEDITOR.instances['introContentCN'].getData());
+      var contentEN = $.trim(CKEDITOR.instances['introContentEN'].getData());
+      if (contentCN=='' && contentEN==''){
+        alert('请至少填写内容!');
+        return
+      }
+      if (map_gid=='' || polygonId==''){
+        alert('没有要设置的项目');
+        return
+      }
+      $('.btn').attr('disabled','disabled');
+      $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right subLoading" />').insertAfter($(this));
+            $.ajax('/{{routerProjectId}}/polygon/ajaxsetpolygoncontent', {
+                data: {
+                  map_gid:map_gid,
+                  polygonId:polygonId,
+                  contentCN:contentCN,
+                  contentEN:contentEN,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    if (data.errcode==0){
+                      $('.featurePanel').hide();
+                      $('#introPanel').show();
+                      $('#map_gid').val('');
+                      $('#polygonId').val('');
+                      CKEDITOR.instances['introContent'].setData('');
+                    }
+                    $('.btn').removeAttr('disabled');
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                    $('.btn').removeAttr('disabled');
+                },
+                complete:function(){
+                  $('.subLoading').remove();
+                }
+            });
+    })
+    CKEDITOR.replace( 'introContentCN');
+    CKEDITOR.replace( 'introContentEN');
+});
+
+</script>
+
+</body>
+</html>

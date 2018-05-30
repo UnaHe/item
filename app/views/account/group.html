@@ -1,0 +1,126 @@
+{{partial("layout/header")}}
+<style>
+.conditionalPart{display: none}
+</style>
+<section id="content_wrapper">
+    <div id="topbar">
+      <div class="topbar-left">
+        <ol class="breadcrumb">
+          <li class="crumb-active"><a href="#">{{"AccountGroup"|_}}</a></li>
+          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
+          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
+          <li class="crumb-trail">{{"AccountManage"|_}}</li>
+        </ol>
+      </div>
+    </div>
+    <div id="content">
+      <div class="row">
+<div class="col-md-12">
+<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-file"></span> {{"AccountGroup"|_}} </span> </div>
+            <div class="panel-body">
+              <form class="cmxform" id="altForm">
+              <div class="form-group">
+              <label class="control-label">要编辑的分组</label>
+                    <select class="form-control" id="editDepart">
+                    <option value="0"></option>
+                            {%for i in clientGroupList%}
+                            <option value="{{i['client_group_id']}}">{{i['client_group_name']}}</option>
+                            {%endfor%}
+                    </select>
+                </div>
+                <div class="alert alert-danger">不选择编辑的分组则为添加分组!</div>
+                <div class="form-group">
+                  <label class="control-label">{{"AccountGroupName"|_}}</label>
+                  <input id="name" name="name" type="text" class="form-control" autocomplete="off" required="">
+                </div>
+                <div class="form-group">
+                  <label class="control-label">{{"AccountGroupRole"|_}}</label> <span>(必须为英文字母 20位以内)</span>
+                  <input id="role" name="role" type="char" class="form-control" autocomplete="off" required="">
+                </div>
+                <div class="form-group">
+                  <input class="submit btn bg-purple pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
+                </div>
+              </form>
+            </div>
+          </div>
+</div>
+          </div>
+        </div>
+  </section>
+
+{{partial ("layout/footer")}}
+{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+{{javascript_include('client/js/main.js')}}
+<script type="text/javascript">
+
+var multiselectConfig = {enableFiltering: true,maxHeight: 220,buttonWidth:"200px"};
+
+function submitHandler(){
+  var name = $.trim($('#name').val());
+            var id = $('#editDepart').val();
+            var name = $.trim($('#name').val());
+            var role = $.trim($('#role').val());
+            if (role=='administrator'){
+              alert('管理员无法被编辑');
+              return false;
+            }
+            $('#subBtn').attr('disabled', 'disabled');
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/{{routerProjectId}}/account/group', {
+                data: {
+                    name: name,
+                    id: id,
+                    role: role,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.errmsg);
+                    if (data.errcode == 0)
+                    {
+                        location.reload();
+                    }else{
+                      $('#subBtn').removeAttr('disabled');
+                    }
+                },
+                error: function(data)
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                  $('#subLoading').remove();
+                }
+            });
+  return false;
+}
+var cateList = {{cates}};
+jQuery(document).ready(function () {
+   "use strict";
+     // Init Theme Core
+    Core.init();
+     jQuery.validator.addMethod("char", function(value, element) { 
+var tel =  /^[a-zA-Z]{1,20}$/; 
+return this.optional(element) || (tel.test(value)); 
+}, "必须为英文字母 20位以内");
+    $('#altForm').validate({submitHandler:submitHandler,ignore: []});
+    var depart = $('#editDepart');
+        depart.change(function(event)
+        {
+            // Values
+            if (this.value == 0) {
+                $('#altForm')[0].reset();
+                return false;
+            }
+            $('#name').val(this.value > 0 ? cateList[this.value]['client_group_name'] : '');
+            $('#role').val(this.value > 0 ? cateList[this.value]['client_group_role'] : '');
+        });
+    // $('.multiselect').multiselect(multiselectConfig);
+
+});
+
+</script>
+
+</body>
+</html>
