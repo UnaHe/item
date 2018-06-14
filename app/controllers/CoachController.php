@@ -42,6 +42,7 @@ class CoachController extends ControllerBase
         }
         $input = $filter->getResult();
         $input['project_id'] = $this->user['project_id'];
+        $input["approval_status"] = 1;
         $coachModel = new CoachModel();
         $coachList = $coachModel->getList($input);
         $coachList = (isset($coachList) && !empty($coachList)) ? $coachList->toArray() : [];
@@ -98,6 +99,10 @@ class CoachController extends ControllerBase
                     'filter' => FILTER_SANITIZE_STRING,
                     'default' => null
                 ],
+                'coach_tel' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => null
+                ],
             ];
             $filter = new FilterModel ($rules);
             if (!$filter->isValid($this->request->getPost())) {
@@ -115,6 +120,7 @@ class CoachController extends ControllerBase
                 'project_id' => $this->user['project_id'],
                 'coach_seniority' => $input['coach_seniority'],
                 'coach_gender' => $input['coach_gender'],
+                'coach_tel' => $input['coach_tel'],
             ];
             if (!empty($input['coach_id'])) {
                 $coachDetails = $coachModel->getList($input);
@@ -372,4 +378,113 @@ class CoachController extends ControllerBase
             return $this->resultModel->output();
         }
     }
+
+    /**
+     * 教练审批列表.
+     */
+    public function coachapprovelistAction()
+    {
+        $rules = [
+            'coach_id' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => [
+                    'min_range' => 1
+                ],
+                'default' => null
+            ],
+            'page' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => [
+                    'min_range' => 1
+                ],
+                'default' => 1
+            ],
+            'psize' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => [
+                    'min_range' => 1
+                ],
+                'default' => 10
+            ],
+            'usePage' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => [
+                    'min_range' => 0,
+                    'max_range' => 1
+                ],
+                'default' => 0
+            ],
+        ];
+        $filter = new FilterModel ($rules);
+        if (!$filter->isValid($this->request->getQuery())) {
+            $this->alert($this->resultModel->getMsg('101'));
+        }
+        $input = $filter->getResult();
+        $input['project_id'] = $this->user['project_id'];
+        $input["approval_status"] = 0;
+        $coachModel = new CoachModel();
+        $coachList = $coachModel->getList($input);
+        $coachList = (isset($coachList) && !empty($coachList)) ? $coachList->toArray() : [];
+        $this->view->coachList = $coachList;
+        $this->view->filter = $input;
+        $this->tag->appendTitle('教练审批列表');
+    }
+
+    /**
+     * 教练审批.
+     */
+    public function coachapproveAction()
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'coach_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'required',
+                ],
+                'approval_status' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1,
+                        'max_range' => 2
+                    ],
+                ],
+
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $Coach = new CoachModel();
+            $coachInfo = $Coach->getCoachByCoachId($input['coach_id']);
+            if (!$coachInfo) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            $cloneCoach = $Coach::cloneResult($Coach, $coachInfo);
+
+            $this->db->begin();
+            try{
+                // 批准还是拒绝.
+                if ($input['approval_status'] === '1') {
+                    $cloneCoach->update($input);
+                } elseif ($input['approval_status'] === '2') {
+                    $cloneCoach->delete();
+                }
+
+                $this->db->commit();
+                $this->resultModel->setResult('0');
+                return $this->resultModel->output();
+            }catch (Exception $e){
+                $this->db->rollback();
+                $this->resultModel->setResult('102');
+                return $this->resultModel->output();
+            }
+        }
+
+        return false;
+    }
+
 }

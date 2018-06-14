@@ -1,76 +1,73 @@
-{{partial("layout/header")}}
-<style type="text/css">
-.table td .small{
-  font-size: 12px;
-}
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="#">{{"NoticeLog"|_}}</a></li>
-          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
-          <li class="crumb-link"><a href="#">{{"NoticeManage"|_}}</a></li>
-        </ol>
-      </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <script type="text/javascript" src="/client/pagers.js"></script>
+    <div class="tpl-content-page-title am-icon-share-square">
+        {{"NoticeLog"|_}}
     </div>
-    <div id="content">
-      <div class="row">
-<div class="col-md-12">
-<div class="panel">
-            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-message_out"></span> {{"NoticeLog"|_}} </span> </div>
-            <div class="panel-body">
-              <table class="table table-hover">
-                <thead>
-                    <th style="width:1%" nowrap="">{{'NoticeLevel'|_}}</th>
-                    <th nowrap="">{{'Content'|_}}</th>
-                    <!--<th style="width:1%" nowrap="">推送人</th>-->
-                                    <th style="width:1%" nowrap="">推送时间</th>
-                                    <th style="width:1%" nowrap="">操作</th>
-                </thead>
-                                <tbody>
-                                     {%for i in noticeList%}
-                                     <tr>
-                                     <td nowrap="" class="small">{%if i['notice_level']==1%}紧急信息{%elseif i['notice_level']==3%}临时信息{%endif%}</td>
-                                         <td class="small">{{i['notice_content_zh_CN']}} </td>
-                                         <!--<td class="small" nowrap="">{{i['client_realname']}} ( {{i['client_name']}} )</td>-->
-                                         <td nowrap class="small">{{date("Y-m-d H:i",i['notice_created_at'])}}</td>
-                                         <td nowrap>
-                      <!--<button type="button" class="btn btn-default btn-xs editBtn" data-id="{{i['notice_id']}}">{{"PushAgain"|_}}</button>-->
-                    </td>
-                                     </tr>
-                                     {%endfor%}
-                                </tbody>
-              </table>
-              <div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"NoticeManage"|_}}</li>
+        <li class="am-active"><a href="/notice/log" >{{"NoticeLog"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <div class="am-g">
+                <div class="am-u-sm-12">
+                    <form class="am-form">
+                        <table class="am-table am-table-striped am-table-hover am-table-compact" style="font-size: 12px;">
+                            <thead>
+                            <tr>
+                                <th style="width: 8%">{{'NoticeLevel'|_}}</th>
+                                <th style="min-width: 30%">{{'ContentCN'|_}}</th>
+                                <th style="width: 8%">{{'ContentEN'|_}}</th>
+                                <th style="width: 10%">推送人</th>
+                                <th style="width: 12%">推送时间</th>
+                                <th style="width: 8%">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {%for i in noticeList%}
+                            <tr>
+                                <td>{%if i['notice_level']==1%}紧急信息{%elseif i['notice_level']==3%}临时信息{%endif%}</td>
+                                <td>{{i['notice_content_zh_CN']}} </td>
+                                <td>{{i['notice_content_en_US']}} </td>
+                                <td>{{i['client_realname']}} ( {{i['client_name']}} )</td>
+                                <td>{{date("Y-m-d H:i",i['notice_created_at'])}}</td>
+                                <td>
+                                    <button type="button" class="btn am-btn am-btn-warning am-btn-xs am-radius editBtn" data-id="{{i['notice_id']}}">{{"PushAgain"|_}}</button>
+                                </td>
+                            </tr>
+                            {%endfor%}
+                            </tbody>
+                        </table>
+                    </form>
+                    <div class="am-u-lg-12">
+                        <div class="am-cf">
+                            <div class="am-fr">
+                                <script language="JavaScript">
+                                    var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
+                                </script>
+                            </div>
+                        </div>
                     </div>
-
+                </div>
             </div>
-          </div>
-
-</div>
-          </div>
         </div>
-  </section>
+    </div>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-var multiselectConfig = {enableFiltering: false,maxHeight: 320};
-jQuery(document).ready(function () {
-   "use strict";
-     // Init Theme Core
-//    $('.editBtn').bind('click',function(){
-//      var id = $(this).attr('data-id');
-//      $('.btn').attr('disabled','disabled');
-//        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="20" />').insertBefore($(this));
-//        location.href='/notice/push?notice_id='+id;
-//    })
-});
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            "use strict";
+            $('.editBtn').bind('click',function(){
+                var id = $(this).attr('data-id');
+                $('.btn').attr('disabled','disabled');
+                var l = Ladda.create(document.querySelector('.editBtn'));
+                l.start();
+                location.href='/notice/push?notice_id='+id;
+            })
+        });
+    </script>
 
-</script>
-
-</body>
-</html>
+{% endblock %}

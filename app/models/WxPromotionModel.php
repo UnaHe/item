@@ -35,7 +35,7 @@ class WxPromotionModel extends ModelBase
                 }
             }
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $sqlCount = 'SELECT count(wp.wx_promotion_id) FROM ' . DB_PREFIX . 'wx_promotion as wp' . $where;
+                $sqlCount = 'SELECT count(wp.wx_promotion_id) FROM ' . DB_PREFIX . 'wx_promotion as wp' . $where.' AND wp.promotion_name IS NOT NULL';
                 $countRes = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                     $this->getReadConnection()->query($sqlCount, $bindParams));
                 $count = $countRes->toArray()[0]['count'];

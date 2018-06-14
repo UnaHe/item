@@ -1,88 +1,97 @@
-{{partial("layout/header")}}
-<style>
-  .equipmentEdit{cursor: pointer;}
-</style>
-<script type="text/javascript" src="/client/pagers.js"></script>
-<section id="content_wrapper">
-  <div id="topbar">
-    <div class="topbar-left">
-      <ol class="breadcrumb">
-        <li class="crumb-active"><a href="/equipment/infrared">{{'infraredList'|_}}</a></li>
-        <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-        <li class="crumb-link"><a href="/">{{"projectList"|_}}</a></li>
-        <li class="crumb-trail">{{"equipmentManage"|_}}</li>
-      </ol>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <script type="text/javascript" src="/client/pagers.js"></script>
+    <div class="tpl-content-page-title">
+        {{'infraredList'|_}}
     </div>
-  </div>
-  <div id="content">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="panel invoice-panel">
-          <div class="panel-heading panel-visible"> <span class="panel-title"> <span class="glyphicons glyphicons-show_big_thumbnails"></span> {{'infraredList'|_}}</span>
-          </div>
-          <div class="panel-body pn" id="invoice-item">
-            <div class="col-md-12 va-m p30">
-              <div class="row" id="invoice-info">
-                {%for i in equipment['data']%}
-                <div class="col-md-2">
-                  <div class="panel panel-alt">
-                    <div class="panel-heading"> <span class="panel-title"> <i class="glyphicons glyphicons-ipad"></i></span>
-                      <div class="panel-btns pull-right ml10"><button type="button" class="btn btn-xs btn-danger btn-gradient mr5 equipmentUpdate" data-id="{{i['equipment_id']}}">更新设备</button>  </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home">首页</a></li>
+        <li>{{"equipmentManage"|_}}</li>
+        <li class="am-active"><a href="/equipment/infrared" >{{'infraredList'|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <div class="am-g">
+                <div class="tpl-table-images">
+                    {%for i in equipment['data']%}
+                    <div class="am-u-sm-12 am-u-md-6 am-u-lg-3 u-float-left">
+                        <div class="tpl-table-images-content">
+                            <div class="tpl-table-images-content-i-time">{{ date('Y-h-d H:i:s', i['equipment_create_at']) }}</div>
+                            <div class="tpl-i-title" title="{{i['equipment_code']}}">
+                                {{i['equipment_code']}}
+                            </div>
+                            <a href="javascript:;" class="tpl-table-images-content-i">
+                                <span class="tpl-table-images-content-i-shadow"></span>
+                                <img src="/echo/images/blank.gif" data-echo="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="200px">
+                            </a>
+                            <div class="tpl-table-images-content-block">
+                                <div class="tpl-i-font">
+                                    <b>{{i['equipment_remark']}}</b>
+                                </div>
+                                <div class="tpl-i-more">
+                                    <ul>
+                                    </ul>
+                                </div>
+                                <div class="am-btn-toolbar" style="margin: 0 auto">
+                                    <div class="am-btn-group am-btn-group-sm am-btn-group-stacked">
+                                        <button type="button" class="am-btn am-btn-danger equipmentUpdate" data-id="{{i['equipment_id']}}"><span class="am-icon-warning"></span> 更新设备</button>
+                                        <button type="button" class="am-btn am-btn-secondary equipmentEdit" data-id="{{i['equipment_id']}}"><span class="am-icon-edit"></span> 编辑设备</button>
+                                        <button type="button" class="am-btn am-btn-warning equipmentAreaEdit" data-id="{{i['equipment_id']}}"><span class="am-icon-archive"></span> 编辑点击区域</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                      
-                        <img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="200">
-                        <address>
-                        <strong>{{i['equipment_remark']}}</strong><br><br>
-                        <abbr title="{{i['equipment_code']}}">{{i['equipment_code']}}</abbr>
-                        <br><br>
-                        <button type="button" class="btn btn-xs btn-default btn-gradient mr5 equipmentEdit" data-id="{{i['equipment_id']}}"> <i class="fa fa-edit pr5"></i> 编辑设备</button><br><br><button type="button" class="btn btn-xs btn-default btn-gradient mr5 equipmentAreaEdit" data-id="{{i['equipment_id']}}"> <i class="fa fa-edit pr5"></i> 编辑点击区域</button>
-                      </address>
+                    {%endfor%}
+                    <div class="am-u-lg-12">
+                        <div class="am-cf">
+                            <div class="am-fr">
+                                <script language="JavaScript">
+                                    var pg = new showPages('pg');pg.pageCount = {{equipment['pageCount']}};pg.printHtml();
+                                </script>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-                {%endfor%}
-              </div>
             </div>
-            <script language="JavaScript">
-                var pg = new showPages('pg');pg.pageCount = {{equipment['pageCount']}};pg.printHtml();
-            </script>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-</section>
-<script>
-    $(document).ready(function(){
-        $('.equipmentEdit').bind('click',function(){
-            location.href='/equipment/infraredhandle?id='+$(this).attr('data-id');
-        })
 
-        $('.equipmentAreaEdit').bind('click',function(){
-            location.href='/equipment/infraredareahandle?id='+$(this).attr('data-id');
-        })
+    <script src="https://cdn.bootcss.com/echo.js/1.7.3/echo.min.js"></script>
+    <script type="text/javascript">
+        echo.init();
+        $(document).ready(function(){
+            $('.equipmentEdit').bind('click',function(){
+                location.href='/equipment/infraredhandle?id='+$(this).attr('data-id');
+            });
 
-        $('.equipmentUpdate').bind('click',function(){
-            if (confirm('确定更新此设备信息？')){
-                $('.btn').attr('disabled','disabled');
-                $.ajax('/equipment/ajaxequipmentupdate', {
-                    data: {id:$(this).attr('data-id')},
-                    type: 'post',
-                    dataType: 'json',
-                    success: function(data)
-                    {
-                        alert(data.msg);
-                        $('.btn').removeAttr('disabled');
-                    },
-                    error: function()
-                    {
-                        alert('推送失败，请重试');
-                        $('.btn').removeAttr('disabled');
-                    },
-                });
-            }
+            $('.equipmentAreaEdit').bind('click',function(){
+                location.href='/equipment/infraredareahandle?id='+$(this).attr('data-id');
+            });
+
+            $('.equipmentUpdate').bind('click',function(){
+                if (confirm('确定更新此设备信息？')){
+                    $('.btn').attr('disabled','disabled');
+                    $.ajax('/equipment/ajaxequipmentupdate', {
+                        data: {id:$(this).attr('data-id')},
+                        type: 'post',
+                        dataType: 'json',
+                        success: function(data)
+                        {
+                            alert(data.msg);
+                            $('.btn').removeAttr('disabled');
+                        },
+                        error: function()
+                        {
+                            alert('推送失败，请重试');
+                            $('.btn').removeAttr('disabled');
+                        },
+                    });
+                }
+            });
         });
-    });
-</script>
-{{partial("layout/footer")}}
+    </script>
+
+{% endblock %}

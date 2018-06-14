@@ -1,127 +1,89 @@
-{{partial("layout/header")}}
-<style>
-    .conditionalPart {
-        display: none
-    }
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">{{"ScenicRouteCategory"|_}}</a></li>
-                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
-                        class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
-            </ol>
-        </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-square-o">
+        {{"ScenicRouteCategory"|_}}
     </div>
-    <div id="content">
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"ScenicManage"|_}}</li>
+        <li class="am-active"><a href="/scenic/routecategory" >{{"ScenicRouteCategory"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel">
-                    <div class="panel-body">
-                        <form class="cmxform" id="altForm">
-                            <div class="form-group">
-                                <label class="control-label">要编辑的分类</label>
-                                <select class="form-control" id="editDepart">
-                                    <option value="0"></option>
-                                    {%for i in scenicRouteCategoryList%}
-                                    <option value="{{i['scenic_route_category_id']}}" data-sort_order="{{i['scenic_route_category_sort_order']}}">{{i['scenic_route_category_name']}}</option>
-                                    {%endfor%}
-                                </select>
-                            </div>
-                            <div class="alert alert-danger">不选择编辑的分类则为添加分类!</div>
-                            <div class="form-group">
-                                <label class="control-label">{{"CategoryName"|_}}</label>
-                                <input id="name" name="name" type="text" class="form-control" autocomplete="off"
-                                       required="">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">{{"CategorySort"|_}}</label>
-                                <div class="input-group">
-                                    <input id="sort_order" class="form-control ui-spinner-input" name="sort_order"
-                                           value="0">
-                                </div>
-
-                            </div>
-                            <div class="form-group">
-                                <button class="submit btn btn-info pull-right ladda-button" id="subBtn"
-                                        data-style="expand-left"><span class="ladda-label">{{"Submit"|_}}</span>
-                                </button>
-                            </div>
-                        </form>
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <div class="am-form-group">
+                        <label for="editDepart" class="control-label">要编辑的分类</label>
+                        <select id="editDepart">
+                            <option value="0"></option>
+                            {%for i in scenicRouteCategoryList%}
+                            <option value="{{i['scenic_route_category_id']}}" data-sort_order="{{i['scenic_route_category_sort_order']}}">{{i['scenic_route_category_name']}}</option>
+                            {%endfor%}
+                        </select>
                     </div>
-                </div>
-            </div>
+                    <div class="am-alert am-alert-danger">不选择编辑的分类则为添加分类!</div>
+                    <div class="am-form-group">
+                        <label for="name" class="control-label">{{"CategoryName"|_}}</label>
+                        <input id="name" name="name" type="text" autocomplete="off" required="">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="sort_order" class="control-label">{{"CategorySort"|_}}</label>
+                        <div class="am-input-group">
+                            <input id="sort_order" type="number" name="sort_order" value="0" min="0" max="100">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{'Submit'|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
         </div>
     </div>
-</section>
 
-{{partial ("layout/footer")}}
-<script type="text/javascript"
-        src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/vendor/plugins/validate/jquery.validate.js"></script>
-<script type="text/javascript"
-        src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/utility/spin.min.js"></script>
-{{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
-<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
-<script type="text/javascript">
-
-    function submitHandler() {
-        var name = $.trim($('#name').val());
-        var category_id = $('#editDepart').val();
-        var sort_order = parseInt($('#sort_order').val());
-        var l = Ladda.create(document.querySelector('#subBtn'));
-        l.start();
-        $.ajax('/{{routerProjectId}}/scenic/routecategory', {
-            data: {
-                name: name,
-                category_id: category_id,
-                sort_order: sort_order
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (data) {
-                alert(data.errmsg);
-                if (data.errcode==0){location.reload();}
-                l.stop();
-            },
-            error: function () {
-                alert('服务器错误');
-                l.stop();
-            }
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    <script type="text/javascript">
+        function submitHandler() {
+            var name = $.trim($('#name').val());
+            var category_id = $('#editDepart').val();
+            var sort_order = parseInt($('#sort_order').val());
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            $.ajax('/scenic/routecategory', {
+                data: {
+                    name: name,
+                    category_id: category_id,
+                    sort_order: sort_order
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    alert(data.msg);
+                    if (data.code==0){location.reload();}
+                    l.stop();
+                },
+                error: function () {
+                    alert('服务器错误');
+                    l.stop();
+                }
+            });
+            return false;
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            $('#altForm').validate({submitHandler: submitHandler, ignore: []});
+            var depart = $('#editDepart');
+            depart.change(function (event) {
+                // Values
+                if (this.value == 0) {
+                    $('#altForm')[0].reset();
+                    return false;
+                }
+                $('#name').val($("#editDepart").find("option:selected").text());
+                $('#sort_order').val($("#editDepart").find("option:selected").attr('data-sort_order'));
+            });
         });
-        return false;
-    }
-    jQuery(document).ready(function () {
-        "use strict";
-        // Init Theme Core
-        Core.init();
+    </script>
 
-        $("#sort_order").spinner({
-            min: 0,
-            max: 100,
-            step: 1,
-            start: 0,
-            numberFormat: "C"
-        });
-
-
-        $('#altForm').validate({submitHandler: submitHandler, ignore: []});
-        var depart = $('#editDepart');
-        depart.change(function (event) {
-            // Values
-            if (this.value == 0) {
-                $('#altForm')[0].reset();
-                return false;
-            }
-            $('#name').val($("#editDepart").find("option:selected").text());
-            $('#sort_order').val($("#editDepart").find("option:selected").attr('data-sort_order'));
-        });
-
-    });
-
-</script>
-
-</body>
-</html>
+{% endblock %}

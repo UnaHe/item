@@ -475,7 +475,7 @@ class DoctorController extends ControllerBase
                 $this->resultModel->setResult('-1');
                 return $this->resultModel->output();
             }
-            if ($doctorDetails->project_id != $this->user['project_id']) {
+            if ($doctorDetails['project_id'] != $this->user['project_id']) {
                 $this->resultModel->setResult('-1');
                 return $this->resultModel->output();
             }
@@ -571,7 +571,7 @@ class DoctorController extends ControllerBase
                 $this->resultModel->setResult('-1');
                 return $this->resultModel->output();
             }
-            if ($doctorDetails->project_id != $this->user['project_id']) {
+            if ($doctorDetails['project_id'] != $this->user['project_id']) {
                 $this->resultModel->setResult('-1');
                 return $this->resultModel->output();
             }
@@ -715,6 +715,7 @@ class DoctorController extends ControllerBase
             $input = $filter->getResult();
             $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
             $ossClient->setConnectTimeout(5);
+
             if ($input['doctor_photo'] != '' && strpos($input['doctor_photo'], '/') == 0) {
                 $objectName = ltrim($input['doctor_photo'], '/');
                 $input['doctor_photo'] = $objectName;
@@ -723,12 +724,16 @@ class DoctorController extends ControllerBase
                         file_get_contents(APP_PATH . 'public/' . $objectName));
                     $input['doctor_photo_source'] = self::SourceOss;
                     @unlink(APP_PATH . 'public/' . $objectName);
+
                 } catch (Exception $e) {
+
                     $this->logger->addMessage('oss upload > doctor_photo: ' . $e->getMessage(),
                         Phalcon\Logger::CRITICAL);
                     $input['doctor_photo_source'] = self::SourceLocale;
                 }
             }
+
+
             $doctorModel = new DoctorModel();
             $params = [
                 'doctor_id' => $input['doctor_id'],
@@ -740,14 +745,18 @@ class DoctorController extends ControllerBase
                 'project_id' => $this->user['project_id'],
                 'doctor_entry_time' => empty($input['entry_time']) ? null : strtotime($input['entry_time']),
                 'doctor_status' => $input['status'],
-                'doctor_photo_source' => $input['doctor_photo_source'],
+                'doctor_photo_source' => isset($input['doctor_photo_source']) ? $input['doctor_photo_source'] : self::SourceLocale,
             ];
+
             if (!empty($input['doctor_id'])) {
                 $this->logger->appendTitle('update');
                 $doctorDetails = $doctorModel->getDetailsById($input['doctor_id']);
-                $oldDetails = $doctorDetails->toArray();
+
+                $oldDetails = $doctorDetails;
+                $doctorDetails = $doctorModel->cloneResult($doctorModel,$doctorDetails);
                 try {
                     $doctorDetails->update($params);
+
                 } catch (Exception $e) {
                     $this->logger->addMessage($e->getMessage(), Phalcon\Logger::CRITICAL);
                     if (isset($objectName)) {
@@ -958,74 +967,78 @@ class DoctorController extends ControllerBase
         $this->tag->appendTitle($this->translate->_('DoctorJob'));
     }
 
-//    public function ajaxdeleteAction()
-//    {
-//        if ($this->request->isPost() && $this->request->isAjax()) {
-//            $rules = [
-//                'doctor_id' => [
-//                    'filter' => FILTER_VALIDATE_INT,
-//                    'options' => [
-//                        'min_range' => 1
-//                    ],
-//                ],
-//            ];
-//            $filter = new FilterModel ($rules);
-//            if (!$filter->isValid($this->request->getPost())) {
-//                $this->resultModel->setResult('101');
-//                return $this->resultModel->output();
-//            }
-//            $input = $filter->getResult();
-//            $this->logger = new LogModel(LOG_FILE_DIR . self::class . '.log');
-//            $this->logger->setTitle('client_id:' . $this->user['client_id'] . ' ' . $this->request->getMethod() . ' ' . $this->dispatcher->getActionName());
-//            $doctorModel = new DoctorModel();
-//            $doctorDetails = $doctorModel->getDetailsById($input['doctor_id']);
-//            if (!$doctorDetails) {
-//                $this->resultModel->setResult('-1');
-//                return $this->resultModel->output();
-//            }
-//            if ($doctorDetails->project_id != $this->user['project_id']) {
-//                $this->resultModel->setResult('-1');
-//                return $this->resultModel->output();
-//            }
-//            try {
-//                $doctorDetails->delete();
-//            } catch (Exception $e) {
-//                $this->logger->addMessage($e->getMessage(), Phalcon\Logger::CRITICAL);
-//                
-//                $this->resultModel->setResult('102');
-//                return $this->resultModel->output();
-//            }
-//            switch ($doctorDetails->doctor_photo_source) {
-//                case self::SourceOss:
-//                    $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
-//                    $ossClient->setConnectTimeout(5);
-//                    try {
-//                        $ossClient->deleteObject(self::$DefaultBucket, $doctorDetails->doctor_photo);
-//                    } catch (Exception $ex) {
-//                        $this->logger->addMessage('oss delete tmp dcotor photo:' . $ex->getMessage(),
-//                            Phalcon\Logger::CRITICAL);
-//                    }
-//                    break;
-//                case self::SourceLocale:
-//                    @unlink(APP_PATH . 'public' . $doctorDetails->doctor_photo);
-//                    break;
-//            }
-//            if (CACHING) {
-//                $this->cache->delete(CacheBase::makeTag(DoctorModel::class . 'clientGetDetailsSimple',
-//                    $doctorDetails->doctor_id));
-//                $departmentId = explode(',', $doctorDetails->doctor_relation);
-//                $removedTag = [DoctorModel::class . 'getList' . $this->user['project_id']];
-//                foreach ($departmentId as $v) {
-//                    $removedTag[] = DoctorModel::class . 'getList' . $v;
-//                }
-//                $this->cache->clean(CacheBase::CLEANING_MODE_TAG, $removedTag);
-//            }
-//            $this->logger->addMessage(json_encode($doctorDetails->toArray(), JSON_UNESCAPED_UNICODE),
-//                Phalcon\Logger::NOTICE);
-//            
-//            $this->resultModel->setResult('0');
-//            return $this->resultModel->output();
-//        }
-//    }
+    public function ajaxdeleteAction()
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'doctor_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                ],
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+            $this->logger = new LogModel(LOG_FILE_DIR . self::class . '.log');
+            $this->logger->setTitle('project_id:' . $this->user['project_id'] . ' ' . $this->request->getMethod() . ' ' . $this->dispatcher->getActionName());
+            $doctorModel = new DoctorModel();
+            $doctorDetails = $doctorModel->getDetailsById($input['doctor_id']);
+
+
+            if (!$doctorDetails) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            if ($doctorDetails['project_id'] != $this->user['project_id']) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+
+            try {
+                $doctorDetails = $doctorModel::cloneResult($doctorModel, $doctorDetails);
+                $doctorDetails->delete();
+            } catch (Exception $e) {
+                $this->logger->addMessage($e->getMessage(), Phalcon\Logger::CRITICAL);
+
+                $this->resultModel->setResult('102');
+                return $this->resultModel->output();
+            }
+            switch ($doctorDetails->doctor_photo_source) {
+                case self::SourceOss:
+                    $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
+                    $ossClient->setConnectTimeout(5);
+                    try {
+                        $ossClient->deleteObject(self::$DefaultBucket, $doctorDetails->doctor_photo);
+                    } catch (Exception $ex) {
+                        $this->logger->addMessage('oss delete tmp dcotor photo:' . $ex->getMessage(),
+                            Phalcon\Logger::CRITICAL);
+                    }
+                    break;
+                case self::SourceLocale:
+                    @unlink(APP_PATH . 'public' . $doctorDetails->doctor_photo);
+                    break;
+            }
+            if (CACHING) {
+                $this->cache->delete(CacheBase::makeTag(DoctorModel::class . 'clientGetDetailsSimple',
+                    $doctorDetails->doctor_id));
+                $departmentId = explode(',', $doctorDetails->doctor_relation);
+                $removedTag = [DoctorModel::class . 'getList' . $this->user['project_id']];
+                foreach ($departmentId as $v) {
+                    $removedTag[] = DoctorModel::class . 'getList' . $v;
+                }
+                $this->cache->clean(CacheBase::CLEANING_MODE_TAG, $removedTag);
+            }
+            $this->logger->addMessage(json_encode($doctorDetails->toArray(), JSON_UNESCAPED_UNICODE),
+                Phalcon\Logger::NOTICE);
+
+            $this->resultModel->setResult('0');
+            return $this->resultModel->output();
+        }
+    }
 
 }

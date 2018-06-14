@@ -9,7 +9,7 @@ class SellerModel extends ModelBase
         if (!$result) {
             $result1 = $this->findFirst(
                 array(
-                    'conditions' => 'map_gid = ?1',
+                    'conditions' => 'map_gid = ?1 and project_id is not null',
                     'bind' => array(1 => $name)
                 )
             );
@@ -45,7 +45,7 @@ class SellerModel extends ModelBase
             $pageCount = 1;
             $orderBy = ' order by s.seller_create_at ASC';
             if (isset($params ['project_id']) && !is_null($params ['project_id'])) {
-                $where .= ' LEFT JOIN n_map_polygon as mp on mp.map_gid= s.map_gid LEFT JOIN n_map as m on m.map_id=mp.map_id WHERE m.project_id =?';
+                $where .= ' LEFT JOIN n_map_polygon as mp on mp.map_gid= s.map_gid LEFT JOIN n_map as m on m.map_id=mp.map_id WHERE m.project_id =? AND s.project_id IS NOT NULL';
                 $bindParams [] = $params ['project_id'];
             }
 
@@ -93,7 +93,7 @@ class SellerModel extends ModelBase
         $tag = CacheBase::makeTag(self::TAG_PREFIX . 'getDetailsById', $id);
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
-            $sql = 'SELECT s.*,m.project_id FROM n_seller as s LEFT JOIN n_map_polygon as mp on mp.map_gid= s.map_gid LEFT JOIN n_map as m on m.map_id=mp.map_id WHERE s.seller_id=? limit 1';
+            $sql = 'SELECT s.*,m.project_id FROM n_seller as s LEFT JOIN n_map_polygon as mp on mp.map_gid= s.map_gid LEFT JOIN n_map as m on m.map_id=mp.map_id WHERE s.seller_id=? and s.project_id is not null limit 1';
             $result = new Phalcon\Mvc\Model\Resultset\Simple ( null, $this, $this->getReadConnection ()->query ( $sql,array($id)) );
             $result = $result->valid()?$result->toArray()[0]:false;
             if (CACHING) {
@@ -108,7 +108,7 @@ class SellerModel extends ModelBase
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
             $sql = 'SELECT s.*,mp.name,g.goods_name,sc.scale_name FROM n_seller as s LEFT JOIN n_map_polygon as mp on mp.map_gid= s.map_gid LEFT JOIN n_map as m on m.map_id=mp.map_id
-            LEFT JOIN n_goods_category as g on s.goods_category_id= g.goods_category_id LEFT JOIN n_scale as sc on s.scale_id= sc.scale_id WHERE s.seller_id=? limit 1';
+            LEFT JOIN n_goods_category as g on s.goods_category_id= g.goods_category_id LEFT JOIN n_scale as sc on s.scale_id= sc.scale_id WHERE s.seller_id=? and s.project_id is not null limit 1';
             $result = new Phalcon\Mvc\Model\Resultset\Simple ( null, $this, $this->getReadConnection ()->query ( $sql,array($id)) );
             $result = $result->valid()?$result->toArray()[0]:false;
             if (CACHING) {

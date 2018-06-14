@@ -1,95 +1,108 @@
-{{partial("layout/header")}}
-{{stylesheet_link("leaflet/leaflet.css")}}
-{{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
-<section id="content_wrapper">
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="#">{{"DoctorList"|_}}</a></li>
-          <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span class="glyphicon glyphicon-home"></span></a></li>
-          <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-          <li class="crumb-trail">{{"DoctorList"|_}}</li>
-        </ol>
-      </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
+    <div class="tpl-content-page-title am-icon-user-md">
+        {{"DoctorList"|_}}
     </div>
-    <div id="content">
-      <div class="row">
-<div class="col-md-12">
-<div class="panel">
-            <div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-group"></span> {{"DoctorList"|_}} </span> <div class="topbar-right" style="margin-right: 10px;">
-      <select class="multiselect" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/{{routerProjectId}}/doctor/list?department_id='+this.value;">
-                    <option value="">全部医生</option>
-                      {%for i in departmentList%}
-                      <option value="{{i['id']}}"{%if filter['department_id']==i['id']%}  selected="selected"{%endif%}>{{i['item']}}</option>
-                      {%endfor%}
-                    </select>
-      </div> </div>
-            <div class="panel-body pbn">
-              <table class="table table-striped table-bordered table-hover" id="datatable">
-                <thead>
-                    <th style="width:1%">照片</th>
-                                    <th nowrap="">姓名</th>
-                                    <th nowrap="">职称</th>
-                                    <th nowrap="">科室</th>
-                                    <th style="width:1%" nowrap="">状态</th>
-                                    <th style="width:1%" nowrap="">入职时间</th>
-                                    <th style="width:1%" class="hidden-xs">操作</th>
-                </thead>
-                                <tbody>
-                                     {%for i in doctorList%}
-                                     <tr id="doctor_{{i['doctor_id']}}">
-                                         <td nowrap="">{%if i['doctor_photo']%}<img src="{%if i['doctor_photo_source']=='oss'%}{{url.getStaticBaseUri()}}{%else%}/{%endif%}{{i['doctor_photo']}}" onerror='this.src="/client/crash.png"' width="50">{%else%}<img src="/client/crash.png" />{%endif%}</td>
-                                         <td class="text-left">{{i['doctor_name']}}</td>
-                                         <td nowrap=""><span class="label" style="background-color: {%if i['doctor_job_color']%}{{i['doctor_job_color']}}{%else%}grey{%endif%}">{{i['doctor_job_title']}}</span></td>
-                                         <td nowrap="">{{i['department']}}</td>
-                                         <td nowrap>
-                                          {%if i['doctor_status']==1%}<span class="label label-success">正常</span>
-                                          {%elseif i['doctor_status']==2%}<span class="label label-info">休假</span>
-                      {%elseif i['doctor_status']==3%}<span class="label label-warning">进修</span>
-                      {%elseif i['doctor_status']==0%}<span class="label label-default">离职</span>
-                      {%endif%}
-                     </td>
-                                         <td nowrap>{%if i['doctor_entry_time']%}{{date("Y-m-d",i['doctor_entry_time'])}}{%else%}---{%endif%}</td>
-                                         <td nowrap>
-                      <button type="button" class="btn btn-default btn-gradient btn-xs" onclick="$('.btn').attr('disabled','disabled');location.href ='/{{routerProjectId}}/doctor/handle?doctor_id={{i['doctor_id']}}';" style="margin-left: 10px">{{"Edit"|_}}</button><button type="button" class="btn btn-default btn-gradient btn-xs deleteBtn" data-id="{{i['doctor_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
-                    </td>
-                                     </tr>
-                                     {%endfor%}
-                                </tbody>
-              </table>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{'DoctorManage'|_}}</li>
+        <li class="am-active"><a href="/doctor/list" >{{"DoctorList"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components" style="overflow: visible">
+        <div class="row" style="overflow: visible">
+            <div class="portlet-title">
+                <div class="tpl-portlet-input tpl-fz-ml">
+                    <div class="portlet-input input-inline">
+                        <select title="全部医生" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/doctor/list?department_id='+this.value;">
+                            <option value="">全部医生</option>
+                            {%for i in departmentList%}
+                            <option value="{{i['id']}}"{%if filter['department_id']==i['id']%}  selected="selected"{%endif%}>{{i['item']}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
             </div>
-          </div>
-
-</div>
-          </div>
+            <form class="am-form">
+                <fieldset>
+                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
+                        <thead>
+                        <tr>
+                            <th style="width:1%">照片</th>
+                            <th style="width:1%" nowrap="">姓名</th>
+                            <th style="width:1%" nowrap="">职称</th>
+                            <th style="width:1%" nowrap="">科室</th>
+                            <th style="width:1%" nowrap="">状态</th>
+                            <th style="width:1%" nowrap="">入职时间</th>
+                            <th style="width:1%" class="hidden-xs">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in doctorList%}
+                        <tr id="doctor_{{i['doctor_id']}}">
+                            <td nowrap="">
+                                {%if i['doctor_photo']%}
+                                <img src="{%if i['doctor_photo_source']=='oss'%}{{url.getStaticBaseUri()}}{%else%}/{%endif%}{{i['doctor_photo']}}" onerror='this.src="/client/crash.png"' width="50">
+                                {%else%}
+                                <img src="/client/crash.png" />
+                                {%endif%}
+                            </td>
+                            <td class="text-left">{{i['doctor_name']}}</td>
+                            <td nowrap="">
+                                <span class="label" style="background-color: {{ i['doctor_job_color'] ? i['doctor_job_color'] : 'grey' }}">
+                                    {{i['doctor_job_title']}}
+                                </span>
+                            </td>
+                            <td nowrap="">{{i['department']}}</td>
+                            <td nowrap>
+                                {%if i['doctor_status']==1%}<span class="label label-success">正常</span>
+                                {%elseif i['doctor_status']==2%}<span class="label label-info">休假</span>
+                                {%elseif i['doctor_status']==3%}<span class="label label-warning">进修</span>
+                                {%elseif i['doctor_status']==0%}<span class="label label-default">离职</span>
+                                {%endif%}
+                            </td>
+                            <td nowrap>
+                                {%if i['doctor_entry_time']%}
+                                {{date("Y-m-d",i['doctor_entry_time'])}}
+                                {%else%}
+                                ---
+                                {%endif%}
+                            </td>
+                            <td nowrap>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="btn am-btn am-btn-secondary am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/doctor/handle?doctor_id={{i['doctor_id']}}';" style="margin-left: 10px">{{"Edit"|_}}</button>
+                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['doctor_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
         </div>
-  </section>
+    </div>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/vendor/plugins/datatables/js/jquery.dataTables.min.js')}}
-{{javascript_include('client/vendor/plugins/datatables/js/datatables.js')}}
-{{javascript_include('client/vendor/plugins/datatables/extras/TableTools/media/js/TableTools.min.js')}}
-{{javascript_include('client/vendor/plugins/datatables/extras/TableTools/media/js/ZeroClipboard.js')}}
-
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-function deleteArticle(id){
-  $('.btn').attr('disabled','disabled');
-  $.ajax('/{{routerProjectId}}/doctor/ajaxdelete', {
+    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript">
+        function deleteArticle(id){
+            $('.btn').attr('disabled','disabled');
+            $.ajax('/doctor/ajaxdelete', {
                 data: {
-                  doctor_id:id,
+                    doctor_id:id,
                 },
                 type: 'post',
                 dataType: 'json',
                 success: function(data)
                 {
-                  console.log(data)
-                    if (data.errcode == 0)
+                    console.log(data)
+                    if (data.code == 0)
                     {
                         $('#doctor_'+id).remove()
                     }else{
-                      alert(data.errmsg);
+                        alert(data.msg);
                     }
                 },
                 error: function()
@@ -97,36 +110,29 @@ function deleteArticle(id){
                     alert('服务器错误');
                 },
                 complete:function(){
-                  $('.btn').removeAttr('disabled');
+                    $('.btn').removeAttr('disabled');
                 }
             });
-}
-jQuery(document).ready(function () {
-   "use strict";
-     // Init Theme Core
-    Core.init();
-
-    $('.deleteBtn').each(function(){
-      $(this).on('click',function(){
-        if (confirm("确定要删除此医生？")){
-          $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-          deleteArticle($(this).attr('data-id'))
         }
-      });
-    })
-    // $('.multiselect').multiselect({enableFiltering: true,maxHeight: 420,buttonWidth:"200px"});
-    $('#datatable').dataTable({
-  "aoColumnDefs": [{ 'bSortable': false, 'aTargets': [ -1 , 0 , 1,2 ] }],
-  "oLanguage": { "oPaginate": {"sPrevious": "", "sNext": ""} },
-  "iDisplayLength": 10,
-  "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-  "sDom": '<"panel-menu dt-panelmenu"lfr><"clearfix">tip',
-  });
-    $('.dataTables_filter input').attr("placeholder", "搜索");
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('.deleteBtn').each(function(){
+                $(this).on('click',function(){
+                    if (confirm("确定要删除此医生？")){
+                        $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
+                        deleteArticle($(this).attr('data-id'))
+                    }
+                });
+            });
 
-});
+            $('#datatable').dataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
+        });
+    </script>
 
-</script>
-
-</body>
-</html>
+{% endblock %}

@@ -55,7 +55,7 @@ class ClientGroupModel extends ModelBase
         return $result;
     }
 
-	public function getSource() {
-		return DB_PREFIX . 'client_group';
-	}
+    public function getSource() {
+        return DB_PREFIX . 'client_group';
+    }
 }

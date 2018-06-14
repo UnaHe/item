@@ -5,8 +5,8 @@ class ControllerBase extends Controller
 {
     protected static $AccessKeyId = 'LTAIoh5uIkAzSN25';
     protected static $AccessKeySecret = '3XZO16LsLVx7V1JEBT6PnozzvhH4Xx';
-//    protected static $EndPoint = 'http://oss-cn-shenzhen.aliyuncs.com';
-    protected static $EndPoint = 'http://oss-cn-shenzhen-internal.aliyuncs.com';
+    protected static $EndPoint = 'http://oss-cn-shenzhen.aliyuncs.com';
+//    protected static $EndPoint = 'http://oss-cn-shenzhen-internal.aliyuncs.com';
     protected static $DefaultBucket = "signposs1";
     protected $user;
     protected $resultModel;
@@ -26,7 +26,7 @@ class ControllerBase extends Controller
         $this->logger->setTitle('item_account_id:' . intval($this->user['item_account_id']) . ' [' . $this->request->getMethod() . ' '.$dispatcher->getControllerName().'/' . $dispatcher->getActionName().']');
     }
 
-    protected function initialize()
+    public function initialize()
     {
         $this->view->controller = $this->dispatcher->getControllerName();
         $this->view->action = $this->dispatcher->getActionName();
@@ -68,6 +68,12 @@ class ControllerBase extends Controller
             }
             $this->view->modules = $modules;
         }
+        if (isset($cpAclNew['resource']['article'])) {
+            $articleCategoryModel = new ArticleCategoryModel();
+            $articleCategoryList = $articleCategoryModel->getList(null, $this->user['project_id'],1);
+            $this->view->articleCategoryList = $articleCategoryList;
+        }
+
         $this->view->cpAclNew = $cpAclNew;
         $this->resultModel = new ResultModel ();
         $settingModel = new SettingModel();

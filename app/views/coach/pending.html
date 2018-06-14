@@ -1,136 +1,135 @@
-{{partial("layout/header")}}
-{{stylesheet_link("leaflet/leaflet.css")}}
-{{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">待处理评分列表</a></li>
-                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">待处理评分列表</li>
-            </ol>
-        </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
+    <div class="tpl-content-page-title am-icon-book">
+        待处理评分列表
     </div>
-    <div id="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel">
-                    <div class="panel-heading">
-                        <span class="panel-title">
-                            <span class="glyphicons glyphicons-group"></span> 待处理评分列表 </span>
-                        <div class="topbar-right" style="margin-right: 10px;">
-                            <select class="multiselect" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/{{routerProjectId}}/coach/pending?coach_id='+this.value;">
-                                <option value="">全部教练</option>
-                                {%for i in coachlist%}
-                                <option value="{{i['coach_id']}}" {%if filter['coach_id']==i['coach_id']%}  selected="selected"{%endif%}>{{i['coach_name']}}</option>
-                                {%endfor%}
-                        </select>
-                    </div> </div>
-                    <div class="panel-body pbn">
-                        <table class="table table-striped table-bordered table-hover" id="datatable">
-                            <thead>
-                            <th nowrap="">姓名</th>
-                            <th nowrap="">评价</th>
-                            <th nowrap="">评分</th>
-                            <th style="width:120px" nowrap="">创建时间</th>
-                            <th style="width:1%" class="hidden-xs">操作</th>
-                            </thead>
-                            <tbody>
-                            {%for i in coachPendingList%}
-                            <tr id="doctor_{{i['coach_id']}}">
-                                <td class="text-left">{{i['coach_pending_name']}}</td>
-                                <td nowrap="">{{i['coach_pending_evaluate']}}</td>
-                                <td class="text-left">{{i['coach_pending_score']}}</td>
-                                <td nowrap>{{date("Y-m-d H:i:s", i['create_at'])}}</td>
-                                <td nowrap="nowrap" style="text-align: center;vertical-align: middle;">
-                                    <button type="button" class="btn btn-default btn-gradient btn-xs okBtn" data-id="{{i['coach_pending_id']}}" style="margin-left: 10px">通过</button>
-                                    <button type="button" class="btn btn-default btn-gradient btn-xs deleteBtn" data-id="{{i['coach_pending_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
-                                </td>
-                            </tr>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"CoachManage"|_}}</li>
+        <li class="am-active"><a href="/coach/pending" >待处理评分列表</a></li>
+    </ol>
+    <div class="tpl-portlet-components" style="overflow: visible">
+        <div class="row" style="overflow: visible">
+            <div class="portlet-title">
+                <div class="tpl-portlet-input tpl-fz-ml">
+                    <div class="portlet-input input-inline">
+                        <select id="department_id" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" title="全部教练" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/coach/pending?coach_id='+this.value;">
+                            <option value=" ">全部教练</option>
+                            {%for i in coachlist%}
+                            <option value="{{i['coach_id']}}" {%if filter['coach_id']==i['coach_id']%}  selected="selected"{%endif%}>{{i['coach_name']}}</option>
                             {%endfor%}
-                            </tbody>
-                        </table>
+                        </select>
                     </div>
                 </div>
-
             </div>
+            <form class="am-form">
+                <fieldset>
+                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
+                        <thead>
+                        <tr>
+                            <th nowrap="" style="width: 12%;">姓名</th>
+                            <th nowrap="" style="width: 40%;">评价</th>
+                            <th nowrap="" style="width: 15%;">评分</th>
+                            <th nowrap="" style="width: 18%;">创建时间</th>
+                            <th nowrap="" style="width: 15%;">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in coachPendingList%}
+                        <tr id="doctor_{{i['coach_id']}}">
+                            <td>{{i['coach_pending_name']}}</td>
+                            <td>{{i['coach_pending_evaluate']}}</td>
+                            <td>
+                                {%if i['coach_pending_score'] > 0 %}
+                                {%for index in 1..i['coach_pending_score'] %}
+                                <span class="am-icon-star"></span>
+                                {%endfor%}
+                                {%endif%}
+                                {%if 5-i['coach_pending_score'] > 0 %}
+                                {%for j in 1..(5-i['coach_pending_score']) %}
+                                <span class="am-icon-star-o"></span>
+                                {%endfor%}
+                                {%endif%}
+                            </td>
+                            <td>{{date("Y-m-d H:i:s", i['create_at'])}}</td>
+                            <td>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="btn am-btn am-btn-secondary am-radius okBtn" data-id="{{i['coach_pending_id']}}">通过</button>
+                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['coach_pending_id']}}">{{"Delete"|_}}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
         </div>
     </div>
-</section>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/vendor/plugins/datatables/js/jquery.dataTables.min.js')}}
-{{javascript_include('client/vendor/plugins/datatables/js/datatables.js')}}
-{{javascript_include('client/vendor/plugins/datatables/extras/TableTools/media/js/TableTools.min.js')}}
-{{javascript_include('client/vendor/plugins/datatables/extras/TableTools/media/js/ZeroClipboard.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-function pendingHandle(id_ok,id_delete) {
-    var coachid='';
-        {%if filter['coach_id'] is defined%}
-           coachid={{filter['coach_id']}};
-        {%endif%}
-    console.log(coachid);
-    $('.btn').attr('disabled','disabled');
-    $.ajax('/{{routerProjectId}}/coach/pendinghandle', {
-        data: {
-            coach_pending_id_ok:id_ok,
-            coach_pending_id_delete:id_delete,
-        },
-        type: 'post',
-        dataType: 'json',
-        success: function(data)
-        {
-            if (data.errcode == 0)
-            {
-                location.replace('/{{routerProjectId}}/coach/pending?coach_id='+coachid);
-                $('#doctor_'+id).remove()
-            }else{
-                alert(data.errmsg);
-            }
-        },
-        error: function()
-        {
-            alert('服务器错误');
-        },
-        complete:function(){
-            $('.btn').removeAttr('disabled');
-        }
-    });
-}
-
-    jQuery(document).ready(function () {
-        "use strict";
-        Core.init();
-        $('.deleteBtn').each(function(){
-            $(this).on('click',function(){
-                if (confirm("确定要删除此评分？")){
-                    $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-                    pendingHandle('',$(this).attr('data-id'))
+    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript">
+        function pendingHandle(id_ok,id_delete) {
+            var coachid='';
+            {%if filter['coach_id'] is defined%}
+            coachid={{filter['coach_id']}};
+            {%endif%}
+            console.log(coachid);
+            $('.btn').attr('disabled','disabled');
+            $.ajax('/coach/pendinghandle', {
+                data: {
+                    coach_pending_id_ok:id_ok,
+                    coach_pending_id_delete:id_delete,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    if (data.code == 0)
+                    {
+                        location.replace('/coach/pending?coach_id='+coachid);
+                        $('#doctor_'+id).remove()
+                    }else{
+                        alert(data.msg);
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                    $('.btn').removeAttr('disabled');
                 }
             });
-        })
-        $('.okBtn').each(function(){
-            $(this).on('click',function(){
+        }
+
+        jQuery(document).ready(function () {
+            "use strict";
+            $('.deleteBtn').each(function(){
+                $(this).on('click',function(){
+                    if (confirm("确定要删除此评分？")){
+                        $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
+                        pendingHandle('',$(this).attr('data-id'))
+                    }
+                });
+            });
+            $('.okBtn').each(function(){
+                $(this).on('click',function(){
                     $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
                     pendingHandle($(this).attr('data-id'),'')
 
+                });
             });
-        })
-        $('#datatable').dataTable({
-            "aoColumnDefs": [{ 'bSortable': false, 'aTargets': [ -1 , 0 , 1,2 ] }],
-            "oLanguage": { "oPaginate": {"sPrevious": "", "sNext": ""} },
-            "iDisplayLength": 10,
-            "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            "sDom": '<"panel-menu dt-panelmenu"lfr><"clearfix">tip',
+            $('#datatable').dataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
         });
-        $('.dataTables_filter input').attr("placeholder", "搜索");
+    </script>
 
-    });
-
-</script>
-
-</body>
-</html>
+{% endblock %}

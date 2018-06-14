@@ -2745,6 +2745,7 @@ imgmap.prototype._getPos = function(element) {
 				if (element.offsetTop > 0) {ypos += element.offsetTop;}
 				element = elementOffsetParent;
 			}
+            ypos = ypos + 76; // 计算误差.
 		}
 		else {
 			xpos = element.offsetLeft;

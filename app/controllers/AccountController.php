@@ -107,7 +107,7 @@ class AccountController extends ControllerBase
             } catch (Exception $e) {
                 $this->db->rollback();
                 $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input), Phalcon\Logger::CRITICAL);
-                
+
                 $this->resultModel->setResult('102');
                 return $this->resultModel->output();
             }
@@ -191,12 +191,14 @@ class AccountController extends ControllerBase
                 } else {
                     $this->resultModel->setResult('102');
                 }
+                $this->logger->log();
                 return $this->resultModel->output();
             }
             $this->db->commit();
             $this->logger->addMessage(json_encode($cloneDetails->toArray(),
                     JSON_UNESCAPED_UNICODE) . (isset($oldDetails) ? json_encode($oldDetails,
                     JSON_UNESCAPED_UNICODE) : ''));
+            $this->logger->log();
             if (CACHING) {
                 $this->cache->clean(CacheBase::CLEANING_MODE_TAG,
                     [ClientGroupModel::class . 'getList' . $this->user['project_id']]);
@@ -261,6 +263,7 @@ class AccountController extends ControllerBase
                 } catch (Exception $e) {
                     $this->db->rollback();
                     $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input, JSON_UNESCAPED_UNICODE));
+                    $this->logger->log();
                     $this->resultModel->setResult('102');
                     return $this->resultModel->output();
                 }
@@ -299,6 +302,7 @@ class AccountController extends ControllerBase
                     } catch (Exception $e) {
                         $this->db->rollback();
                         $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input, JSON_UNESCAPED_UNICODE));
+                        $this->logger->log();
                         $this->resultModel->setResult('102');
                         return $this->resultModel->output();
                     }
@@ -307,6 +311,7 @@ class AccountController extends ControllerBase
             }
 
             $this->logger->addMessage(json_encode($input, JSON_UNESCAPED_UNICODE));
+            $this->logger->log();
             $this->session->remove('AccessPlugin');
             if (CACHING) {
                 $this->cache->delete(CacheBase::makeTag(AccessModel::class . 'getList',
@@ -346,7 +351,7 @@ class AccountController extends ControllerBase
             $tag = CacheBase::makeTag('clientAccessFetch', $input['group_id']);
             $reource = $this->cache->get($tag);
             if (!$reource || 1) {
-                $controllerDir = APP_PATH . 'app/controllers/' . SYSTEM;
+                $controllerDir = APP_PATH . 'app/controllers/';
                 $files = scandir($controllerDir);
                 $reource = [];
                 foreach ($files as $v) {

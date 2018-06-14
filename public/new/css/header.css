@@ -1,0 +1,239 @@
+.error-title {
+    font-size: 120px;
+    font-weight: 800;
+    color: #a87fc6;
+    text-align: center;
+    padding-top: 110px;
+    margin-bottom: 20px;
+    line-height: 120px;
+}
+
+.error-subtitle {
+    font-weight: 400;
+    text-align: center;
+    font-size: 40px;
+    color: #b0b0b0;
+    margin-bottom: 80px;
+}
+
+label.error {
+    color: #d9534f;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pull-right {
+    float: right;
+}
+
+#settings_menu {
+    float: left;
+    margin-left: 30px;
+    color: #888;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.u-float-left {
+    float: left !important;
+}
+
+.am-disabled {
+    cursor: not-allowed;
+}
+
+#clickAreaNumber {
+    font-family: "微软雅黑", serif;
+    font-weight: bolder;
+    color: darkred;
+}
+
+.areaTypeInput {
+    display: none;
+}
+
+label {
+    margin: 0 10px;
+    cursor: pointer;
+}
+
+.tpl-portlet-components {
+    font-size: 14px;
+}
+
+.select-style {
+    font-family: "Segoe UI","Lucida Grande",Helvetica,Arial,"Microsoft YaHei",FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",FontAwesome,sans-serif;
+}
+
+.am-icon-close {
+    background-color: red !important;
+    color: white;
+}
+
+/*spinner*/
+.ui-spinner-button {
+    z-index: 3;
+    cursor: pointer;
+    display: block;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    width: 16px;
+    height: 50%;
+    padding: 0;
+    margin: 0;
+    font-size: .5em;
+    text-align: center;
+}
+.ui-spinner-up {
+    top: 0;
+}
+.ui-spinner-down {
+    bottom: 0;
+}
+
+/*nestable*/
+.dd {
+    position: relative;
+    display: block;
+    margin: 10px 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    line-height: 20px;
+}
+.dd-list {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.dd-handle {
+    color: #666;
+    border: 1px solid #cccccc;
+    padding: 5px 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    position: relative;
+}
+.dd-placeholder {
+    margin: 5px 0;
+    padding: 0;
+    min-height: 30px;
+    background: #f2fbff;
+    border: 1px dashed #b6bcbf;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+.dd-dragel {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+}
+.dd-dragel .dd-handle {
+    top: -76px;
+    background: #888;
+    -webkit-box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 4px 6px 0 rgba(0, 0, 0, 0.1);
+}
+
+/*===============================================
+  J. Checkboxes - Custom Fusion exlcusive
+                  pure CSS Checkboxes
+================================================= */
+.cBox {
+    position: relative;
+}
+
+.cBox.cBox-inline {
+    display: inline-block;
+}
+
+.cBox.cBox-inline + .cBox.cBox-inline {
+    margin-left: 18px; }
+
+.cBox input {
+    margin: 0; }
+
+.cBox label {
+    cursor: pointer;
+    color: #AAA;
+    font-size: 11px;
+    font-weight: 400;
+    padding-left: 10px;
+    margin: 0; }
+
+.cBox label:before {
+    content: "";
+    cursor: pointer;
+    position: absolute;
+    width: 17px;
+    height: 17px;
+    top: 0;
+    left: 0;
+    border-radius: 2px;
+    border: 1px solid #CCC;
+    border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.18);
+    background-color: #f2f2f2;
+    /*
+    border-color: #cccccc rgba(0, 0, 0, 0.19) rgba(0, 0, 0, 0.18);
+    background-color: #f28900;
+    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.1) 100%);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 10%, rgba(255, 255, 255, 0.1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80ffffff',endColorstr='#00ffffff',GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);*/ }
+
+.cBox.cBox-gradient label:before {
+    border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.18);
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3) 1%, rgba(255, 255, 255, 0.15) 100%);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 1%, rgba(255, 255, 255, 0.15) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80ffffff',endColorstr='#00ffffff',GradientType=0); }
+
+.cBox label:after {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+    opacity: 0;
+    content: '';
+    position: absolute;
+    width: 11px;
+    height: 5px;
+    background: transparent;
+    top: 5px;
+    left: 3px;
+    border: 3px solid #555;
+    border-top: none;
+    border-right: none;
+    -webkit-transform: rotate(-58deg);
+    -moz-transform: rotate(-58deg);
+    -o-transform: rotate(-58deg);
+    -ms-transform: rotate(-58deg);
+    transform: rotate(-58deg); }
+
+.cBox input[type=checkbox]:checked + label:after {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    filter: alpha(opacity=100);
+    opacity: 1; }
+
+/* Checkboxes - Custom Colors */
+.cBox.facebook-bg label:before {
+    background-color: #9de0f5; }
+
+.cBox.twitter-bg label:before {
+    background-color: #a8e9ea; }
+
+.cBox.pinterest-bg label:before {
+    background-color: #ffac9c; }
+
+.cBox.instagram-bg label:before {
+    background-color: #fbb882; }
+.cBox.cBox-teal label:before {
+    background-color: #a8e9ea;
+}
+
+/*ol*/
+.am-breadcrumb {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}

@@ -1,5 +1,6 @@
 <?php
 class SearchRecordingModel extends ModelBase {
+    const TAG_PREFIX = 'SearchRecordingModel_';
 
     public function getListSimple(array $params = [])
     {
@@ -54,4 +55,46 @@ class SearchRecordingModel extends ModelBase {
 	public function getSource() {
 		return DB_PREFIX . 'search_recording';
 	}
+
+    /**
+     * 搜索关键字（前十）
+     * @param array $params
+     * @return array|bool
+     */
+	public function getSearchTop($params = [])
+    {
+        $tag = CacheBase::makeTag(self::TAG_PREFIX . 'getSearchTop', json_encode($params));
+        $result = CACHING ? $this->cache->get($tag) : false;
+        if (!$result) {
+            $where = '';
+            $bindParams = [];
+
+            if(isset($params['project_id']) && !empty($params['project_id'])){
+                $where .= (empty($where)?' WHERE':' AND').' project_id = ?';
+                $bindParams[] = $params['project_id'];
+            }
+
+            if(isset($params['startTime']) && !empty($params['startTime'])){
+                $where .= (empty($where)?' WHERE':' AND').' search_time >= ?';
+                $bindParams[] = $params['startTime'];
+            }
+
+            if(isset($params['endTime']) && !empty($params['endTime'])){
+                $where .= (empty($where)?' WHERE':' AND').' search_time <= ?';
+                $bindParams[] = $params['endTime'];
+            }
+
+            $sql = "SELECT search_words, count(search_words) as searchcount FROM n_search_recording" . $where . " GROUP BY search_words ORDER BY searchcount DESC LIMIT 10";
+
+            $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,$this->getReadConnection()->query($sql, $bindParams));
+
+            $result = $data->valid() ? $data->toArray() : false;
+
+            if (CACHING) {
+                $this->cache->save($tag, $result);
+            }
+        }
+        return $result;
+    }
+
 }

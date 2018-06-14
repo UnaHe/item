@@ -112,7 +112,9 @@ class EquipmentModel extends ModelBase
             }
 
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $limit = $this->sqlLimit($sqlTemplate , 'COUNT(e.equipment_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $res = $this->sqlLimit($sqlTemplate , 'COUNT(e.equipment_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $limit = $res['limit'];
+                $pageCount = $res['pageCount'];
             }
             $sql = sprintf($sqlTemplate, "ei.*,e.*") . $where . $orderBy . $limit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,

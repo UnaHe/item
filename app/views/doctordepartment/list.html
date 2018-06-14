@@ -1,0 +1,270 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    {{stylesheet_link("leaflet/leaflet1.0.3.css")}}
+    {{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
+    <style>
+        .success{
+            background-color: #caebeb !important;
+        }
+    </style>
+    <div class="tpl-content-page-title am-icon-building-o">
+        {{"DoctorDepartmentList"|_}}
+    </div>
+    <div class="pull-right" style="margin-top: 20px;">
+        <button type="button" class="btn am-btn am-btn-success am-btn-xs am-radius" onclick="location.href='/doctordepartment/department';">添加科室</button>
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"DoctorDepartmentManage"|_}}</li>
+        <li class="am-active"><a href="/doctordepartment/list" >{{"DoctorDepartmentList"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <div class="am-g">
+                <div class="am-u-sm-12 am-u-md-3 am-u-lg-3">
+                    <section class="am-panel am-panel-default">
+                        <header class="am-panel-hd">
+                            <h3 class="am-panel-title am-icon-list-alt"> 科室列表</h3>
+                        </header>
+                        <div class="am-panel-bd">
+                            <form class="am-form">
+                                <fieldset style="padding: 0;">
+                                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
+                                        <thead>
+                                        <tr>
+                                            <th>名称</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {%for i in departmentList['data']%}
+                                        <tr>
+                                            <td class="department_id {%if loop.first%}success{%endif%}" data-department="{{i['department_id']}}" style="cursor:pointer">{{i['department_name']}}——{{i['map_name']}}</td>
+                                        </tr>
+                                        {%endfor%}
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+                <div class="am-u-sm-12 am-u-md-6 am-u-lg-6" id="map"></div>
+                <div class="am-u-sm-12 am-u-md-3 am-u-lg-3">
+                    <section class="am-panel am-panel-default">
+                        <header class="am-panel-hd">
+                            <h3 class="am-panel-title am-icon-list-alt"> 点位列表</h3>
+                        </header>
+                        <div class="am-panel-bd">
+                            <form name="altForm" id="altForm">
+                                <fieldset style="padding: 0;">
+                                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable1">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 10% !important;"></th>
+                                            <th>名称</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <button class="submit btn am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn" onclick="submitHandler()" data-style="expand-left">{{"Save"|_}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{javascript_include("leaflet/leaflet1.0.3.js")}}
+    {{javascript_include("leaflet/L.Icon.Pulse.js")}}
+    {{javascript_include("leaflet/leaflet.polylineDecorator.js")}}
+    {{javascript_include("leaflet/MovingMarker.js")}}
+    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript">
+        var department_id = "{{departmentList['data'][0]['department_id']}}",submit_flag = false;
+        var image_type="{{imageType}}",minZoom = '{{clientMapSetting[0]}}',maxZoom = '{{clientMapSetting[1]}}'
+        var len = 0.002197,sh = $(window).height()-400;
+    
+        var greenPulse = {heartbeat: false,color:"green"};
+    
+        var selectedIcon = L.icon.pulse(greenPulse);
+        $('#map').css({'height':'500px'});
+    
+        var nexrad = L.layerGroup();
+        var iconLayerGroup = L.layerGroup();
+
+        var center = [0,0];
+        {%if clientMapSetting[4] is defined%}
+        center = '{{clientMapSetting[4]}}'.split('|');
+        {%endif%}
+        var maxBounds = L.latLngBounds([-len*'{{clientMapSetting[3]}}',-len*'{{clientMapSetting[2]}}'], [len*'{{clientMapSetting[3]}}',len*'{{clientMapSetting[2]}}']);
+    
+        var params = {
+            minZoom: minZoom,
+            maxZoom: maxZoom,
+            detectRetina: true,
+            attribution: ""
+        };
+        var map = L.map('map', {
+            center: center,
+            zoom: minZoom*1+1,
+    //        maxBounds:maxBounds,
+            zoomControl: true
+        });
+        jQuery(document).ready(function () {
+            "use strict";
+            //初始化
+            $('#datatable').DataTable({
+                "aoColumnDefs": [{'bSortable': false, 'aTargets': [-1, 0]}],
+                "iDisplayLength": 10,
+                "ordering": false,
+                "aLengthMenu": [[10, 30, 50, -1], [10, 30, 50, "All"]],
+                "sDom": '<"panel-menu dt-panelmenu"lfr><"clearfix">tip',
+                "searching": false
+            });
+            var datatable1 = $('#datatable1').DataTable({
+                "scrollY": 358,
+                "ordering": false,
+                "paging": false,
+                "lengthChange": false,
+                "lengthMenu": false,
+                "info": false,
+                "ajax": {
+                    "url": "/doctordepartment/ajaxgetpolygonsbymap?department_id="+department_id,
+                    "data" :'',
+                    "type": "post",
+                    "dataSrc": function ( data ) {
+                        if (data.code == 0) {
+                            var html='';
+                            var old_gids = data.data.map_gid,mapId = data.data.map_id;
+                            resetLayer();
+                            nexrad.addLayer(L.tileLayer('https://signposs1.oss-cn-shenzhen.aliyuncs.com/maps/' + mapId + '/zh_CN/{z}/{x}/{y}.'+image_type, params)).addTo(map);
+                            var checked  = '',layer_index = '';
+                            var point = '';
+                            var json = Array();
+                            $.each(data.data.polygon_list,function(k,v){
+                                checked = layer_index = '';
+                                if(old_gids && old_gids.indexOf(v.map_gid) > -1){  //选中
+                                    checked = 'checked="true"';
+                                    point = changepoint(v.centroid);
+                                    var selectedMarker = L.marker([point[0],point[1]],{
+                                        icon: selectedIcon,
+                                    });
+                                    var layer_index = iconLayerGroup.getLayerId(selectedMarker);
+                                    iconLayerGroup.addLayer(selectedMarker).addTo(map);
+                                }
+                                json.push( ['<div class="cBox cBox-teal cBox-inline">'+
+                                ' <input type="checkbox" name="polygon[]" id="spot_'+v.map_polygon_id+'"'+
+                                'class="polygonCheck"'+
+                                'data-point="'+v.centroid+'"'+
+                                'data-index="'+layer_index+'"'+
+                                'value="'+v.map_gid+'" '+checked+'>'+
+                                '<label for="spot_'+v.map_polygon_id+'"></label>'+
+                                '</div>', v.name]);
+                            })
+                        }
+                        return json;
+                    }
+                }
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
+            $('#datatable1_wrapper .am-u-sm-6')[0].remove();
+
+            $("#datatable").on("click",".department_id",function(){
+                var value = $(this).data('department');
+                if(value == department_id){
+                    return false;
+                }else{
+                    if(submit_flag && confirm("当前科室未提交，确认提交！")){
+                        submitHandler();
+                    }else{
+                        $('.success').removeClass('success');
+                        $(this).addClass('success');
+                        submit_flag = false;
+                        if(!!value){
+                            department_id = value;
+                            datatable1.ajax.url("/doctordepartment/ajaxgetpolygonsbymap?department_id="+department_id);
+                            datatable1.ajax.reload(null, true );
+                        }
+                    }
+                }
+            });
+            $('#datatable1').on('click','.polygonCheck',function(){
+                submit_flag = true;
+                var value = $(this).prop('checked');
+                if(value){
+                    var point = changepoint($(this).data('point'));
+                    var selectedMarker =L.marker([point[0],point[1]],{
+                        icon: selectedIcon,
+                    });
+                    var layer_index = iconLayerGroup.getLayerId(selectedMarker);
+                    iconLayerGroup.addLayer(selectedMarker).addTo(map);
+                    $(this).data('index',layer_index);
+                }else{
+                    var index = $(this).data('index');
+                    if(!!index && iconLayerGroup.hasLayer(index)){
+                        iconLayerGroup.removeLayer(index)
+                    }
+                }
+            })
+        });
+    
+        function resetLayer(){
+            nexrad.clearLayers();
+            iconLayerGroup.clearLayers();
+        }
+        function changepoint(point){
+            var newpoint = [];
+            var replacePoint = point.replace('POINT(','');
+            replacePoint = replacePoint.replace(')','');
+            replacePoint = replacePoint.replace(' ',',');
+            replacePoint = replacePoint.split(",");
+            newpoint[0] = replacePoint[1];
+            newpoint[1] = replacePoint[0];
+            return newpoint;
+        }
+        function submitHandler(){
+            $('.btn').attr('disabled','disabled');
+            $('select').attr('disabled','disabled');
+            $('input[type="radio"]').attr('disabled','disabled');
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            var data = $("#altForm").serialize()+'&department_id='+department_id;
+            $.ajax('/doctordepartment/ajaxdepartmentmapsubmit', {
+                data: data,
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.msg);
+                    if (data.code == 0)
+                    {
+                        location.reload();
+                    }
+                    l.stop();
+                },
+                error: function(data)
+                {
+                    alert('服务器错误');
+                    l.stop();
+                },
+                complete:function(){
+                    $('#subLoading').remove();
+                    $('.btn').removeAttr('disabled');
+                    $('select').removeAttr('disabled');
+                    $('input[type="radio"]').attr('disabled','disabled');
+                }
+            });
+            return false;
+        }
+    </script>
+
+{% endblock %}

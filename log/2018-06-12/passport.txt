@@ -1,0 +1,9 @@
+[2018-06-12 10:12:00 INFO] item_account_id:0 [POST passport/login] success item_account_id:1
+[2018-06-12 10:27:53 INFO] item_account_id:1 [GET passport/logout] success
+[2018-06-12 10:28:01 INFO] item_account_id:0 [POST passport/login] success item_account_id:1
+[2018-06-12 12:47:10 INFO] item_account_id:1 [GET passport/logout] success
+[2018-06-12 12:47:20 INFO] item_account_id:0 [POST passport/login] success item_account_id:1
+[2018-06-12 12:49:02 INFO] item_account_id:1 [GET passport/logout] success
+[2018-06-12 12:49:06 INFO] item_account_id:0 [POST passport/login] success item_account_id:1
+[2018-06-12 14:05:08 INFO] item_account_id:1 [GET passport/logout] success
+[2018-06-12 14:05:15 INFO] item_account_id:0 [POST passport/login] success item_account_id:1

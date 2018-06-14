@@ -91,4 +91,165 @@ class AjaxController extends ControllerBase
         $this->session->remove('AccessPlugin');
         $this->alert("OK", '/' . $this->user['project_id'] . '/index/index');
     }
+
+    /**
+     * 获取点位扫码次数(前十).
+     */
+    public function getScanTopAction()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            $rules = [
+                'scan_type' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 2
+                    ],
+                ]
+            ];
+
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $params = $this->getTime($input['scan_type']);
+
+            $params['project_id'] = $this->user['project_id'];
+
+            $data = (new ScanRecordingModel())->getScanTop($params);
+
+            $this->resultModel->setResult('0', $data);
+            return $this->resultModel->output();
+        }
+
+        return false;
+    }
+
+    public function getNavigationTopAction()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            $rules = [
+                'navigation_type' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 2
+                    ],
+                ]
+            ];
+
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $params = $this->getTime($input['navigation_type']);
+
+            $params['project_id'] = $this->user['project_id'];
+
+            $data = (new NaviposRecordingModel())->getNavigationTop($params);
+
+            $this->resultModel->setResult('0', $data);
+            return $this->resultModel->output();
+        }
+
+        return false;
+    }
+
+    public function getSearchTopAction()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            $rules = [
+                'search_type' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 2
+                    ],
+                ]
+            ];
+
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $params = $this->getTime($input['search_type']);
+
+            $params['project_id'] = $this->user['project_id'];
+
+            $data = (new SearchRecordingModel())->getSearchTop($params);
+
+            $this->resultModel->setResult('0', $data);
+            return $this->resultModel->output();
+        }
+
+        return false;
+    }
+
+    public function getDestinationTopAction()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            $rules = [
+                'destination_type' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 2
+                    ],
+                ]
+            ];
+
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $params = $this->getTime($input['destination_type']);
+
+            $params['project_id'] = $this->user['project_id'];
+
+            $data = (new NaviposRecordingModel())->getDestinationTop($params);
+
+            $this->resultModel->setResult('0', $data);
+            return $this->resultModel->output();
+        }
+
+        return false;
+    }
+
+    public function getTime($type)
+    {
+        $year = date('Y');
+        $month = date('m');
+        $day = date('d');
+        $week = date('w');
+
+        // 时间范围.
+        $params = [];
+        if ($type === '2') {
+            // 本月.
+            $params['startTime'] = mktime(0, 0, 0, $month, 1, $year);
+            $params['endTime'] = mktime(23, 59, 59, $month, date('t'), $year);
+        } else if($type === '1') {
+            // 本周.
+            $params['startTime'] = mktime(0, 0, 0, $month, $day - $week + 1, $year);
+            $params['endTime'] = mktime(23, 59, 59, $month, $day - $week + 7, $year);
+        } else {
+            //今天.
+            $params['startTime'] = mktime(0, 0, 0, $month, $day, $year);
+            $params['endTime'] = mktime(0, 0, 0, $month, $day + 1, $year) - 1;
+        }
+
+        return $params;
+    }
 }

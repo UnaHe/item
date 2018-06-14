@@ -1,354 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-<!-- Meta, title, CSS, favicons, etc. -->
-<meta charset="utf-8">
-{{get_title()}}
-<meta name="keywords" content="HTML5 Bootstrap 3 Admin Template UI Theme">
-<meta name="description" content="Fusion - A Responsive HTML5 Admin UI Template Theme">
-<meta name="author" content="AdminDesigns">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/new/css/header.css">
 
-<!-- Bootstrap CSS -->
-  <link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/bootstrapItem.min.css">
-  <!-- Theme CSS -->
-  <link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/vendorItem.css">
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/theme.css">
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/utility.css">
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/custom.css">
-  {{javascript_include('client/vendor/jquery/jquery-1.11.1.min.js')}}
-<!-- Favicon -->
-<link rel="shortcut icon" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/favicon.ico">
-<style>
-.navbar-brand-char{
-  font-size: 14px;
-  font-weight: bold;
-  position: fixed;
-  top :20px;
-  overflow: hidden;
-  width: 140px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>
-</head>
-<body class="dashboard-page">
-<script> var boxtest = localStorage.getItem('boxed'); if (boxtest === 'true') {document.body.className+=' boxed-layout';} </script>
-<!-- Start: Theme Preview Pane -->
-<div id="skin-toolbox">
-  <div class="skin-toolbox-panel">
-    <form id="skin-toolbox-form">
-      <h4 class="pl5 mt20">Layout Options</h4>
-      <div class="form-group">
-        <label class="radio-inline">
-          <input type="radio" name="optionsRadios" id="fullwidth-option" checked="">
-          Fullwidth </label>
-      </div>
-      <div class="form-group mb20">
-        <label class="radio-inline">
-          <input type="radio" name="optionsRadios" id="boxed-option">
-          Boxed Layouts </label>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Start: Header -->
-<header class="navbar navbar-fixed-top">
-  <div class="navbar-branding"> <span id="toggle_sidemenu_l" class="glyphicons glyphicons-show_lines"></span> <a class="navbar-brand-char" href="/">项目管理平台</a> </div>
-  <div class="navbar-left">
-    <div class="navbar-divider"></div>
-      <div id="settings_menu">
-          {%if user['projectDetails'] is defined%}
-          <div class="form-group">
-        <label class="col-md-7"><button class="btn {%if user['projectDetails']['project_emergency_evacuation']==1%}btn-danger{%else%}btn-info{%endif%}"  onclick="location.href='/evacuate/opt';" style="margin-right: 10px;">{%if user['projectDetails']['project_emergency_evacuation']==1%}撤销紧急疏散{%else%}紧急疏散{%endif%}</button> 当前管理项目</label>
-        <div class="col-md-5">
-          <select class="multiselect" id="projectNow" required="">
-            {%for i in itemProjectList%}
-            <option value="{{i['project_id']}}"{%if i['project_id']==user['project_id']%} selected{%endif%}>{{i['project_name']}}</option>
-            {%endfor%}
-          </select>
-
-        </div>
-
-      </div>
-
-
-
-          {%endif%}
-      <!-- <ul class="dropdown-menu" role="menu">
-        <li><a href="javascript:void(0);"><span class="glyphicons glyphicons-user text-red2 mr15"></span>Users</a></li>
-        <li><a href="javascript:void(0);"><span class="glyphicons glyphicons-cargo text-purple2 mr15"></span>Servers</a></li>
-        <li><a href="javascript:void(0);"><span class="glyphicons glyphicons-history text-grey2 mr15"></span>Crons</a></li>
-      </ul> -->
+<header class="am-topbar am-topbar-inverse admin-header">
+    <div class="am-topbar-brand homePage">
+        <a href="/" class="tpl-logo" style="color: #000;">
+            项目管理平台
+        </a>
     </div>
-  </div>
-  <div class="navbar-right">
-    <div class="navbar-search">
-    </div>
-    <!-- <div class="navbar-menus">
-      <div class="btn-group" id="alert_menu">
-        <button type="button" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicons glyphicons-bell"></span> <b>3</b> </button>
-        <ul class="dropdown-menu media-list" role="menu">
-          <li class="dropdown-header">Recent Alerts<span class="pull-right glyphicons glyphicons-bell"></span></li>
-          <li class="p15 pb10">
-            <ul class="list-unstyled">
-              <li><span class="glyphicons glyphicons-bell text-orange2 fs16 mr15"></span><b>CEO</b> lunch meeting Tuesday</li>
-              <li class="pt10"><span class="glyphicons glyphicons-facebook text-blue2 fs16 mr15"></span>Facebook likes are at <b>4,100</b></li>
-              <li class="pt10"><span class="glyphicons glyphicons-paperclip text-teal2 fs16 mr15"></span>Mark <b>uploaded</b> 3 new Docs</li>
-              <li class="pt10"><span class="glyphicons glyphicons-gift text-purple2 fs16 mr15"></span>It's <b>Marks</b> 34th Birthday</li>
-              <li class="pt10"><span class="glyphicons glyphicons-cup text-red2 fs16 mr15"></span>Best new employee awarded to <b>Jessica</b></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      <div class="btn-group" id="comment_menu">
-        <button type="button" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicons glyphicons-display"></span> <b>7</b> </button>
-        <div class="dropdown-menu" role="menu">
-          <ul class="nav nav-tabs tabs-border-bottom" role="tablist">
-            <li class="active"><a href="#header_tab1" role="tab" data-toggle="tab">Messages</a></li>
-            <li><a href="#header_tab2" role="tab" data-toggle="tab">Tickets</a></li>
-            <li><a href="#header_tab3" role="tab" data-toggle="tab">Todo List</a></li>
-          </ul>
-          <div class="tab-content pn border-none dropdown-persist">
-            <div class="tab-pane active" id="header_tab1">
-              <div class="dropdown-submenu dropdown-persist">
-                <div class="row">
-                  <div class="col-xs-8">
-                    <input class="dropdownSearch" type="text" placeholder="Search...">
-                  </div>
-                  <div class="col-xs-4">
-                    <div class="cBox cBox-inline ml20">
-                      <input type="checkbox" id="headercBox1" name="check" value="None">
-                      <label for="headercBox1">Delete</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="p15">
-                <div class="media border-none"> <a class="pull-left" href="#"> <img class="media-object thumbnail thumbnail-sm rounded" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/avatars/2.jpg" alt="..."> </a>
-                  <div class="media-body">
-                    <h5 class="media-heading mbn">Simon Rivers <small class="text-light5"> - 3 hours ago</small></h5>
-                    <p class="text-muted"> Hey Louis, I was wondering if</p>
-                  </div>
-                </div>
-                <div class="media mt10 border-none"> <a class="pull-left" href="#"> <img class="media-object thumbnail thumbnail-sm rounded border-online" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/avatars/6.jpg" alt="..."> </a>
-                  <div class="media-body">
-                    <h5 class="media-heading mbn">Tracy Rope <small class="text-light5"> - 8 hours ago</small></h5>
-                    <p class="text-muted"> Bam baby get at, I was</p>
-                  </div>
-                </div>
-                <div class="media mt10 border-none"> <a class="pull-left" href="#"> <img class="media-object thumbnail thumbnail-sm rounded border-online" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/avatars/8.jpg" alt="..."> </a>
-                  <div class="media-body">
-                    <h5 class="media-heading mbn">Courtney Dash <small class="text-light5"> - 3 days ago</small></h5>
-                    <p class="text-muted"> I was wonde awesome brief </p>
-                  </div>
-                </div>
-                <div class="media mt10 border-none"> <a class="pull-left" href="#"> <img class="media-object thumbnail thumbnail-sm rounded border-light5" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/avatars/2.jpg" alt="..."> </a>
-                  <div class="media-body">
-                    <h5 class="media-heading mbn">Simon Rivers <small class="text-light5"> - 3 hours ago</small></h5>
-                    <p class="text-muted mbn"> Hey Louis, I was wondering </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane" id="header_tab2">
-              <div class="dropdown-submenu dropdown-persist">
-                <div class="cBox cBox-inline cBox-orange ml15 p1">
-                  <input type="checkbox" id="headercBox2" name="check" value="None">
-                  <label for="headercBox2">Closed</label>
-                </div>
-                <div class="cBox cBox-inline cBox-purple">
-                  <input type="checkbox" id="headercBox3" name="check" value="None">
-                  <label for="headercBox3">Low</label>
-                </div>
-                <div class="cBox cBox-inline cBox-blue">
-                  <input type="checkbox" id="headercBox4" name="check" value="None">
-                  <label for="headercBox4">Med</label>
-                </div>
-                <div class="cBox cBox-inline cBox-red2 cBox-gradient">
-                  <input type="checkbox" id="headercBox5" name="check" value="None" checked/="">
-                  <label for="headercBox5">Urgent</label>
-                </div>
-              </div>
-              <div class="sortable mt10 mb10">
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #1]</b> - Validation Errors <small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #2]</b> - User Profile Debug<small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #3]</b> - User hacked <small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #4]</b> - Mailbox Debug <small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #5]</b> - User Profile Debug<small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #6]</b> - User Profile Debug<small class="text-blue2"> [read more..]</small></div>
-                </div>
-                <div class="todo-item table-layout p8">
-                  <div class="todo-handle va-m">
-                    <div class="v-handle"></div>
-                  </div>
-                  <div class="todo-body va-m"><b class="text-muted">[Ticket #7]</b> - User Profile Debug<small class="text-blue2"> [read more..]</small></div>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane" id="header_tab3">
-              <div class="dropdown-submenu dropdown-persist">
-                <div class="row">
-                  <div class="col-xs-12">
-                    <input class="dropdownSearch" type="text" placeholder="Create New Item...">
-                  </div>
-                </div>
-              </div>
-              <div class="ticket-item table-layout">
-                <div class="ticket-handle va-m">
-                  <div class="cBox ml10">
-                    <input type="checkbox" id="headercBox7" name="check" value="None">
-                    <label for="headercBox7"></label>
-                  </div>
-                </div>
-                <div class="ticket-body p10 va-m"><b class="text-muted">[#2]</b> - IE8 Profile Drag Errors <span class="label label-sm bg-grey2 ml10">Javascript</span></div>
-              </div>
-              <div class="ticket-item table-layout">
-                <div class="ticket-handle va-m">
-                  <div class="cBox ml10">
-                    <input type="checkbox" id="headercBox6" name="check" value="None">
-                    <label for="headercBox6"></label>
-                  </div>
-                </div>
-                <div class="ticket-body p10 va-m"><b class="text-muted">[#1]</b> - Validation Errors on USCM testing facitiliy <small class="text-red2">- Urgent</small></div>
-              </div>
-              <div class="ticket-item table-layout">
-                <div class="ticket-handle va-m">
-                  <div class="cBox ml10">
-                    <input type="checkbox" id="headercBox9" name="check" value="None">
-                    <label for="headercBox9"></label>
-                  </div>
-                </div>
-                <div class="ticket-body p10 va-m"><b class="text-muted">[#4]</b> - CSS Problems with Tables <span class="label label-sm bg-orange2 ml10">CSS</span></div>
-              </div>
-              <div class="ticket-item table-layout">
-                <div class="ticket-handle va-m">
-                  <div class="cBox ml10">
-                    <input type="checkbox" id="headercBox10" name="check" value="None">
-                    <label for="headercBox10"></label>
-                  </div>
-                </div>
-                <div class="ticket-body p10 va-m"><b class="text-muted">[#5]</b> - PHP Form validation errors occuring on email page<span class="label label-sm bg-purple2 ml10">PHP</span></div>
-              </div>
-              <div class="ticket-item table-layout">
-                <div class="ticket-handle va-m">
-                  <div class="cBox ml10">
-                    <input type="checkbox" id="headercBox8" name="check" value="None">
-                    <label for="headercBox8"></label>
-                  </div>
-                </div>
-                <div class="ticket-body p10 pb15 va-m"><b class="text-muted">[#3]</b> - Mailbox Validation Errors on Firefox</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
-</header>
 
-<!-- Start: Main -->
-<div id="main">
-  <!-- Start: Sidebar -->
-  <aside id="sidebar_left">
-    <div class="user-info">
-      <div class="media">{%if user["item_account_avatar"]%} <a class="pull-left" href="#">
-        <div class="media-object border border-purple br64 bw2 p2"> <img class="br64" src="{{user['item_account_avatar']}}" alt="..."> </div>
-        </a>{%endif%}
-        <div class="mobile-link"> <span class="glyphicons glyphicons-show_big_thumbnails"></span> </div>
-        <div class="media-body">
-          <h5 class="media-heading mt5 mbn fw700 cursor">{{user["item_account_username"]}}<span class="caret ml5"></span></h5>
-          <div class="media-links fs11" style="margin-top: 10px;"><a href="/index/refresh">刷新</a>　　　<a href="/passport/changepass">修改密码</a>　　　 <a href="/passport/logout">{{"Sign Out"|_}}</a></div>
-        </div>
-      </div>
+    <div class="am-icon-list tpl-header-nav-hover-ico am-fl am-margin-right">
     </div>
-    <div class="user-divider"></div>
-    <!--<div class="user-menu">
-      <div class="row text-center mb15">
-        <div class="col-xs-4"> <a href="/index/index"> <span class="glyphicons glyphicons-home fs22 text-blue2"></span>
-          <h5 class="fs11">Home</h5>
-          </a> </div>
-        <div class="col-xs-4"> <a href="#"> <span class="glyphicons glyphicons-inbox fs22 text-orange2"></span>
-          <h5 class="fs11">Inbox</h5>
-          </a> </div>
-        <div class="col-xs-4"> <a href="#"> <span class="glyphicons glyphicons-bell fs22 text-purple2"></span>
-          <h5 class="fs11">Data</h5>
-          </a> </div>
-      </div>
-      <div class="row text-center">
-        <div class="col-xs-4 text-center"> <a href="#"> <span class="glyphicons glyphicons-imac fs22 text-grey3"></span>
-          <h5 class="fs11">Views</h5>
-          </a> </div>
-        <div class="col-xs-4"> <a href="#"> <span class="glyphicons glyphicons-settings fs22 text-green2"></span>
-          <h5 class="fs11">Settings</h5>
-          </a> </div>
-        <div class="col-xs-4"> <a href="/index/refresh"> <span class="glyphicons glyphicons-restart fs22 text-light6"></span>
-          <h5 class="fs11">Refresh</h5>
-          </a> </div>
-      </div>
-    </div>-->
-    
-    <div class="sidebar-menu">
-      <ul class="nav">
-      <li{%if controller=='index' AND action=='index'%} class="active"{%endif%}> <a href="/"><span class="glyphicons glyphicons-home"></span><span class="sidebar-title">{{"projectList"|_}}</span></a> </li>
-        <li><hr /></li>
-        {%if (cpAclNew['resource']['equipment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-        <li{%if controller=='equipment'%}  class="active"{%endif%}> <a class="accordion-toggle{%if controller=='equipment'%} menu-open{%endif%}" href="#sideEquipment"><span class="glyphicons glyphicons-show_thumbnails"></span><span class="sidebar-title">{{"equipmentManage"|_}}</span><span class="caret"></span></a>
-        <ul id="sideEquipment" class="nav sub-nav">
-          {%if ((cpAclNew['resource']['equipment'] is defined) AND ('infrared' in cpAclNew['resource']['equipment'])) OR ((cpAclNew['resource']['equipment'] is defined) AND ('all' in cpAclNew['resource']['equipment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-          <li{%if controller=='equipment' AND (action=="infrared" OR action=="infraredhandle" OR action=="infraredareahandle")%}  class="active"{%endif%}><a class="ajax-disable" href="/equipment/infrared"><span class="glyphicons glyphicons-show_big_thumbnails"></span> {{"equipmentInfrared"|_}} </a></li>{%endif%}
-        </ul>
-        </li>
+
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#topbar-collapse'}">
+        <span class="am-sr-only">导航切换</span>
+        <span class="am-icon-bars"></span>
+    </button>
+
+    <div id="settings_menu">
+        {%if user['projectDetails'] is defined%}
+            <button class="am-btn {{ user['projectDetails']['project_emergency_evacuation']==1 ? 'am-btn-danger' : 'am-btn-success' }} am-btn-sm" onclick="location.href='/evacuate/opt';" style="margin-right: 20px;">
+                {{ user['projectDetails']['project_emergency_evacuation']==1 ? '撤销紧急疏散' : '紧急疏散' }}
+            </button>
+            <span style="margin-right: 10px;">当前管理项目:</span>
+            <select id="projectNow" data-am-selected="{searchBox: 1, btnSize:'sm'}" title="当前管理项目">
+                {%for i in itemProjectList%}
+                <option value="{{i['project_id']}}" {{i['project_id']==user['project_id'] ? 'selected' : null}}>{{i['project_name']}}</option>
+                {%endfor%}
+            </select>
         {%endif%}
-        {%if (cpAclNew['resource']['notice'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-        <li{%if controller=='notice'%}  class="active"{%endif%}> <a class="accordion-toggle{%if controller=='notice'%} menu-open{%endif%}" href="#sideMessage"><span class="glyphicons glyphicons-message_flag"></span><span class="sidebar-title">{{"NoticeManage"|_}}</span><span class="caret"></span></a>
-          <ul id="sideMessage" class="nav sub-nav">
-          {%if ((cpAclNew['resource']['notice'] is defined) AND ('push' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['notice'] is defined) AND ('all' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <li{%if controller=='notice' AND action=="push"%}  class="active"{%endif%}><a class="ajax-disable" href="/notice/push"><span class="glyphicons glyphicons-message_new"></span> {{"NoticePush"|_}} </a></li>{%endif%}
-            {%if ((cpAclNew['resource']['notice'] is defined) AND ('log' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['notice'] is defined) AND ('all' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <li class="divider"></li>
-            <li{%if controller=='notice' AND action=="log"%}  class="active"{%endif%}><a class="ajax-disable" href="/notice/log"><span class="glyphicons glyphicons-message_out"></span> {{"NoticeLog"|_}} </a></li>{%endif%}
-          </ul>
-        </li>{%endif%}
-          {%if (cpAclNew['resource']['polygonsort'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-          <li{%if controller=='polygonsort'%}  class="active"{%endif%}> <a class="accordion-toggle{%if controller=='polygonsort'%} menu-open{%endif%}" href="#sidePolygonsort"><span class="glyphicons glyphicons-show_thumbnails"></span><span class="sidebar-title">{{"polygonsortManage"|_}}</span><span class="caret"></span></a>
-          <ul id="sidePolygonsort" class="nav sub-nav">
-              {%if ((cpAclNew['resource']['polygonsort'] is defined) AND ('list' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['polygonsort'] is defined) AND ('all' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-              <li{%if controller=='polygonsort' AND action=="list"%}  class="active"{%endif%}><a class="ajax-disable" href="/polygonsort/list"><span class="glyphicons glyphicons-show_big_thumbnails"></span> {{"polygonsortList"|_}} </a></li>{%endif%}
-            {%if ((cpAclNew['resource']['polygonsort'] is defined) AND ('handle' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['polygonsort'] is defined) AND ('all' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <li{%if controller=='polygonsort' AND action=="handle"%}  class="active"{%endif%}><a class="ajax-disable" href="/polygonsort/handle"><span class="glyphicons glyphicons-show_big_thumbnails"></span> {{"polygonsortHandle"|_}} </a></li>{%endif%}
-          </ul>
-          </li>{%endif%}
-      </ul>
     </div>
-  </aside>
+
+    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+
+        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list tpl-header-list">
+            <li class="am-hide-sm-only">
+                <a href="javascript:;" id="admin-fullscreen" class="tpl-header-list-link">
+                    <span class="am-icon-arrows-alt"></span>
+                    <span class="admin-fullText">开启全屏</span>
+                </a>
+            </li>
+
+            <li class="am-dropdown" data-am-dropdown data-am-dropdown-toggle>
+                <a class="am-dropdown-toggle tpl-header-list-link" href="javascript:;">
+                    <span class="tpl-header-list-user-nick">{{ user['item_account_username'] }}</span>
+                    <span class="tpl-header-list-user-ico">
+                        <img class="br64" src="{{ user['item_account_avatar'] is defined and user['item_account_avatar'] is not empty ? user['item_account_avatar'] : '/user_default.jpg' }}">
+                    </span>
+                </a>
+                <ul class="am-dropdown-content">
+                    <li><a href="/index/refresh"><span class="am-icon-bell-o"></span> 刷新</a></li>
+                    <li><a href="/passport/changepass"><span class="am-icon-cog"></span> 修改密码</a></li>
+                    <li><a href="/passport/logout"><span class="am-icon-power-off"></span> {{ "Sign Out"|_ }}</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</header>

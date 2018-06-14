@@ -1,145 +1,153 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+
 <head>
-<!-- Meta, title, CSS, favicons, etc. -->
-<meta charset="utf-8">
-<title>橙视光标 - 客户端</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>橙视光标 - 客户端</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="/assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="/assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="橙视光标 - 客户端"/>
+    <link rel="stylesheet" href="/assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
 
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/bootstrapItem.min.css">
-<!-- Theme CSS -->
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/vendorItem.css">
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/theme.css">
-<link rel="stylesheet" type="text/css" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/css/utility.css">
-
-<!-- Favicon -->
-<link rel="shortcut icon" href="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/favicon.ico">
+    <link rel="stylesheet" href="/new/css/login.css">
 </head>
 
-<body class="minimal login-page">
+<body data-type="login">
 
-<!-- Start: Main -->
-<div id="main">
-  <div id="content">
-    <div class="row">
-      <div id="page-logo"></div>
-    </div>
-    <div class="row">
-      <div class="panel-bg">
-        <div class="panel">
-          <div class="panel-heading"> <span class="panel-title">选择登录方式 <span class="glyphicon glyphicon-hand-right pl5"></span></span>
-            <ul class="nav panel-tabs">
-              <li class="active loginType" data-toggle="tab1"><a href="javascript:void(null);">扫码登录</a></li>
-              <li class="loginType" data-toggle="tab2"><a href="javascript:void(null);">账号密码登录</a></li>
-            </ul>
-          </div>
-
-          <div class="panel-body" id="tab1">
-              <p align="center">( 请使用微信扫码 )</p>
-          <div class="form-group text-center" id="qrImg"><img src='data:image/png;base64,{{qrImg}}' /></div>
-          </div>
-            <div class="panel-body" id="tab2" style="display: none;">
-                <div class="login-avatar"> </div>
-                <div class="form-group">
-                    <div class="input-group"> <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span> </span>
-                        <input type="text" class="form-control" placeholder="账号" id="username">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="input-group"> <span class="input-group-addon"><span class="glyphicon glyphicon-link"></span> </span>
-                        <input type="password" class="form-control" placeholder="密码" id="password">
-                    </div>
-                </div>
-                <div class="panel-footer">
-                    <button type="button" class="btn btn-sm bg-purple2 pull-right deleteBtn ladda-button" data-style="expand-left" id="submitBtn"><span
-                            class="ladda-label"><i class="fa fa-home"></i> {{'login'|_}}</span></button>
-                    <div class="clearfix"></div>
+    <div class="am-g myapp-login">
+        <div class="myapp-login-logo-block  tpl-login-max">
+            <div class="myapp-login-logo-text">
+                <div class="myapp-login-logo-text">
+                    Item<span> Login</span> <i class="am-icon-skyatlas"></i>
                 </div>
             </div>
-            <div class="clearfix"></div>
-          </div>
+            <div class="am-u-sm-10 login-am-center">
+                <ul class="am-nav am-nav-tabs">
+                    <li class="am-active"><a href="javascript:void(null);" name="tab1" onclick="tab(this.name)">扫码登录</a></li>
+                    <li><a href="javascript:void(null);" name="tab2" onclick="tab(this.name)">账号密码登录</a></li>
+                </ul>
+                <div class="panel-body" id="tab1">
+                    <form class="am-form">
+                        <fieldset class="fieldset">
+                            <p align="center">( 请使用微信扫码 )</p>
+                            <div class="am-form-group text-center" id="qrImg">
+                                <img src='data:image/png;base64,{{ qrImg }}' />
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="panel-body" id="tab2" style="display: none;">
+                    <form class="am-form">
+                        <P></P>
+                        <fieldset>
+                            <div class="am-form-group">
+                                <input type="text" class="" placeholder="账号" id="username">
+                            </div>
+                            <div class="am-form-group">
+                                <input type="password" class="" placeholder="密码" id="password">
+                            </div>
+                            <p>
+                                <button id="submitBtn" type="submit" class="am-btn am-btn-default">{{'login'|_}}</button>
+                            </p>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
-<!-- End: Main -->
 
-<div class="overlay-black"></div>
+</body>
 
-<!-- jQuery -->
-{{javascript_include('client/vendor/jquery/jquery-1.11.1.min.js')}}
-{{javascript_include('client/vendor/plugins/backstretch/jquery.backstretch.min.js')}}
+<script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/amazeui.min.js"></script>
+<script src="/assets/js/app.js"></script>
+
 {{javascript_include('socket.io/socket.io-1.4.5.js')}}
 {{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
 <script type="text/javascript">
-jQuery(document).ready(function () {
-   "use strict";
-   // Init Full Page BG(Backstretch) plugin
-     $.backstretch("https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/img/stock/splash/2.jpg");
+    // 切换菜单.
+    function tab(name) {
+        $('.am-active').removeClass('am-active');
+        $('a[name='+name+']').parent().addClass('am-active');
+        if (name == 'tab1') {
+            $('#tab2').hide();
+            $('#tab1').show();
+        } else {
+            $('#tab1').hide();
+            $('#tab2').show();
+        }
+    }
 
-     $('.loginType').bind('click',function(){
-         var _toggle = $(this).attr('data-toggle');
-         $('.loginType').removeClass('active');
-         $(this).addClass('active');
-         $('.panel-body').hide();
-         $('#'+_toggle).show();
-     });
-     var socket = io('{{setting["ioUrl"]}}');
-       socket.on('connect', function(){
-    socket.emit('login', "signp|client|{{_csrfKey}}");
-   });
-   socket.on('new_msg', function(msg){
-    msg = eval("("+msg+")");
-    var postObj = $.extend({}, msg, {"{{_csrfKey}}":"{{_csrf}}"});
-    $('#qrImg').html('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" />');
-    $.ajax('/passport/wx', {
-            data: postObj,
-            type: 'post',
-            dataType: 'json',
-            success: function(data) {
-                if (data.errcode=="0"){
-                  location.replace("/")
-                }else{
-                  $('#qrImg').html(data.errmsg+"<br /><br /><a href='javascript:void(null);' onclick='location.reload();'>点此刷新</a>");
-                }
-            },
-            error:function(){
-              $('#qrImg').html("{{'ServerError'|_}}<br /><br /><a href='javascript:void(null);' onclick='location.reload();'>点此刷新</a>");
-            },
+    jQuery(document).ready(function () {
+        "use strict";
+        // Init Full Page BG(Backstretch) plugin
+        $('.loginType').bind('click',function(){
+            var _toggle = $(this).attr('data-toggle');
+            $('.loginType').removeClass('active');
+            $(this).addClass('active');
+            $('.panel-body').hide();
+            $('#'+_toggle).show();
         });
-   });
-   $('#submitBtn').bind('click',function(){
-       var username = $.trim($('#username').val());
-       var password = $.trim($('#password').val());
-       if (username==='' || password===''){
-           alert('请填写完整');
-           return;
-       }
-       var postObj = {"{{_csrfKey}}":"{{_csrf}}",username:username,passwd:password};
-       var l = Ladda.create( document.querySelector( '#submitBtn' ) );
-       l.start();
-       $.ajax('/passport/login', {
-           data: postObj,
-           type: 'post',
-           dataType: 'json',
-           success: function(data) {
-               if (data.code===0){
-                   location.href='/';
-                   return;
-               }
-               alert(data.errmsg);
-               location.reload();
-           },
-           error:function(){
-               alert("验证异常，请刷新重试！");
-               l.stop();
-           },
-       });
-   });
+        var socket = io('{{setting["ioUrl"]}}');
+        socket.on('connect', function(){
+            socket.emit('login', "signp|client|{{_csrfKey}}");
+        });
+        socket.on('new_msg', function(msg){
+            msg = eval("("+msg+")");
+            var postObj = $.extend({}, msg, {"{{_csrfKey}}":"{{_csrf}}"});
+            $('#qrImg').html('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" />');
+            $.ajax('/passport/wx', {
+                data: postObj,
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code=="0"){
+                        location.replace("/")
+                    }else{
+                        $('#qrImg').html(data.msg+"<br /><br /><a href='javascript:void(null);' onclick='location.reload();'>点此刷新</a>");
+                    }
+                },
+                error:function(){
+                    $('#qrImg').html("{{'ServerError'|_}}<br /><br /><a href='javascript:void(null);' onclick='location.reload();'>点此刷新</a>");
+                },
+            });
+        });
+        $('#submitBtn').bind('click',function(){
+            var username = $.trim($('#username').val());
+            var password = $.trim($('#password').val());
+            if (username==='' || password===''){
+                alert('请填写完整');
+                return;
+            }
+            var postObj = {"{{_csrfKey}}":"{{_csrf}}",username:username,passwd:password};
+            var l = Ladda.create( document.querySelector( '#submitBtn' ) );
+            l.start();
+            $.ajax('/passport/login', {
+                data: postObj,
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code===0){
+                        location.href='/';
+                        return;
+                    }
+                    alert(data.msg);
+                    location.reload();
+                },
+                error:function(){
+                    alert("验证异常，请刷新重试！");
+                    l.stop();
+                },
+            });
+        });
 
-});
+    });
 </script>
-</body>
+
 </html>

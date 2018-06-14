@@ -129,8 +129,13 @@ class MapPolygonModel extends ModelBase
                 }
                 $where .= (empty($where) ? ' WHERE' : ' AND') . " (mp.name LIKE '%" . $params ['keywords'] . "%' OR mp.type LIKE '%" . $params ['keywords'] . "%'" . $whereExtra . ")";
             }
+            if (isset($params ['category_id']) && !empty($params['category_id'])) {
+                $where .= (empty($where) ? ' WHERE' : ' AND') . ' mp.map_polygon_category_id=?';
+                $bindParams [] = $params ['category_id'];
+            }
+
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $sqlCount = 'SELECT count(mp.map_polygon_id) FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id' . $where;
+                $sqlCount = 'SELECT count(mp.map_polygon_id) FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id ' . $where;
                 $countRes = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                     $this->getReadConnection()->query($sqlCount, $bindParams));
                 $count = $countRes->toArray()[0]['count'];
@@ -141,8 +146,16 @@ class MapPolygonModel extends ModelBase
                 $offset = ($params ['page'] - 1) * $params ['psize'];
                 $limit = ' limit ' . $params ['psize'] . ' OFFSET ' . $offset;
             }
-            //  			$sql = 'SELECT mp.*,p.project_name FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id '. $where . ' order by mp.map_polygon_id ' . $limit;
-            $sql = 'SELECT sr.*,mpd.*,mp.*,p.project_name,cm.company_intro FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id LEFT JOIN ' . DB_PREFIX . 'map_polygon_description as mpd ON mp.map_gid=mpd.map_gid LEFT JOIN n_seller as sr on mp.map_gid=sr.map_gid LEFT JOIN ' . DB_PREFIX . 'company_message as cm on mp.map_gid = cm.users_user_name ' . $where . ' order by mp.map_polygon_id ' . $limit;
+            $sql = 'SELECT || FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id LEFT JOIN ' . DB_PREFIX . 'map_polygon_description as mpd ON mp.map_gid=mpd.map_gid LEFT JOIN ' . DB_PREFIX . 'seller as sr on mp.map_gid=sr.map_gid AND sr.project_id=p.project_id  LEFT JOIN ' . DB_PREFIX . 'company_message as cm on mp.map_gid = cm.users_user_name  ' . $where . ' order by mp.map_polygon_id ' . $limit;
+
+            if (isset($params ['col']) && !empty($params['col'])) {
+                $sql = str_replace('||' , $params['col'] , $sql);
+                // $sql = sprintf($sql, $params['col']);
+            }else{
+                $sql = str_replace('||' ,"sr.*,mpd.*,mp.*,p.project_name,cm.company_intro" , $sql);
+                // $sql = sprintf($sql, "sr.*,mpd.*,mp.*,p.project_name,cm.company_intro");
+            }
+//            echo $sql;exit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                 $this->getReadConnection()->query($sql, $bindParams));
             $result['data'] = $data->toArray();
@@ -176,7 +189,7 @@ class MapPolygonModel extends ModelBase
                 $where .= " AND mp.name like '%" . $params ['words'] . "%'";
             }
             $sql = 'SELECT mp.*,p.project_name FROM ' . DB_PREFIX . 'map_polygon as mp LEFT JOIN ' . DB_PREFIX . 'map as m ON mp.map_id = m.map_id LEFT JOIN ' . DB_PREFIX . 'project as p on m.project_id = p.project_id ' . $where . ' order by mp.map_polygon_id ';
-            // 			echo $sql;die;
+//             			echo $sql;die;
             $result = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                 $this->getReadConnection()->query($sql, $bindParams));
             $result = $result->toArray();

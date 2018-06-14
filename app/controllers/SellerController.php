@@ -69,6 +69,7 @@ class SellerController extends ControllerBase
                 return $this->resultModel->output();
             }
             $input = $filter->getResult();
+
             $SellerModel = new SellerModel();
             $sellerDetails = $SellerModel->getDetailsById($input['seller_id']);
             if(empty($sellerDetails)){
@@ -96,7 +97,7 @@ class SellerController extends ControllerBase
                 'seller_shop_name' => $input['seller_shop_name'],
                 'seller_name' => $input['seller_name'],
                 'seller_tel' => $input['seller_tel'],
-                'seller_profile' => strip_tags($input['seller_profile']),
+                'seller_profile' => $input['seller_profile'],
                 'seller_card_img' => $input['seller_card_img'],
                 'goods_category_id' => $input['goods_category_id'],
                 'scale_id' => $input['scale_id'],
@@ -107,6 +108,7 @@ class SellerController extends ControllerBase
             $this->logger->appendTitle('update');
             $cloneDetails = $SellerModel::cloneResult($SellerModel, $sellerDetails);
             $this->db->begin();
+
             try {
                 $cloneDetails->save($params);
                 $this->db->commit();
@@ -183,11 +185,12 @@ class SellerController extends ControllerBase
     }
 
     /**
-     * MarkActionName(商家列表|ajaxchangepassword)
+     * MarkActionName(商家列表|ajaxchangepassword|recommend)
      * @return mixed
      */
     public function sellerlistAction()
     {
+
         $rules = [
             'seller_status' => [
                 'filter' => FILTER_VALIDATE_INT,
@@ -232,6 +235,72 @@ class SellerController extends ControllerBase
         $this->view->sellerList = $seller['data'];
         $this->view->pageCount = $seller['pageCount'];
         $this->view->status = $input['seller_status'];
+    }
+
+    public function recommendAction(){
+
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'seller_staff_intro' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => null
+                ],
+
+                'seller_shop_img' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => null
+                ],
+
+                'seller_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                ],
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+            $sellerModel = new SellerModel();
+            $sellerDetails = $sellerModel->getDetailsById($input['seller_id']);
+            if (!$sellerDetails) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            if ($sellerDetails['project_id'] != $this->user['project_id']) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            if($input['seller_staff_intro'] == ''){
+                $params = [
+                    'seller_shop_img' => $input['seller_shop_img'],
+                    'seller_create_at' => time(),
+                ];
+            }elseif($input['seller_shop_img'] == ''){
+                $params = [
+                    'seller_staff_intro' => $input['seller_staff_intro'],
+                    'seller_create_at' => time(),
+                ];
+            }
+            $cloneDetails = $sellerModel::cloneResult($sellerModel, $sellerDetails);
+            $this->db->begin();
+            try {
+                $cloneDetails->save($params);
+                $this->db->commit();
+                $this->logger->addMessage(json_encode(array_merge($params,$sellerDetails), JSON_UNESCAPED_UNICODE), Phalcon\Logger::INFO);
+            } catch (Exception $e) {
+                $this->db->rollback();
+                $this->logger->addMessage($e->getMessage() . ' ' . json_encode(array_merge($params,$sellerDetails), JSON_UNESCAPED_UNICODE),
+                    Phalcon\Logger::CRITICAL);
+                $this->resultModel->setResult('102');
+                return $this->resultModel->output();
+            }
+            $this->resultModel->setResult('0');
+            return $this->resultModel->output();
+        }
     }
 
     public function ajaxchangepasswordAction()
@@ -610,13 +679,5 @@ class SellerController extends ControllerBase
             return $this->resultModel->output();
         }
     }
-
-
-
-
-
-
-
-
 
 }

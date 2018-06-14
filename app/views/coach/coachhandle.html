@@ -1,218 +1,210 @@
-{{partial("layout/header")}}
-<style>
-    .conditionalPart{display: none}
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">{%if coachDetails['coach_id'] is defined%}编辑教练{%else%}添加教练{%endif%}</a></li>
-                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">{%if coachDetails['coach_id'] is defined%}编辑教练{%else%}添加教练{%endif%}</li>
-            </ol>
-        </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-book">
+        {%if coachDetails['coach_id'] is defined%}编辑教练{%else%}添加教练{%endif%}
     </div>
-    <div id="content">
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"CoachManage"|_}}</li>
+        <li class="am-active"><a href="/coach/coachhandle" >{%if coachDetails['coach_id'] is defined%}编辑教练{%else%}添加教练{%endif%}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-user_add"></span> {%if coachDetails['coach_id'] is defined%}编辑教练{%else%}添加教练{%endif%}</span> </div>
-                    <div class="panel-body">
-                        <form class="cmxform" id="altForm">
-                            <input type="hidden" id="doctor_id" value="{%if coachDetails['coach_id'] is defined%}{{coachDetails['coach_id']}}{%endif%}" />
-                            <div class="form-group">
-                                <label>{{"Photo"|_}}</label>
-                                <div style="margin: 6px;display: {%if coachDetails['coach_photo'] is defined%}block{%else%}none{%endif%};" id="previewDiv">
-                                    <a href="" target="_blank" id="previewImageUrl">
-                                        <img src="{%if coachDetails['coach_photo'] is defined%}{{coachDetails['coach_photo']}}{%endif%}" width="100" id="previewImage" />
-                                    </a>
-                                    <button type="button" class="btn btn-info btn-gradient btn-xs" style="margin-left: 30px;" onclick="removeImage()">移除照片</button>
-                                    <input type="hidden" id="doctor_photo" value="">
-                                </div>
-                                <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
-                                    <div class="progress-bar" role="progressbar" id="thumbnailProgress" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                </div>
-                                <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()" >
-                            </div>
-                            <div class="form-group">
-                                <label>姓名</label>
-                                <input id="doctor_name" name="doctor_name" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_name"]}}{%endif%}">
-                            </div>
-                            <div class="form-group">
-                                <label>性别</label>
-                                <div class="col-md-13">
-                                    <select class="multiselect single" id="coach_gender" required="">
-                                        <option value="1"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==1 %} selected{%endif%}>男</option>
-                                        <option value="2"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==2 %} selected{%endif%}>女</option>
-                                    </select></div>
-                            </div>
-                            <div class="form-group">
-                                <label>年龄</label>
-                                <input id="coach_age" name="coach_age" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_age"]}}{%endif%}">
-                            </div>
-                            <div class="form-group">
-                            <label>驾龄</label>
-                            <input id="coach_seniority" name="coach_seniority" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_seniority"]}}{%endif%}">
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <input type="hidden" id="doctor_id" value="{%if coachDetails['coach_id'] is defined%}{{coachDetails['coach_id']}}{%endif%}" />
+                    <div class="am-form-group">
+                        <label>{{"Photo"|_}}</label>
+                        <div style="margin: 6px;display: {%if coachDetails['coach_photo'] is defined%}block{%else%}none{%endif%};" id="previewDiv">
+                            <a href="" target="_blank" id="previewImageUrl">
+                                <img src="{%if coachDetails['coach_photo'] is defined%}{{coachDetails['coach_photo']}}{%endif%}" width="100" id="previewImage" />
+                            </a>
+                            <button type="button" class="am-close am-close-alt am-icon-close am-close-spin" style="margin-left: 30px;" onclick="removeImage()"></button>
+                            <input type="hidden" id="doctor_photo" value="">
                         </div>
-                            <div class="form-group">
-                                <label>{{"Intro"|_}}</label>
-                                <textarea id="coach_intro" name="coach_intro" required="">{%if coachDetails is defined%}{{coachDetails["coach_intro"]}}{%endif%}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
-                            </div>
-                        </form>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="thumbnailProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                            <input id="thumbnail" name="thumbnail" type="file" multiple onchange="UpLoadFile()" >
+                        </div>
                     </div>
-                </div>
-            </div>
+                    <div class="am-form-group">
+                        <label for="doctor_name">姓名</label>
+                        <input id="doctor_name" name="doctor_name" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_name"]}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="coach_gender">性别</label>
+                        <div>
+                            <select id="coach_gender" required data-am-selected="{btnSize:'sm'}">
+                                <option value="1"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==1 %} selected{%endif%}>男</option>
+                                <option value="2"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==2 %} selected{%endif%}>女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="coach_tel">联系电话</label>
+                        <input id="coach_tel" name="coach_tel" type="number" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_tel"]}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="coach_age">年龄</label>
+                        <input id="coach_age" name="coach_age" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_age"]}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="coach_seniority">驾龄</label>
+                        <input id="coach_seniority" name="coach_seniority" class="form-control" type="text" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_seniority"]}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="coach_intro">{{"Intro"|_}}</label>
+                        <textarea id="coach_intro" name="coach_intro" required="">{%if coachDetails is defined%}{{coachDetails["coach_intro"]}}{%endif%}</textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{'Submit'|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
         </div>
     </div>
-</section>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
-{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-
-    var multiselectConfig = {maxHeight: 220,buttonWidth:"200px"};
-    function UpLoadFile() {
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain; charset=utf-8');
-        // FormData 对象
-        var formData = new FormData();
-        var files = document.getElementById('thumbnail').files;
-        if (files[0] ==undefined){
-            alert("No file chosen")
-            return;
-        }
-        var totalBytes = files[0].size;
-        // $("#userfile").attr("disabled","disabled");
-        $("#thumbnail").attr("disabled","disabled");
-
-        formData.set('part', 'coach_photo');
-        formData.set('Filedata', files[0]);
-        // XMLHttpRequest 对象
-        xhr.upload.onprogress = function (ev) {
-            var percent = 0;
-            if (ev.lengthComputable) {
-                percent = parseInt(100 * ev.loaded / ev.total);
-                $("#thumbnailProgress").width(percent + "%");
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+    <script type="text/javascript">
+        function UpLoadFile() {
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('text/plain; charset=utf-8');
+            // FormData 对象
+            var formData = new FormData();
+            var files = document.getElementById('thumbnail').files;
+            if (files[0] ==undefined){
+                alert("No file chosen");
+                return;
             }
-        };
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState==4){
-                if (xhr.status == 200) {
-                    $("#previewImage").attr("src" , xhr.responseText);
-                    $("#previewImageUrl").attr("href" , xhr.responseText);
-                    $("#doctor_photo").val(xhr.responseText);
-                    $("#previewDiv").show();
-                    // fileInput.replaceWith(fileInput.val('').clone(true));
-                }else{
-                    alert(xhr.responseText)
+            var totalBytes = files[0].size;
+            // $("#userfile").attr("disabled","disabled");
+            $("#thumbnail").attr("disabled","disabled");
+
+            formData.set('part', 'coach_photo');
+            formData.set('Filedata', files[0]);
+            // XMLHttpRequest 对象
+            xhr.upload.onprogress = function (ev) {
+                var percent = 0;
+                if (ev.lengthComputable) {
+                    percent = parseInt(100 * ev.loaded / ev.total);
+                    $("#thumbnailProgress").width(percent + "%");
                 }
-            }
-            $("#thumbnailProgress").width("0%");
-            $('#thumbnail').removeAttr("disabled");
-        }
-        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
-        xhr.send(formData);
-    }
-    function removeImage(){
-        $("#previewImage").attr("src" , "");
-        var fileInput = $('#thumbnail');
-        fileInput.replaceWith(fileInput.val('').clone(true));
-        $("#previewImageUrl").attr("href" , '');
-        $("#previewDiv").hide();
-    }
-    function submitHandler(){
-        var coach_intro      = $.trim(CKEDITOR.instances['coach_intro'].getData());
-        var coach_id         = parseInt($('#doctor_id').val()),
-            coach_age        = parseInt($('#coach_age').val()),
-            coach_seniority  = parseInt($('#coach_seniority').val()),
-            coach_gender     = parseInt($('#coach_gender').val()),
-            coach_name       = $.trim($('#doctor_name').val()),
-            coach_photo      = $.trim($('#doctor_photo').val());
-        if (!coach_name){
-            alert('请填写姓名！');
-            return;
-        }
-        $('#subBtn').attr('disabled', 'disabled');
-        $('#subLoading').remove();
-        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
-        $.ajax('/{{routerProjectId}}/coach/coachhandle', {
-            data: {
-                coach_id        : coach_id,
-                coach_name      : coach_name,
-                coach_intro     : coach_intro,
-                coach_photo     : coach_photo,
-                coach_age       :coach_age,
-                coach_seniority :coach_seniority,
-                coach_gender    :coach_gender
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function(data)
-            {
-                alert(data.errmsg);
-                if (data.errcode == 0)
-                {
-                    location.replace('/{{routerProjectId}}/coach/coachlist');
-                }
-            },
-            error: function()
-            {
-                alert('服务器错误');
-            },
-            complete:function(){
-                $('#subBtn').removeAttr('disabled');
-                $('#subLoading').remove();
-            }
-        });
-        return false;
-    }
-    jQuery(document).ready(function () {
-        "use strict";
-        Core.init();
-        var baseImageUrl = '{{url.getStaticBaseUri()}}';
-        {%if coachDetails is defined%}
-        $('#doctor_photo').val('{{coachDetails["coach_photo"]}}');
-        {%endif%}
-
-        $.validator.addMethod("needsSelection", function(value, element) {
-            return $(element).multiselect("getChecked").length > 0;
-        });
-
-        var validator = $("#altForm").validate({
-            submitHandler:submitHandler,
-            ignore: ':hidden:not("#department_id")',
-            rules: {
-                department_id: "required needsSelection",
-                coach_intro: {
-                    required: function()
-                    {
-                        CKEDITOR.instances.coach_intro.updateElement();
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState==4){
+                    if (xhr.status == 200) {
+                        $("#previewImage").attr("src" , xhr.responseText);
+                        $("#previewImageUrl").attr("href" , xhr.responseText);
+                        $("#doctor_photo").val(xhr.responseText);
+                        $("#previewDiv").show();
+                        // fileInput.replaceWith(fileInput.val('').clone(true));
+                    }else{
+                        alert(xhr.responseText)
                     }
                 }
-            },
-            errorPlacement: function(error, element)
-            {
-                if (element.attr("name") == "coach_intro")
-                {
-                    error.insertAfter("textarea#coach_intro");
-                } else {
-                    error.insertAfter(element);
-                }
+                $("#thumbnailProgress").width("0%");
+                $('#thumbnail').removeAttr("disabled");
+            };
+            xhr.open("post", "/upload/upload", true);
+            xhr.send(formData);
+        }
+        function removeImage(){
+            $("#doctor_photo").val('');
+            $("#previewImage").attr("src" , "");
+            var fileInput = $('#thumbnail');
+            fileInput.replaceWith(fileInput.val('').clone(true));
+            $("#previewImageUrl").attr("href" , '');
+            $("#previewDiv").hide();
+        }
+        function submitHandler(){
+            var coach_intro      = $.trim(CKEDITOR.instances['coach_intro'].getData());
+            var coach_id         = parseInt($('#doctor_id').val()),
+                coach_age        = parseInt($('#coach_age').val()),
+                coach_seniority  = parseInt($('#coach_seniority').val()),
+                coach_gender     = parseInt($('#coach_gender').val()),
+                coach_name       = $.trim($('#doctor_name').val()),
+                coach_photo      = $.trim($('#doctor_photo').val());
+            if (!coach_name){
+                alert('请填写姓名！');
+                return;
             }
+            $('#subBtn').attr('disabled', 'disabled');
+            $('#subLoading').remove();
+            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            $.ajax('/coach/coachhandle', {
+                data: {
+                    coach_id        : coach_id,
+                    coach_name      : coach_name,
+                    coach_intro     : coach_intro,
+                    coach_photo     : coach_photo,
+                    coach_age       :coach_age,
+                    coach_seniority :coach_seniority,
+                    coach_gender    :coach_gender
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    alert(data.msg);
+                    if (data.code == 0)
+                    {
+                        location.replace('/coach/coachlist');
+                    }
+                },
+                error: function()
+                {
+                    alert('服务器错误');
+                },
+                complete:function(){
+                    $('#subBtn').removeAttr('disabled');
+                    $('#subLoading').remove();
+                }
+            });
+            return false;
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            var baseImageUrl = '{{url.getStaticBaseUri()}}';
+            {%if coachDetails is defined%}
+            $('#doctor_photo').val('{{coachDetails["coach_photo"]}}');
+            {%endif%}
+
+            $.validator.addMethod("needsSelection", function(value, element) {
+                return $(element).multiselect("getChecked").length > 0;
+            });
+
+            var validator = $("#altForm").validate({
+                submitHandler:submitHandler,
+                ignore: ':hidden:not("#department_id")',
+                rules: {
+                    department_id: "required needsSelection",
+                    coach_intro: {
+                        required: function()
+                        {
+                            CKEDITOR.instances.coach_intro.updateElement();
+                        }
+                    }
+                },
+                errorPlacement: function(error, element)
+                {
+                    if (element.attr("name") == "coach_intro")
+                    {
+                        error.insertAfter("textarea#coach_intro");
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+            CKEDITOR.replace( 'coach_intro');
+            $('#entry_time').mask('9999/99/99');
         });
-        CKEDITOR.replace( 'coach_intro');
-        $('.single').multiselect(multiselectConfig);
-        $('#entry_time').mask('9999/99/99');
-    });
+    </script>
 
-</script>
-
-</body>
-</html>
+{% endblock %}

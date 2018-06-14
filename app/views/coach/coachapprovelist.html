@@ -1,0 +1,126 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
+    <div class="tpl-content-page-title am-icon-book">
+        {{"CoachApprove"|_}}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"CoachManage"|_}}</li>
+        <li class="am-active"><a href="/coach/coachapprovelist" >{{"CoachApprove"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <form class="am-form">
+                <fieldset>
+                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
+                        <thead>
+                        <tr>
+                            <th style="width:1%">照片</th>
+                            <th nowrap="">姓名</th>
+                            <th nowrap="">性别</th>
+                            <th nowrap="">年龄</th>
+                            <th nowrap="">驾龄</th>
+                            <th nowrap="">评分</th>
+                            <th nowrap="">联系方式</th>
+                            <th style="width:120px" nowrap="">评价次数</th>
+                            <th style="width:1%" class="hidden-xs">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in coachList%}
+                        <tr id="doctor_{{i['coach_id']}}">
+                            <td nowrap="">{%if i['coach_photo'] is defined%}<img src="{{i['coach_photo']}}" width="50"/>{%else%}<img src="/client/crash.png "/>{%endif%}</td>
+                            <td>{{i['coach_name']}}</td>
+                            <td>{%if i['coach_gender']==1%}男{%elseif i['coach_gender']==2%}女{%endif%}</td>
+                            <td>{{i['coach_age']}}</td>
+                            <td>{{i['coach_seniority']}}</td>
+                            <td nowrap="">{{i['coach_score']}}</td>
+                            <td>{{i['coach_tel']}}</td>
+                            <td nowrap>{{i['evaluate_count']}}次</td>
+                            <td nowrap>
+                                <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius" onclick="Allow({{i['coach_id']}})" style="margin-left: 10px">{{"Allow"|_}}</button>
+                                <button type="button" class="am-btn am-btn-danger am-btn-xs am-radius" onclick="Refuse({{i['coach_id']}})" style="margin-left: 10px">{{"Refuse"|_}}</button>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript">
+        // 通过.
+        function Allow(coach_id)
+        {
+            var r = confirm('确定审批吗？');
+            if (r == true) {
+                $.ajax('/coach/coachapprove', {
+                    type: "POST",
+                    dataType: 'JSON',
+                    data: {
+                        'coach_id': coach_id,
+                        'approval_status': 1
+                    },
+                    success:function(data){
+                        if(data.code == 0) {
+                            alert(data.msg);
+                            $("#doctor_"+coach_id).remove();
+                            // location.reload();
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error:function(){
+                        alert('操作失败，请稍后重试！');
+                    }
+                })
+            }
+        }
+
+        // 拒绝.
+        function Refuse(coach_id)
+        {
+            var r = confirm('确定拒绝吗？');
+            if (r == true) {
+                $.ajax('/coach/coachapprove', {
+                    type: "POST",
+                    dataType: 'JSON',
+                    data: {
+                        'coach_id': coach_id,
+                        'approval_status': 2
+                    },
+                    success:function(data){
+                        if(data.code == 0) {
+                            alert(data.msg);
+                            $("#doctor_"+coach_id).remove();
+                            // location.reload();
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error:function(){
+                        alert('操作失败，请稍后重试！');
+                    }
+                })
+            }
+        }
+
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('#datatable').dataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
+        });
+    </script>
+
+{% endblock %}

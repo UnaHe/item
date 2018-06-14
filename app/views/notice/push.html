@@ -1,120 +1,188 @@
-{{partial("layout/header")}}
-<style>
-.preview{width: 100%}
-.preview span{
-  text-align: center;
-  margin:6px;
-}
-.preview span img{
-  margin-top: 6px;
-  width:100px;
-}
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="#">{{"NoticePush"|_}}</a></li>
-          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
-          <li class="crumb-link"><a href="#">{{"NoticeManage"|_}}</a></li>
-        </ol>
-      </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-envelope">
+        {{"NoticePush"|_}}
     </div>
-    <div id="content">
-      <div class="row">
-<div class="col-md-12">
-<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-message_new"></span> {{"NoticePush"|_}} </span> </div>
-            <div class="panel-body">
-              <form class="cmxform" id="altForm">
-                <div class="form-group">
-                  <label for="content_cn">内容</label>
-                  <textarea id="content_cn" name="content_cn" type="text" class="form-control postData" rows="6" required="">{{noticeDetails['notice_content_zh_CN']}}</textarea>
-                </div>
-                <div class="form-group">
-                  <label>{{"NoticeLevel"|_}}</label>
-                  <div class="col-md-13">
-                    <select class="multiselect postData" id="level">
-                    <option value="3">临时信息</option>
-                    <option value="1">紧急信息</option>
-                    </select></div>
-                </div>
-                <div class="form-group">
-                  <label> {{'NoticeTimeout'|_}} </label><span style="margin-left: 30px;">(单位：秒)</span>
-                  <input type="text" class="form-control postData" id="notice_timeout" maxlength="10" value="10" autocomplete="off" required="">
-                </div>
-                <div class="form-group mb25">
-                  <div class="col-md-12 pt5">
-                    <div class="cBox cBox-teal cBox-inline">
-                      <input type="checkbox" id="toMobile" value="" checked>
-                      <label for="toMobile" style="color:#000;font-size:14px;">同时推送至全部移动端</label>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"NoticeManage"|_}}</li>
+        <li class="am-active"><a href="/notice/push" >{{"NoticePush"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <form class="am-form">
+                <fieldset>
+                    <div class="am-form-group">
+                        <label for="map_id">{{"MapName"|_}}</label>
+                        <div>
+                            <select id="map_id" required onchange="selectPoint(this.value)" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize: 'sm'}">
+                                <option value="0">全部</option>
+                                {%for i in mapList%}
+                                <option value="{{i['map_id']}}">{{i['map_name']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
                     </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button"
-                          data-style="expand-left" id="subBtn"><span
-                          class="ladda-label"><i class="fa fa-share"></i> {{'push'|_}}</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-</div>
-          </div>
+                    <div class="am-form-group">
+                        <label for="id">{{"Equipment"|_}}</label>
+                        <div>
+                            <select id="id" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize: 'sm'}">
+                                <option value="0">请先选择地图</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="content_cn">内容</label>
+                        <textarea id="content_cn" name="content_cn" rows="3" required>{{noticeDetails['notice_content_zh_CN']}}</textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="content_en">{{'ContentEN'|_}}</label> ( 选填 )
+                        <textarea id="content_en" name="content_en" rows="3" >{{noticeDetails['notice_content_en_US']}}</textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <label>{{"NoticeLevel"|_}}</label>
+                        <div>
+                            <select id="level" data-am-selected="{btnSize: 'sm'}" title="{{'NoticeLevel'|_}}">
+                                <option value="3" "{{ noticeDetails['notice_level']==3 ? 'selected' : null }}">临时信息</option>
+                                <option value="1" "{{ noticeDetails['notice_level']==1 ? 'selected' : null }}">紧急信息</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="notice_timeout"> {{'NoticeTimeout'|_}}</label>
+                        <span style="margin-left: 30px;">(单位：秒)</span>
+                        <input type="text" class="form-control" id="notice_timeout" maxlength="10" value="10" autocomplete="off" required="">
+                    </div>
+                    <div class="am-checkbox">
+                        <label for="toMobile">
+                            <input type="checkbox" id="toMobile"> 同时推送至全部移动端
+                        </label>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="button" class="am-btn am-btn-secondary am-radius pull-right am-btn-sm" id="subBtn"><span class="am-icon-share"> {{'push'|_}}</span></button>
+                    </div>
+                </fieldset>
+            </form>
         </div>
-  </section>
+    </div>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-var multiselectConfig = {enableFiltering: true,maxHeight: 320,buttonWidth:"400px"};
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+    <script type="text/javascript">
+        function selectPoint(map_id){
+            var html='';
+            if (map_id>0){
+                $.ajax('/pointresource/ajaxgetequipmentbymapid', {
+                    data: {
+                        map_id: map_id,
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(data)
+                    {
+                        if (data.code == 0)
+                        {
+                            if (data.data.length>0){
+                                var firstPointId;
+                                html = '<option value="0">全部</option>';
+                                for(var i=0;i<data.data.length;i++){
+                                    html += '<option value="'+data.data[i]['id']+'" data-equipment="'+data.data[i]['equipment_id']+'">'+data.data[i]['equipment_id']+'. '+data.data[i]['map_point_name']+'</option>';
+                                }
+                            }
+                        }else{
+                            alert(data.msg);
+                        }
+                        if (html==''){
+                            html='<option value="">没有相关设备</option>';
+                        }
+                        $("#id").selected('enable').html(html);
+                    },
+                    error: function()
+                    {
+                        alert('服务器错误');
+                    },
+                    complete:function(){
+                    }
+                });
+            }else{
+                $("#id").selected('disable').html('<option value="0">请先选择地图</option>');
+            }
+        }
 
-function submitHandler(){
-    var postData = {};
-    $('.postData').each(function(){
-        postData[this.id] = $.trim(this.value);
-    });
-    if (postData.content_cn===''){
-        alert('请填写推送内容!')
-        return false;
-    }
-    postData.toMobile = $('#toMobile').prop('checked')?1:0;
-    if (confirm('确定推送信息？')){
-        var l = Ladda.create(document.querySelector('#' + this.id));
-        l.start();
-        $.ajax('/notice/push', {
-            data: postData,
-            type: 'post',
-            dataType: 'json',
-            success: function(data)
-            {
-                alert(data.msg);
-                if (data.code == 0 ){
-                    location.href='/notice/log';
+        function submitHandler(){
+            var map_id     = $.trim($('#map_id').val()),point_id = $.trim($('#id').val());
+            var equipment_id = $('#id option:selected').attr('data-equipment');
+            if (point_id>0 && !equipment_id){
+                alert('设备获取失败，请联系管理员!');
+                return false;
+            }
+            var content_cn = $.trim($('#content_cn').val()),content_en = $.trim($('#content_en').val()),
+                level = $('#level').val();
+            if (content_cn==''){
+                alert('请填写推送内容!')
+                return false;
+            }
+            var timeout = parseInt($('#notice_timeout').val());
+            if (isNaN(timeout) || timeout<=0){
+                alert('显示时间不正确');
+                return false;
+            }
+            var toMobile = $('#toMobile').prop('checked')?1:0;
+            console.log(map_id , point_id , equipment_id , content_cn,content_en , level , toMobile,timeout);
+            $('#subBtn').attr('disabled', 'disabled');
+            if (confirm('确定推送信息？')){
+                var l = Ladda.create(document.querySelector('#' + this.id));
+                l.start();
+                $.ajax('/notice/push', {
+                    data: {
+                        equipment_id     : equipment_id,
+                        level     : level,
+                        content_cn     : content_cn,
+                        content_en     : content_en,
+                        map_id    : map_id,
+                        point_id   : point_id,
+                        toMobile   : toMobile,
+                        timeout   : timeout,
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(data)
+                    {
+                        alert(data.msg);
+                        if (data.code == 0 ){
+                            location.href='/notice/log';
+                        }
+                        l.stop();
+                    },
+                    error: function()
+                    {
+                        alert('服务器错误');
+                        l.stop();
+                    }
+                });
+            }
+            $('#subBtn').attr('disabled', false);
+            return false;
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('#subBtn').bind('click',submitHandler);
+            $.validator.addMethod("needsSelection", function(value, element) {
+                return $(element).multiselect("getChecked").length > 0;
+            });
+            $("#altForm").validate({
+                submitHandler:submitHandler,
+                ignore: [':hidden:not("#map_id")'],
+                rules:{
+                    map_id: "required needsSelection",
                 }
-                l.stop();
-            },
-            error: function()
-            {
-                alert('推送失败，请重试');
-                l.stop();
-            },
+            });
+
+            $("#id").selected('disable')
         });
-    }
-}
-jQuery(document).ready(function () {
-   "use strict";
-     // Init Theme Core
-    $('#subBtn').bind('click',submitHandler);
-    $('#level').multiselect(multiselectConfig);
+    </script>
 
-});
-
-</script>
-
-</body>
-</html>
+{% endblock %}

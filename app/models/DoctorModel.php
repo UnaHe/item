@@ -6,17 +6,17 @@ class DoctorModel extends ModelBase
 
     /**
      * @param $doctor_id
-     * @return bool
+     * @return bool | array
      */
     public function getDetailsById($doctor_id)
     {
         $tag = CacheBase::makeTag(self::class . 'getDetailsById', $doctor_id);
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
-             $sql = "select d.*,dj.doctor_job_title from " . DB_PREFIX ."doctor as d LEFT JOIN " . DB_PREFIX . "doctor_job as dj ON d.doctor_job_id=dj.doctor_job_id WHERE d.doctor_id=?";
+            $sql = "select d.*,dj.doctor_job_title from " . DB_PREFIX ."doctor as d LEFT JOIN " . DB_PREFIX . "doctor_job as dj ON d.doctor_job_id=dj.doctor_job_id WHERE d.doctor_id=?";
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                 $this->getReadConnection()->query($sql, [$doctor_id]));
-            $result = $data->valid() ? $data: false;
+            $result = $data->valid() ? $data->toArray()[0]: false;
             if (CACHING) {
                 $this->cache->save($tag, $result);
             }
@@ -76,7 +76,7 @@ class DoctorModel extends ModelBase
     }
 
     /**
-     * @return string | array
+     * @return array
      */
 
     public function clientGetListSimple(array $params = [])

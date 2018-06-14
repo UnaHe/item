@@ -1,94 +1,83 @@
-{{partial("layout/header")}}
-<style>
-.preview{width: 100%}
-.preview span{
-  text-align: center;
-  margin:6px;
-}
-.preview span img{
-  margin-top: 6px;
-  width:100px;
-}
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="#">{{"PointResourceManage"|_}}</a></li>
-          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-          <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
-        </ol>
-      </div>
-    </div>
-    <div id="content">
-      <div class="row">
-<div class="col-md-12">
-<div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicon glyphicon-file"></span> {{"PointResourceManage"|_}} </span> </div>
-            <div class="panel-body">
-              <form class="cmxform" id="altForm">
-                <div class="form-group">
-                  <label>{{"MapName"|_}}</label>
-                  <div class="col-md-13">
-                    <select class="multiselect" id="map_id" required="" onchange="selectPoint(this.value)">
-                    <option value=""></option>
-                    {%for i in mapList%}
-                      <option value="{{i['map_id']}}">{{i['map_name']}}</option>
-                      {%endfor%}
-                    </select></div>
-                </div>
-                <div class="form-group">
-                  <label>{{"Equipment"|_}}</label>
-                  <div class="col-md-13">
-                    <select class="multiselect" id="id" required="" onchange="initialResource($('#map_id').val(),this.value)">
-                    </select></div>
-                </div>
-                <div class="form-group">
-                  <label>{{"PointResourceImage"|_}}</label>
-                  <div id="imagePreview" class='preview'></div>
-                  <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="uploadImage()" >
-                  <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px;">
-                        <div class="progress-bar" role="progressbar" id="thumbnailProgress" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                      </div>
-                </div>
-                <div class="form-group">
-                  <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
-                </div>
-              </form>
-            </div>
-          </div>
-</div>
-          </div>
-        </div>
-  </section>
+{% extends "layout/main.html" %}
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-var multiselectConfig = {enableFiltering: true,maxHeight: 320,buttonWidth:"400px"};
-var xhr_uploadVideo;
-function initialResource(map_id,pointId){
-       $.ajax('/{{routerProjectId}}/pointresource/ajaxgetresourcebymappointid', {
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-file-image-o">
+        {{"PointResourceManage"|_}}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li class="am-active"><a href="/pointresource/handle" >{{"PointResourceManage"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row" style="min-height: 500px">
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <div class="am-form-group">
+                        <label for="map_id">{{"MapName"|_}}: </label>
+                        <div>
+                            <select class="formData" id="map_id" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize: 'sm'}}" onchange="selectPoint(this.value)">
+                                <option value="0">选择{{"MapName"|_}}</option>
+                                {%for i in mapList%}
+                                <option value="{{i['map_id']}}">{{i['map_name']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="map_gid">{{"Equipment"|_}}: </label>
+                        <div>
+                            <select class="formData" id="map_gid" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize: 'sm'}}" onchange="initialResource($('#map_id').val(),this.value)">
+                                <option value=" ">请先选择{{"MapName"|_}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label>{{"PointResourceImage"|_}}: </label>
+                        <div id="imagePreview" class='preview'></div>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="thumbnailProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file" id="images" style="display: none;">
+                            <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的文件</button>
+                            <input id="thumbnail" name="thumbnail" type="file" onchange="uploadImage()">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="btn am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{"Submit"|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    <script type="text/javascript">
+        var xhr_uploadVideo;
+        function initialResource(map_id,pointId){
+            if (pointId === ' ') {
+                return;
+            }
+            $.ajax('/pointresource/ajaxgetresourcebymappointid', {
                 data: {
-                  point_id: pointId,
-                  map_id: map_id,
+                    point_id: pointId,
+                    map_id: map_id,
                 },
                 type: 'post',
                 dataType: 'json',
                 success: function(data)
                 {
-                  console.log(data);
-                  var imageHtml = '';
-                    if (data.errcode == 0)
+                    console.log(data);
+                    var imageHtml = '';
+                    if (data.code == 0)
                     {
-                      if (data.data.image.length>0){
-                        for(var i=0;i<data.data.image.length;i++){
-                          imageHtml += '<span style="float:left;display:inline;"><button class="btn btn-danger btn-xs" onclick="if (confirm(\'确定删除？\')){remove(\''+data.data.image[i]+'\');$(this).parent().remove();};return false;">X</button><br /><a href="'+data.data.image[i]+'" target="_blank"><img src="'+data.data.image[i]+'" alt=""/></a></span>';
+                        if (data.data.image.length>0){
+                            for(var i=0;i<data.data.image.length;i++){
+                                imageHtml += '<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close am-close-spin" onclick="if (confirm(\'确定删除？\')){remove(\''+data.data.image[i]+'\');$(this).parent().remove();};return false;"></button><br /><a href="'+data.data.image[i]+'" target="_blank"><img style="width: 20%;height: 20%" src="'+data.data.image[i]+'" alt=""/></a></span>';
+                            }
                         }
-                      }
                     }else{
-                      alert(data.errmsg);
+                        alert(data.msg);
                     }
                     if (imageHtml=='') imageHtml='没有相关图片';
                     $('#imagePreview').html(imageHtml);
@@ -100,184 +89,184 @@ function initialResource(map_id,pointId){
                 complete:function(){
                 }
             });
-    }
-function selectPoint(map_id){
-  console.log(map_id);
-  var html='';
-  if (map_id>0){
-    $.ajax('/{{routerProjectId}}/pointresource/ajaxgetequipmentbymapid', {
-                data: {
-                  map_id: map_id,
-                },
-                type: 'post',
-                dataType: 'json',
-                success: function(data)
-                {
-                    if (data.errcode == 0)
+        }
+        function selectPoint(map_id){
+            console.log(map_id);
+            var html='';
+            if (map_id>0){
+                $.ajax('/pointresource/ajaxgetequipmentbymapid', {
+                    data: {
+                        map_id: map_id,
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(data)
                     {
-                      if (data.data.length>0){
-                        var firstPointId;
-                        for(var i=0;i<data.data.length;i++){
-                          if (i==0){
-                            firstPointId = data.data[i]['id'];
-                          }
-                          html += '<option value="'+data.data[i]['id']+'" data-equipment="'+data.data[i]['equipment_id']+'">'+data.data[i]['map_point_name']+'</option>';
+                        if (data.code == 0)
+                        {
+                            if (data.data.length>0){
+                                var firstPointId;
+                                for(var i=0;i<data.data.length;i++){
+                                    if (i==0){
+                                        firstPointId = data.data[i]['id'];
+                                    }
+                                    html += '<option value="'+data.data[i]['id']+'" data-equipment="'+data.data[i]['equipment_id']+'">'+data.data[i]['map_point_name']+'</option>';
+                                }
+                                // if (firstPointId){
+                                //     initialResource(map_id,firstPointId);
+                                // }
+                            }
+                        }else{
+                            alert(data.msg);
                         }
-                        if (firstPointId){
-                          initialResource(map_id,firstPointId);
+                        if (html==''){
+                            html='<option value=" ">没有相关设备</option>';
+                            $('#imagePreview').html('');
+                            $('#images').hide();
+                        }else{
+                            $('#images').show();
                         }
-                      }
-                    }else{
-                      alert(data.errmsg);
+                        $("#map_gid").html(html).selected('enable');
+                    },
+                    error: function()
+                    {
+                        alert('服务器错误');
+                    },
+                    complete:function(){
                     }
-                    $('.multiselect').removeAttr('disabled');
-                    if (html==''){
-                      html='<option value="">没有相关设备</option>';
-                    $('#imagePreview').html('');
-                    }
-                    console.log(html);
-                  $("#id").html(html);
-                  $('#id').multiselect('rebuild');
-                },
-                error: function()
-                {
-                    alert('服务器错误');
-                },
-                complete:function(){
-                }
-            });
-  }
+                });
+            }
 
-}
-function remove(url){
-  $('.btn').attr('disabled','disabled');
-   $.ajax('/{{routerProjectId}}/pointresource/ajaxremovetmpresource', {
+        }
+        function remove(url){
+            $('.btn').attr('disabled','disabled');
+            $.ajax('/pointresource/ajaxremovetmpresource', {
                 data: {
-                  url:url
+                    url:url
                 },
                 type: 'post',
                 dataType: 'json',
                 success: function(data)
                 {
-                  console.log(data)
+                    console.log(data)
                 },
                 error: function()
                 {
                 },
                 complete:function(){
-                  $('.btn').removeAttr('disabled');
+                    $('.btn').removeAttr('disabled');
                 }
             });
-}
-function uploadImage() {
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain; charset=utf-8');
-        // FormData 对象
-        var formData = new FormData();
-        var files = document.getElementById('thumbnail').files;
-        if (files[0] ==undefined){
-            alert("No file chosen")
-            return;
         }
-        var totalBytes = files[0].size;
-        // $("#userfile").attr("disabled","disabled");
-        $("#thumbnail").attr("disabled","disabled");
-
-        formData.set('part', 'point_resource_image');
-        formData.set('Filedata', files[0]);
-        // XMLHttpRequest 对象
-        xhr.upload.onprogress = function (ev) {
-            var percent = 0;
-            if (ev.lengthComputable) {
-                percent = parseInt(100 * ev.loaded / ev.total);
-                $("#thumbnailProgress").width(percent + "%");
+        function uploadImage() {
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('text/plain; charset=utf-8');
+            // FormData 对象
+            var formData = new FormData();
+            var files = document.getElementById('thumbnail').files;
+            if (files[0] ==undefined){
+                alert("No file chosen")
+                return;
             }
-        };
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState==4){
-            if (xhr.status == 200) {
-              console.log(xhr.responseText);
-              $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn btn-danger btn-xs" onclick="if (confirm(\'确定删除？\')){remove(\''+xhr.responseText+'\');$(this).parent().remove();}return false;">X</button><br /><a href="'+xhr.responseText+'" target="_blank"><img src="'+xhr.responseText+'" alt=""/></a></span>');
-              $('#thumbnail').val('');
-              // fileInput.replaceWith(fileInput.val('').clone(true));
-            }else{
-              alert(xhr.responseText)
-            }
-        }
-        $("#thumbnailProgress").width("0%");
-        $('#thumbnail').removeAttr("disabled");
-        }
-        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
-        xhr.send(formData);
-    }
+            var totalBytes = files[0].size;
+            // $("#userfile").attr("disabled","disabled");
+            $("#thumbnail").attr("disabled","disabled");
 
-function submitHandler(){
-            var map_id     = $.trim($('#map_id').val()),point_id = $.trim($('#id').val());
-            var equipment_id = $('#id option:selected').attr('data-equipment');
+            formData.set('part', 'point_resource_image');
+            formData.set('Filedata', files[0]);
+            // XMLHttpRequest 对象
+            xhr.upload.onprogress = function (ev) {
+                var percent = 0;
+                if (ev.lengthComputable) {
+                    percent = parseInt(100 * ev.loaded / ev.total);
+                    $("#thumbnailProgress").width(percent + "%");
+                }
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState==4){
+                    if (xhr.status == 200) {
+                        console.log(xhr.responseText);
+                        $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close" onclick="if (confirm(\'确定删除？\')){remove(\''+xhr.responseText+'\');$(this).parent().remove();}return false;"></button><br /><a href="'+xhr.responseText+'" target="_blank"><img style="width: 20%;height: 20%" src="'+xhr.responseText+'" alt=""/></a></span>');
+                        $('#thumbnail').val('');
+                        // fileInput.replaceWith(fileInput.val('').clone(true));
+                    }else{
+                        alert(xhr.responseText)
+                    }
+                }
+                $("#thumbnailProgress").width("0%");
+                $('#thumbnail').removeAttr("disabled");
+            }
+            xhr.open("post", "/upload/upload", true);
+            xhr.send(formData);
+        }
+
+        function submitHandler(){
+            var map_id     = $.trim($('#map_id').val()),point_id = $.trim($('#map_gid').val());
+            var equipment_id = $('#map_gid option:selected').attr('data-equipment');
             if (!equipment_id){
-              alert('设备获取失败，请联系管理员!')
-              return false;
+                alert('设备获取失败，请联系管理员!')
+                return false;
             }
             var imageSrc = '';
             $('#imagePreview img').each(function(index,ele){
-              imageSrc += $(this).parent().attr('href')+'|';
+                imageSrc += $(this).parent().attr('href')+'|';
             });
             if (imageSrc==''){
-              alert('必须含有图片资源')
-              return false;
+                alert('必须含有图片资源')
+                return false;
             }
             $('#subBtn').attr('disabled', 'disabled');
-            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
-            $.ajax('/{{routerProjectId}}/pointresource/handle', {
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            $.ajax('/pointresource/handle', {
                 data: {
-                  equipment_id     : equipment_id,
-                  imageSrc     : imageSrc,
-                  map_id    : map_id,
-                  point_id   : point_id,
+                    equipment_id     : equipment_id,
+                    imageSrc     : imageSrc,
+                    map_id    : map_id,
+                    point_id   : point_id,
                 },
                 type: 'post',
                 dataType: 'json',
                 success: function(data)
                 {
-                    if (data.errcode == 0)
+                    if (data.code == 0)
                     {
                         if (data.data!='ok'){
-                          alert('推送失败，可能原因（设备不在线），请重新提交！');
-                          return;
+                            alert('推送失败，可能原因（设备不在线），请重新提交！');
+                            return;
                         }
                     }
-                    alert(data.errmsg);
+                    l.stop();
+                    alert(data.msg);
                 },
                 error: function()
                 {
+                    l.stop();
                     alert('服务器错误');
                 },
                 complete:function(){
-                  $('#subBtn').removeAttr('disabled');
-                  $('#subLoading').remove();
+                    l.stop();
+                    $('#subBtn').removeAttr('disabled');
+                    $('#subLoading').remove();
                 }
             });
             return false;
-}
-jQuery(document).ready(function () {
-   "use strict";
-     // Init Theme Core
-    Core.init();
-    $.validator.addMethod("needsSelection", function(value, element) {
-        return $(element).multiselect("getChecked").length > 0;
-    });
-    $("#altForm").validate({
-      submitHandler:submitHandler,
-    ignore: [':hidden:not("#map_id")'],
-    rules:{
-      map_id: "required needsSelection",
-    }
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $.validator.addMethod("needsSelection", function(value, element) {
+                return $(element).multiselect("getChecked").length > 0;
             });
-    $('.multiselect').multiselect(multiselectConfig);
+            $("#altForm").validate({
+                submitHandler:submitHandler,
+                ignore: [':hidden:not("#map_id")'],
+                rules:{
+                    map_id: "required needsSelection",
+                }
+            });
+            $('#map_gid').selected('disable');
+        });
+    </script>
 
-});
-
-</script>
-
-</body>
-</html>
+{% endblock %}

@@ -21,7 +21,7 @@ class ModelBase extends Model {
      * @param $bindParams
      * @param $page
      * @param $pageSize
-     * @return string
+     * @return array
      */
 
     protected function sqlLimit($sqlTemplate , $countPart , $where , $bindParams , $page , $pageSize){
@@ -35,6 +35,10 @@ class ModelBase extends Model {
         }
         $offset = ($page - 1) * $pageSize;
         $limit = ' limit ' . $pageSize . ' OFFSET ' . $offset;
-        return $limit;
+        $data = [
+            'pageCount' => $pageCount,
+            'limit' => $limit
+        ];
+        return $data;
     }
 }

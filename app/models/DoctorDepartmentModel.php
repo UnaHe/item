@@ -4,7 +4,7 @@ class DoctorDepartmentModel extends ModelBase
 {
     /**
      * @param $department_id
-     * @return bool
+     * @return bool|\Phalcon\Mvc\Model
      */
     public function getDetailsById($department_id)
     {
@@ -71,7 +71,7 @@ class DoctorDepartmentModel extends ModelBase
         $tag = CacheBase::makeTag(self::class . 'getList', $params);
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
-            $where = $countWhere = $limit = '';
+            $where = $countWhere = $limit = $orderBy = '';
             if (isset ($params ['project_id']) && !empty($params['project_id'])) {
                 $where .= (empty($where) ? ' WHERE ' : ' AND ') . ' d.project_id =?';
                 $bindParams [] = $params ['project_id'];
@@ -90,7 +90,8 @@ class DoctorDepartmentModel extends ModelBase
                 $limit = ' limit ' . $params ['psize'] . ' OFFSET ' . $offset;
                 $result['pageCount'] = $pageCount;
             }
-            $sql = 'select d.*,m.map_name from n_doctor_department as d join n_map as m on d.map_id = m.map_id ' . $where . $limit;
+            $orderBy = ' ORDER BY d.department_id';
+            $sql = 'select d.*,m.map_name from n_doctor_department as d join n_map as m on d.map_id = m.map_id ' . $where . $orderBy . $limit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,
                 $this->getReadConnection()->query($sql, $bindParams));
             if ($data->valid()) {

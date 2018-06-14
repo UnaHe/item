@@ -1,59 +1,67 @@
-{{partial("layout/header")}}
-  <!-- Start: Content -->
-  <section id="content_wrapper">
+{% extends "layout/main.html" %}
 
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="/">{{"projectList"|_}}</a></li>
-        </ol>
-      </div>
+{% block content %}
+
+    <style>
+        .project {
+            cursor:pointer;
+        }
+    </style>
+    <!-- Start: Content -->
+    <div class="tpl-content-page-title">
+        {{ "projectList"|_ }}
     </div>
-    <div id="content">
-      <div id="widget-dropdown" class="row">
-          {%for i in itemProjectList%}
-        <div class="col-sm-4">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20 project" data-id="{{i['project_id']}}" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-grey"></i></div>
-              <h2 class="mt15 lh15 text-grey2"><b>{{i['project_name']}}</b></h2>
-              <h5 class="text-muted">{%if i['project_status']==1%}正常{%else%}关闭{%endif%}</h5>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home">首页</a></li>
+        <li class="am-active">{{ "projectList"|_ }}</li>
+    </ol>
+
+    <div class="row">
+        {%for i in itemProjectList%}
+        {%if i['project_status']==1%}
+        <div class="am-u-lg-3 am-u-md-6 am-u-sm-12">
+            <div class="project dashboard-stat {{ i['project_status'] == 1 ? 'green' : 'red' }}" data-id="{{ i['project_id'] }}" >
+                <div class="visual">
+                    <i class=""></i>
+                </div>
+                <div class="details">
+                    <div class="number"></div>
+                    <div class="desc"> {{ i['project_name'] }} </div>
+                </div>
+                <a class="more" href="javascript:void(null);"> 查看详情
+                    <i class="m-icon-swapright m-icon-white"></i>
+                </a>
             </div>
-          </div>
         </div>
-          {%endfor%}
-      </div>
-      </div>
-  </section>
-  {{partial("layout/footer")}}
+        {%endif%}
+        {%endfor%}
+    </div>
 
-<!-- Theme Javascript --> 
+    <!-- Theme Javascript -->
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            "use strict";
+            $('.project').bind('click', function () {
+                $.ajax('/project/panel', {
+                    data: {
+                        project_id: $(this).attr('data-id'),
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            location.href = '/project/panel';
+                            return;
+                        }
+                        alert(data.msg);
+                    },
+                    error: function () {
+                        alert("验证异常，请刷新重试！");
+                    },
+                });
+            });
 
-<script type="text/javascript">
-jQuery(document).ready(function () {
-	 "use strict";
-     // Init Theme Core
-//     Core.init();
+        });
+    </script>
 
-     $('.project').bind('click',function(){
-         $.ajax('/project/panel', {
-             data: {project_id:$(this).attr('data-id')},
-             type: 'post',
-             dataType: 'json',
-             success: function(data) {
-                 if (data.code===0){
-                     location.href='/project/panel';
-                     return;
-                 }
-                 alert(data.msg);
-             },
-             error:function(){
-                 alert("验证异常，请刷新重试！");
-             },
-         });
-     });
-
-  });
-</script>
-</body>
-</html>
+{% endblock %}

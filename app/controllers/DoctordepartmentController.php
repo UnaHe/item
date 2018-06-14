@@ -77,6 +77,9 @@ class DoctordepartmentController extends ControllerBase
                     return $this->resultModel->output();
                 }
                 $oldDepartmentDetails = $departmentDetails->toArray();
+                if($oldDepartmentDetails['map_id'] !== $input['map_id']){ //如果修改了地图，则清空map_gid
+                    $params['map_gid'] = '';
+                }
             }
             $this->db->begin();
             try {
@@ -95,7 +98,7 @@ class DoctordepartmentController extends ControllerBase
                 $this->db->rollback();
                 $this->logger->addMessage(json_encode($params) . ' error:' . $e->getMessage(),
                     Phalcon\Logger::CRITICAL);
-                
+
                 $this->resultModel->setResult('102');
                 return $this->resultModel->output();
             }
@@ -103,7 +106,7 @@ class DoctordepartmentController extends ControllerBase
             $this->logger->addMessage(json_encode($params,
                     JSON_UNESCAPED_UNICODE) . (isset($oldDepartmentDetails) ? ' Old:' . json_encode($oldDepartmentDetails,
                         JSON_UNESCAPED_UNICODE) : ''), Phalcon\Logger::NOTICE);
-            
+
             if (CACHING) {
                 $removedTag = [
                     DoctorDepartmentModel::class . 'getList' . $this->user['project_id'],
@@ -117,6 +120,10 @@ class DoctordepartmentController extends ControllerBase
             $this->resultModel->setResult('0');
             return $this->resultModel->output();
         }
+
+
+
+
         $this->tag->appendTitle($this->translate->_('DoctorDepartmentInfo'));
         $departmentModel = new DoctorDepartmentModel();
         $departmentList = $departmentModel->clientGetList($this->user['project_id']);
@@ -193,7 +200,7 @@ class DoctordepartmentController extends ControllerBase
             } catch (Exception $e) {
                 $this->db->rollback();
                 $this->logger->addMessage($e->getMessage(), Phalcon\Logger::CRITICAL);
-                
+
                 $this->resultModel->setResult('102');
                 return $this->resultModel->output();
             }
@@ -201,7 +208,7 @@ class DoctordepartmentController extends ControllerBase
             $this->logger->addMessage(json_encode($departmentDetails->toArray(),
                     JSON_UNESCAPED_UNICODE) . ' childs:' . json_encode($tree->getArrayList($departmentDetails->department_id),
                     JSON_UNESCAPED_UNICODE), Phalcon\Logger::NOTICE);
-            
+
             if (CACHING) {
                 $removedTag = [
                     DoctorDepartmentModel::class . 'getList' . $this->user['project_id'],
@@ -209,6 +216,177 @@ class DoctordepartmentController extends ControllerBase
                 ];
                 foreach ($delDepartment as $v) {
                     $removedTag[] = DoctorModel::class . 'getList' . $v;
+                }
+                $this->cache->clean(CacheBase::CLEANING_MODE_TAG, $removedTag);
+            }
+            $this->resultModel->setResult('0');
+            return $this->resultModel->output();
+        }
+    }
+
+    /**
+     * MarkActionName(科室列表|ajaxgetpolygonsbymap|ajaxdepartmentmapsubmit)
+     * @return mixed
+     */
+    public function listAction()
+    {
+        $rules = array(
+            'project_id' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 1
+                ),
+                'default' => $this->user['project_id'],
+            ),
+            'page' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 1
+                ),
+                'default' => 1
+            ),
+            'psize' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 1
+                ),
+                'default' => 20
+            ),
+//            'usePage' => array(
+//                'filter' => FILTER_VALIDATE_INT,
+//                'options' => array(
+//                    'min_range' => 0,
+//                    'max_range' => 1
+//                ),
+//                'default' => 1
+//            )
+        );
+        $filter = new FilterModel ($rules);
+        if (!$filter->isValid($this->request->getQuery())) {
+            $this->alert($this->resultModel->getMsg('101'));
+        }
+        $input = $filter->getResult();
+        $this->tag->appendTitle($this->translate->_('DoctorDepartmentList'));
+        $departmentModel = new DoctorDepartmentModel();
+        $departmentList = $departmentModel->getList($input);
+
+        $projectModel = new ProjectModel();
+        $projectDetails = $projectModel->getDetailsByProjectId($this->user['project_id']);
+
+        //地图配置
+        if (!empty($projectDetails->project_client_map)) {
+            $this->view->clientMapSetting = explode(',', $projectDetails->project_client_map);
+        }else{
+            $this->view->clientMapSetting = ['18', '21', '0.7', '1.2'];
+        }
+        $this->view->imageType = $projectDetails->project_map_tile_type ? $projectDetails->project_map_tile_type : 'jpg';
+        $this->view->departmentList = $departmentList;
+    }
+
+    public function ajaxgetpolygonsbymapAction()
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'department_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                ],
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getQuery())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+            $departmentModel = new DoctorDepartmentModel();
+            $departmentDetails = $departmentModel->getDetailsById($input['department_id']);
+            if (!$departmentDetails) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            if ($departmentDetails->project_id != $this->user['project_id'] || empty($departmentDetails->map_id)) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+
+            $mapPolygonModel = new MapPolygonModel();
+            $mapPolygonList = $mapPolygonModel->getListByAvailable(['map_id'=>$departmentDetails->map_id,'project_id'=>$this->user['project_id']]);
+            if (!$mapPolygonList) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            $data = [
+                'polygon_list' => $mapPolygonList,
+                'map_id' => $departmentDetails->map_id,
+                'map_gid' => explode(',',$departmentDetails->map_gid),
+            ];
+            $this->resultModel->setResult('0',$data);
+            return $this->resultModel->output();
+        }
+    }
+
+    public function ajaxdepartmentmapsubmitAction()
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'department_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                ],
+                'polygon' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'flags'  => FILTER_FORCE_ARRAY,
+                    'default' => [],
+                ]
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+            $departmentModel = new DoctorDepartmentModel();
+            $departmentDetails = $departmentModel->getDetailsById($input['department_id']);
+            if (!$departmentDetails) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            if ($departmentDetails->project_id != $this->user['project_id'] || empty($departmentDetails->map_id)) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            $params = [
+//                'map_gid' => $input['department_id'],
+                'map_gid' => !empty($input['polygon']) ? implode(',',$input['polygon']) : '',
+            ];
+            $this->logger->appendTitle('update');
+            $this->db->begin();
+            try {
+                $departmentDetails->update($params);
+                if (CACHING) {
+                    $this->cache->delete(CacheBase::makeTag(DoctorDepartmentModel::class . 'getDetailsById',
+                        $input['department_id']));
+                }
+            }catch (Exception $e){
+                $this->db->rollback();
+                $this->logger->addMessage(json_encode($params) . ' error:' . $e->getMessage(),
+                    Phalcon\Logger::CRITICAL);
+
+                $this->resultModel->setResult('102');
+                return $this->resultModel->output();
+            }
+            $this->db->commit();
+            if (CACHING) {
+                $removedTag = [
+                    DoctorDepartmentModel::class . 'getList' . $this->user['project_id'],
+                    DoctorModel::class . 'getList' . $this->user['project_id']
+                ];
+                if (!empty($input['department_id'])) {
+                    $removedTag[] = DoctorModel::class . 'getList' . $input['department_id'];
                 }
                 $this->cache->clean(CacheBase::CLEANING_MODE_TAG, $removedTag);
             }

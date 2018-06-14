@@ -1,0 +1,484 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {{ get_title() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="/assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="/assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="{{ get_title() }}" />
+    <link rel="stylesheet" href="/assets/css/amazeui.min.css" />
+    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="/assets/css/app.css">
+
+    <script src="/assets/js/jquery.min.js"></script>
+</head>
+
+<body data-type="index">
+
+{{ partial("layout/header") }}
+
+<div class="tpl-page-container tpl-page-header-fixed">
+
+    <div class="tpl-left-nav tpl-left-nav-hover">
+        <div class="tpl-left-nav-title">
+            菜单
+        </div>
+        <div class="tpl-left-nav-list">
+            <ul class="tpl-left-nav-menu">
+                {# 项目列表 #}
+                <li class="tpl-left-nav-item homePage">
+                    <a href="/" class="nav-link {{ controller == 'index' AND action == 'index' ? 'active' : null }}">
+                        <i class="am-icon-home"></i>
+                        <span>{{ "projectList"|_ }}</span>
+                    </a>
+                </li>
+
+                {# 修改密码 #}
+                <li class="tpl-left-nav-item">
+                    <a href="/passport/changepass" class="nav-link {{ controller == 'passport' AND action == 'changepass' ? 'active' : null }}">
+                        <i class="am-icon-cog"></i>
+                        <span >修改密码</span>
+                    </a>
+                </li>
+
+                {# 轮播图 #}
+                {%if (cpAclNew['resource']['pointresource'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="/pointresource/handle" class="nav-link {{ controller == 'pointresource' AND action == 'handle' ? 'active' : null }}">
+                        <i class="am-icon-image"></i>
+                        <span >{{"PointResourceManage"|_}}</span>
+                    </a>
+                </li>
+                {%endif%}
+
+                {# 文章 #}
+                {%if ((cpAclNew['resource']['article'] is defined) AND ('list' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                    {%if articleCategoryList is defined%}
+                        {%for i in articleCategoryList%}
+                        <li class="tpl-left-nav-item">
+                            <a href="/article/list?article_category_id={{i['article_category_id']}}" class="nav-link {{ controller=='article' AND action=='list' AND filter is defined AND filter['article_category_id']==i['article_category_id'] ? 'active' : null }}">
+                                <i class="am-icon-newspaper-o"></i>
+                                <span >{{i['name']}}</span>
+                            </a>
+                        </li>
+                        {%endfor%}
+                    {%endif%}
+
+                {#<li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'article' ? 'active' : null }}">
+                        <i class="am-icon-bookmark-o"></i>
+                        <span>{{"ArticleManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'article' ? 'display:block;' : null }}">
+                        {%if ((cpAclNew['resource']['article'] is defined) AND ('handle' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                        <li>
+                            <a href="/article/handle" class="{{ controller == 'article' AND action == 'handle' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ArticleHandle"|_}}</span>
+                            </a>
+                        </li>
+                        {%endif%}
+
+                        {%if ((cpAclNew['resource']['article'] is defined) AND ('list' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                        <li>
+                            <a href="/article/list" class="{{ controller == 'article' AND action == 'list' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ArticleList"|_}}</span>
+                            </a>
+                        </li>
+                        {%endif%}
+
+                        {%if ((cpAclNew['resource']['article'] is defined) AND ('category' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                        <li>
+                            <a href="/article/category" class="{{ controller == 'article' AND action == 'category' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ArticleCategory"|_}}</span>
+                            </a>
+                        </li>
+                        {%endif%}
+                    </ul>
+                </li>#}
+                {%endif%}
+
+                {# 设备 #}
+                {%if (cpAclNew['resource']['equipment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'equipment' ? 'active' : null }}">
+                        <i class="am-icon-wpforms"></i>
+                        <span>{{ "equipmentManage"|_ }}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'equipment' ? 'display:block;' : null }}">
+                        {%if ((cpAclNew['resource']['equipment'] is defined) AND ('infrared' in cpAclNew['resource']['equipment'])) OR ((cpAclNew['resource']['equipment'] is defined) AND ('all' in cpAclNew['resource']['equipment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                        <li>
+                            <a href="/equipment/infrared" class="{{ controller == 'equipment' AND (action == 'infrared' OR action == 'infraredhandle' OR action == 'infraredareahandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "equipmentInfrared"|_ }}</span>
+                            </a>
+                        </li>
+                        {%endif%}
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 医生 #}
+                {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'doctor' ? 'active' : null }}">
+                        <i class="am-icon-hospital-o"></i>
+                        <span>{{"DoctorManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'doctor' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('list' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctor/list" class="{{ controller == 'doctor' AND action == 'list' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorList"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('handle' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctor/handle" class="{{ controller == 'doctor' AND action == 'handle' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorHandle"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('schedule' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctor/schedule" class="{{ controller == 'doctor' AND (action == 'schedule' OR action == 'scheduleview') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorSchedule"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('job' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctor/job" class="{{ controller == 'doctor' AND action == 'job' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorJob"|_}}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 医生部门 #}
+                {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'doctordepartment' ? 'active' : null }}">
+                        <i class="am-icon-building"></i>
+                        <span>{{"DoctorDepartmentManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'doctordepartment' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('list' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctordepartment/list" class="{{ controller == 'doctordepartment' AND action == 'list' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorDepartmentList"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/doctordepartment/department" class="{{ controller == 'doctordepartment' AND action == 'department' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"DoctorDepartmentInfo"|_}}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 消息 #}
+                {%if (cpAclNew['resource']['notice'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'notice' ? 'active' : null }}">
+                        <i class="am-icon-envelope"></i>
+                        <span>{{ "NoticeManage"|_ }}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'notice' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['notice'] is defined) AND ('push' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['notice'] is defined) AND ('all' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/notice/push" class="{{ controller == 'notice' AND action == 'push' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "NoticePush"|_ }}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['notice'] is defined) AND ('log' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['notice'] is defined) AND ('all' in cpAclNew['resource']['notice'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/notice/log" class="{{ controller == 'notice' AND action == 'log' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "NoticeLog"|_ }}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 点位 #}
+                {%if (cpAclNew['resource']['polygonsort'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'polygonsort' ? 'active' : null }}">
+                        <i class="am-icon-sort-amount-asc"></i>
+                        <span>{{ "polygonsortManage"|_ }}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'polygonsort' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['polygonsort'] is defined) AND ('list' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['polygonsort'] is defined) AND ('all' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/polygonsort/list" class="{{ controller == 'polygonsort' AND action == 'list' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "polygonsortList"|_ }}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['polygonsort'] is defined) AND ('handle' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['polygonsort'] is defined) AND ('all' in cpAclNew['resource']['polygonsort'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/polygonsort/handle" class="{{ controller == 'polygonsort' AND action == 'handle' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "polygonsortHandle"|_ }}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 帐号 #}
+                {%if (cpAclNew['resource']['account'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'account' ? 'active' : null }}">
+                        <i class="am-icon-users"></i>
+                        <span>{{"AccountManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'account' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['account'] is defined) AND ('list' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['account'] is defined) AND ('all' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/account/list" class="{{ controller == 'account' AND action == 'list' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"AccountList"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['account'] is defined) AND ('group' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['account'] is defined) AND ('all' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/account/group" class="{{ controller == 'account' AND action == 'group' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"AccountGroup"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['account'] is defined) AND ('groupaccess' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['account'] is defined) AND ('all' in cpAclNew['resource']['account'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/account/groupaccess" class="{{ controller == 'account' AND action == 'groupaccess' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"AccountGroupAccess"|_}}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 封面 #}
+                {%if (cpAclNew['resource']['images'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'images' ? 'active' : null }}">
+                        <i class="am-icon-file-image-o"></i>
+                        <span>{{ "CoverManage"|_ }}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'images' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['images'] is defined) AND ('coverlist' in cpAclNew['resource']['images'])) OR ((cpAclNew['resource']['images'] is defined) AND ('all' in cpAclNew['resource']['images'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/images/coverlist" class="{{ controller == 'images' AND action == 'coverlist' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "CoverList"|_ }}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['images'] is defined) AND ('coverupload' in cpAclNew['resource']['images'])) OR ((cpAclNew['resource']['images'] is defined) AND ('all' in cpAclNew['resource']['images'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/images/coverupload" class="{{ controller == 'images' AND action == 'coverupload' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{ "CoverUpload"|_ }}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 教练 #}
+                {%if (cpAclNew['resource']['coach'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'coach' ? 'active' : null }}">
+                        <i class="am-icon-th"></i>
+                        <span>{{"CoachManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'coach' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['coach'] is defined) AND ('coachlist' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['coach'] is defined) AND ('all' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/coach/coachlist" class="{{ controller == 'coach' AND action == 'coachlist' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"CoachList"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['coach'] is defined) AND ('coachhandle' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['coach'] is defined) AND ('all' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/coach/coachhandle" class="{{ controller == 'coach' AND action == 'coachhandle' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"EditCoach"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['coach'] is defined) AND ('pending' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['coach'] is defined) AND ('all' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/coach/pending" class="{{ controller == 'coach' AND action == 'pending' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"HandleScore"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['coach'] is defined) AND ('coachapprovelist' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['coach'] is defined) AND ('all' in cpAclNew['resource']['coach'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/coach/coachapprovelist" class="{{ controller == 'coach' AND action == 'coachapprovelist' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"CoachApprove"|_}}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 商家帐号 #}
+                {%if (cpAclNew['resource']['seller'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'seller' ? 'active' : null }}">
+                        <i class="am-icon-sellsy"></i>
+                        <span>商家管理</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'seller' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['seller'] is defined) AND ('sellerlist' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['seller'] is defined) AND ('all' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/seller/sellerlist" class="{{ controller == 'seller' AND (action == 'sellerlist' OR action == 'sellerhandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>商家账号</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['seller'] is defined) AND ('scale' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['seller'] is defined) AND ('all' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/seller/scale" class="{{ controller == 'seller' AND action == 'scale' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>规模类别</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['seller'] is defined) AND ('goodscategory' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['seller'] is defined) AND ('all' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/seller/goodscategory" class="{{ controller == 'seller' AND action == 'goodscategory' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>主营类别</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['seller'] is defined) AND ('promotionlist' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['seller'] is defined) AND ('all' in cpAclNew['resource']['seller'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/seller/promotionlist" class="{{ controller == 'seller' AND action == 'promotionlist' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>促销列表</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 景区 #}
+                {%if (cpAclNew['resource']['scenic'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'scenic' ? 'active' : null }}">
+                        <i class="am-icon-building"></i>
+                        <span>{{"ScenicManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'scenic' ? 'display:block;' : null }}">
+                        <li>
+                            {%if ((cpAclNew['resource']['scenic'] is defined) AND ('spots' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['scenic'] is defined) AND ('all' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/scenic/spots" class="{{ controller == 'scenic' AND (action == 'spots' OR action == 'spothandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ScenicSpots"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['scenic'] is defined) AND ('route' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['scenic'] is defined) AND ('all' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/scenic/route" class="{{ controller == 'scenic' AND (action == 'route' OR action == 'routehandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ScenicRoute"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['scenic'] is defined) AND ('routecategory' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['scenic'] is defined) AND ('all' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/scenic/routecategory" class="{{ controller == 'scenic' AND action == 'routecategory' ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ScenicRouteCategory"|_}}</span>
+                            </a>
+                            {%endif%}
+
+                            {%if ((cpAclNew['resource']['scenic'] is defined) AND ('events' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['scenic'] is defined) AND ('all' in cpAclNew['resource']['scenic'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                            <a href="/scenic/events" class="{{ controller == 'scenic' AND (action == 'events' OR action == 'eventshandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"ScenicEvents"|_}}</span>
+                            </a>
+                            {%endif%}
+                        </li>
+                    </ul>
+                </li>
+                {%endif%}
+
+                {# 评论 #}
+                {%if (cpAclNew['resource']['comment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'comment' ? 'active' : null }}">
+                        <i class="am-icon-comments"></i>
+                        <span>{{"CommentManage"|_}}</span>
+                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                    </a>
+                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'comment' ? 'display:block;' : null }}">
+                        {%if ((cpAclNew['resource']['comment'] is defined) AND ('list' in cpAclNew['resource']['comment'])) OR ((cpAclNew['resource']['comment'] is defined) AND ('all' in cpAclNew['resource']['comment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                        <li>
+                            <a href="/comment/list" class="{{ controller == 'comment' AND (action == 'list' OR action == 'infraredhandle' OR action == 'infraredareahandle') ? 'active' : null}}">
+                                <i class="am-icon-angle-right"></i>
+                                <span>{{"CommentList"|_}}</span>
+                            </a>
+                        </li>
+                        {%endif%}
+                    </ul>
+                </li>
+                {%endif%}
+            </ul>
+        </div>
+    </div>
+
+    <div class="tpl-content-wrapper">
+        {% block content %}
+
+        {% endblock %}
+    </div>
+
+</div>
+
+{{ partial("layout/footer") }}
+
+<script src="/assets/js/amazeui.min.js"></script>
+<script src="/assets/js/iscroll.js"></script>
+<script src="/assets/js/app.js"></script>
+</body>
+
+</html>

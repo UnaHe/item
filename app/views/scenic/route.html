@@ -1,118 +1,104 @@
-{{partial("layout/header")}}
-<script type="text/javascript" src="/console/pagers.js"></script>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">{{"ScenicRoute"|_}}</a></li>
-                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
-                        class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
-            </ol>
-        </div>
-        <div class="topbar-right pt30">
-            <button type="button" class="btn btn-success btn-sm updateEquipment"
-                    onclick="location.href='/{{routerProjectId}}/scenic/routehandle';">添加路线方案
-            </button>
-        </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <script type="text/javascript" src="/client/pagers.js"></script>
+    <div class="tpl-content-page-title am-icon-square-o">
+        {{"ScenicRoute"|_}}
     </div>
-    <div id="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel">
-                    <div class="panel-heading"><span class="panel-title"> <span
-                            class="glyphicon glyphicon-list-alt"></span> {{"ScenicRoute"|_}} </span>
-                        <div class="topbar-right" style="margin-right: 10px;">
-                            <select class="multiselect"
-                                    onchange="$('.btn').attr('disabled','disabled');location.href='/{{routerProjectId}}/scenic/route?category_id='+this.value;">
-                                <option value="">全部分类</option>
-                                {%for i in scenicRouteCategoryList%}
-                                <option value="{{i['scenic_route_category_id']}}" {%if filter[
-                                'category_id']==i['scenic_route_category_id']%} selected="selected"{%endif%}>{{i['scenic_route_category_name']}}</option>
-                                {%endfor%}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-hover">
-                            <thead>
-                            <th style="text-align: left" nowrap="">方案名称</th>
-                            <th style="width:1%" nowrap="">分类</th>
-                            <th style="width:1%" nowrap="">操作</th>
-                            </thead>
-                            <tbody>
-                            {%for i in scenicRoute['data']%}
-                            <tr id="route_{{i['scenic_route_id']}}">
-                                <td style="text-align: left">{{i['scenic_route_name']}}</td>
-                                <td nowrap="">{{i['scenic_route_category_name']}}</td>
-                                <td nowrap>
-                                    <button type="button" class="btn btn-info btn-gradient btn-xs"
-                                            onclick="location.href ='/{{routerProjectId}}/scenic/routehandle?id={{i['scenic_route_id']}}';">
-                                        {{"Edit"|_}}
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-xs deleteBtn ladda-button"
-                                            data-id="{{i['scenic_route_id']}}" id="deleteBtn_{{i['scenic_route_id']}}"
-                                            style="margin-left: 10px" data-style="expand-left"><span
-                                            class="ladda-label">{{"Delete"|_}}</span></button>
-                                </td>
-                            </tr>
+    <div class="pull-right" style="margin-top: 20px;">
+        <button type="button" class="am-btn am-btn-success am-btn-xs updateEquipment btn" onclick="location.href='/scenic/routehandle';">添加路线方案</button>
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"ScenicManage"|_}}</li>
+        <li class="am-active"><a href="/scenic/route" >{{"ScenicRoute"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components" style="overflow: visible">
+        <div class="row" style="overflow: visible">
+            <div class="portlet-title">
+                <div class="tpl-portlet-input tpl-fz-ml">
+                    <div class="portlet-input input-inline">
+                        <select title="全部分类" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/scenic/route?category_id='+this.value;">
+                            <option value=" ">全部分类</option>
+                            {%for i in scenicRouteCategoryList%}
+                            <option value="{{i['scenic_route_category_id']}}" {%if filter['category_id']==i['scenic_route_category_id']%} selected="selected"{%endif%}>{{i['scenic_route_category_name']}}</option>
                             {%endfor%}
-                            </tbody>
-                        </table>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <table class="am-table am-table-striped am-table-hover am-table-compact">
+                        <thead>
+                        <tr>
+                            <th style="width:50%" nowrap="">方案名称</th>
+                            <th nowrap="">分类</th>
+                            <th nowrap="">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in scenicRoute['data']%}
+                        <tr id="route_{{i['scenic_route_id']}}">
+                            <td>{{i['scenic_route_name']}}</td>
+                            <td nowrap="">{{i['scenic_route_category_name']}}</td>
+                            <td nowrap>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="am-btn am-btn-secondary am-radius" onclick="location.href ='/scenic/routehandle?id={{i['scenic_route_id']}}';">{{"Edit"|_}}</button>
+                                    <button type="button" class="am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['scenic_route_id']}}" id="deleteBtn_{{i['scenic_route_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
+            <div class="am-u-lg-12">
+                <div class="am-cf">
+                    <div class="am-fr">
                         <script language="JavaScript">
                             var pg = new showPages('pg');pg.pageCount = {{scenicRoute['pageCount']}};pg.printHtml();
                         </script>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
-</section>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/vendor/plugins/ladda/ladda.min.js')}}
-<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
-<script type="text/javascript">
-    jQuery(document).ready(function () {
-        "use strict";
-        // Init Theme Core
-        Core.init();
-
-        $('.deleteBtn').each(function () {
-            $(this).on('click', function () {
-                if (confirm("确定要删除此方案？")) {
-                    var id = $(this).attr('data-id');
-                    var l = Ladda.create(document.querySelector('#' + this.id));
-                    l.start();
-                    $.ajax('/{{routerProjectId}}/scenic/routedelete', {
-                        data: {
-                            id: id,
-                        },
-                        type: 'post',
-                        dataType: 'json',
-                        success: function (data) {
-                            alert(data.errmsg);
-                            if (data.errcode == 0) {
-                                $('#route_' + id).remove();
-                            }
-                            l.stop();
-                        },
-                        error: function () {
-                            alert('服务器错误');
-                            l.stop();
-                        },
-                    });
-                }
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('.deleteBtn').each(function () {
+                $(this).on('click', function () {
+                    if (confirm("确定要删除此方案？")) {
+                        var id = $(this).attr('data-id');
+                        var l = Ladda.create(document.querySelector('#' + this.id));
+                        l.start();
+                        $.ajax('/scenic/routedelete', {
+                            data: {
+                                id: id,
+                            },
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (data) {
+                                alert(data.msg);
+                                if (data.code == 0) {
+                                    $('#route_' + id).remove();
+                                }
+                                l.stop();
+                            },
+                            error: function () {
+                                alert('服务器错误');
+                                l.stop();
+                            },
+                        });
+                    }
+                });
             });
         });
-        $('.multiselect').multiselect({enableFiltering: true,maxHeight: 420,buttonWidth:"400px"});
+    </script>
 
-    });
-
-</script>
-
-</body>
-</html>
+{% endblock %}

@@ -1,763 +1,444 @@
-{{partial("layout/header")}}
-<link rel="stylesheet" href="/client/imgmap/imgmap.css" type="text/css">
-<link rel="stylesheet" href="/client/imgmap/js/colorPicker.css" type="text/css" />
-<script language="javascript" type="text/javascript" src="/client/imgmap/js/jquery.colorPicker.js"></script>
-<style>
-    #clickAreaNumber {
-        font-family: "微软雅黑";
-        font-weight: bolder;
-        color: darkred;
-    }
+{% extends "layout/main.html" %}
 
-    .areaTypeInput {
-        display: none;
-    }
-</style>
-<script type="text/javascript" src="/client/pagers.js"></script>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active">
-                    <a href="/equipment/infrared">{{'equipmentInfraredAreaHandle'|_}}</a>
-                </li>
-                <li class="crumb-icon">
-                    <a href="/">
-                        <span class="glyphicon glyphicon-home"></span>
-                    </a>
-                </li>
-                <li class="crumb-link">
-                    <a href="/">{{"projectList"|_}}</a>
-                </li>
-                <li class="crumb-trail">{{"equipmentManage"|_}}</li>
-            </ol>
-        </div>
+{% block content %}
+
+    <link rel="stylesheet" href="/client/imgmap/imgmap.css" type="text/css">
+    <link rel="stylesheet" href="/client/imgmap/js/colorPicker.css" type="text/css" />
+    <script language="javascript" type="text/javascript" src="/client/imgmap/js/jquery.colorPicker.js"></script>
+
+    <div class="tpl-content-page-title am-icon-th-large">
+        {{'equipmentInfraredAreaHandle'|_}}
     </div>
-    <div id="content">
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"equipmentManage"|_}}</li>
+        <li><a href="/equipment/infrared" >{{'infraredList'|_}}</a></li>
+        <li class="am-active">{{'equipmentInfraredAreaHandle'|_}}</li>
+    </ol>
+    <div class="tpl-portlet-components">
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel invoice-panel">
-                    <div class="panel-heading panel-visible">
-                        <span class="panel-title">
-                            <span class="glyphicons glyphicons-show_big_thumbnails"></span> {{'equipmentInfraredAreaHandle'|_}}</span>
-                        <div class="panel-header-menu pull-right mr10">
-                            <!--<button type="button" class="btn btn-xs btn-default btn-gradient mr5"> <i class="fa fa-plus-square pr5"></i> New Invoice</button>-->
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-xs btn-default btn-gradient dropdown-toggle" data-toggle="dropdown">
-                                    <span class="glyphicons glyphicons-cogwheel"></span>
-                                </button>
-                                <ul class="dropdown-menu checkbox-persist pull-right text-left" role="menu">
-                                    <li id="infraredUpdate" data-id="{{equipmentDetails['equipment_infrared_id']}}">
-                                        <a>
-                                            <i class="fa fa-envelope-o"></i> infrared update </a>
-                                    </li>
-                                </ul>
+            <div class="am-g">
+                <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
+                    <fieldset>
+                        <legend>{{equipmentDetails["equipment_code"]}} {{'clickArea'|_}}</legend>
+                        <div id="pic_container">
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="am-u-sm-12 am-u-md-6 am-u-lg-6" style="display: none;">
+                    <fieldset>
+                        <legend>{{equipmentDetails["equipment_code"]}} {{'clickArea'|_}}</legend>
+                        <div style="border-bottom: solid 1px #efefef;display: none;">
+                            <div id="button_container">
+                                <label for="dd_zoom">Zoom:</label>
+                                <select onchange="gui_zoom(this)" id="dd_zoom">
+                                    <option value='0.25'>25%</option>
+                                    <option value='0.5'>50%</option>
+                                    <option value='1' selected="1">100%</option>
+                                    <option value='2'>200%</option>
+                                    <option value='3'>300%</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel-body pn" id="invoice-item">
-                        <div class="col-md-12 va-m p30">
-                            <div class="row" id="invoice-info">
-                                <div class="col-md-6">
-                                    <fieldset>
-                                        <legend>{{'clickArea'|_}}</legend>
-                                        <div id="pic_container">
-                                        </div>
-                                    </fieldset>
-                                </div>
-                                <div class="col-md-7" style="display: none;">
-                                    <fieldset>
-                                        <legend>{{'clickArea'|_}}</legend>
-                                        <div style="border-bottom: solid 1px #efefef;display: none;">
-                                            <div id="button_container">
-                                                <label for="dd_zoom">Zoom:</label>
-                                                <select onchange="gui_zoom(this)" id="dd_zoom">
-                                                    <option value='0.25'>25%</option>
-                                                    <option value='0.5'>50%</option>
-                                                    <option value='1' selected="1">100%</option>
-                                                    <option value='2'>200%</option>
-                                                    <option value='3'>300%</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div id="form_container" style="clear: both;">
-                                        </div>
-                                    </fieldset>
-                                </div>
-                                <div class="col-md-6" id="areaTypeInput" style="display:none;margin-top: 20px;">
-                                    <blockquote>
-                                        <p id="clickAreaNumber" style="font-weight: bolder"></p>
-                                        <small>
-                                            <select id="areaTypeSelect" class="multiselect">';
-                                                <option value="">&lt;选择类型&gt;</option>
-                                                <!-- <option value="1">文字+音乐</option> -->
-                                                <option value="2">图片+音乐</option>
-                                                <option value="3">视频</option>
-                                                <!--<option value="4">地图应用</option>-->
-                                                <option value="5">屏幕区域</option>
-                                            </select>
-                                        </small>
-                                    </blockquote>
-                                    <div id="areaTypeInput1" class="areaTypeInput">
-                                        <div class="form-group">
-                                            <label>音乐文件</label>
-                                            <span>( 仅支持mp3文件 )</span>
-                                            <div style="margin: 6px;" id="musicFilePreview1"></div>
-                                            <div class="progress progress-striped active" id="musicFileProgressBar1" style="height: 6px;margin-bottom: 0px;">
-                                                <div class="progress-bar" role="progressbar" id="musicFileProgress1" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                            </div>
-                                            <input id="musicFile1" name="musicFile" type="file" style="display: block;" class="form-control" onchange="UploadFile('musicFile','1')">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>
-                                                <span style="color: red;">*</span> {{"content"|_}}</label>
-                                            <span>( 仅支持纯文字 )</span>
-                                            <textarea id="content1" name="content1" class="form-control" rows="12" required=""></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-sm btn-danger pull-left deleteBtn ladda-button" data-style="expand-left" id="deleteBtn1">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-trash-o"></i> {{'deleteArea'|_}}</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button" data-style="expand-left" id="typeBtn1">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-save"></i> {{'save'|_}}</span>
-                                            </button>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </div>
-                                    <div id="areaTypeInput2" class="areaTypeInput">
-                                        <div class="form-group">
-                                            <label>音乐文件</label>
-                                            <span>( 仅支持mp3文件 )</span>
-                                            <div style="margin: 6px;" id="musicFilePreview2"></div>
-                                            <div class="progress progress-striped active" id="musicFileProgressBar2" style="height: 6px;margin-bottom: 0px;">
-                                                <div class="progress-bar" role="progressbar" id="musicFileProgress2" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                            </div>
-                                            <input id="musicFile2" name="musicFile" type="file" style="display: block;" class="form-control" onchange="UploadFile('musicFile','2')">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>图片文件</label>
-                                            <span>( 最多上传3张图片，图片分辨率：{{equipmentDetails["equipment_infrared_screen_width"]}} * {{equipmentDetails["equipment_infrared_screen_height"]}}
-                                                )</span>
-                                            <div style="margin: 6px;width: 100%" id="screenImagePreview2"></div>
-                                            <input id="screenImage2" name="screenImage2" type="file" style="display: block;" class="form-control" onchange="UploadAreaImage()">
-                                            <div class="progress progress-striped active" id="screenImageProgressBar2" style="height: 6px;margin-bottom: 0px;float: left;width: 100%">
-                                                <div class="progress-bar" role="progressbar" id="screenImageProgress2" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-sm btn-danger pull-left deleteBtn ladda-button" data-style="expand-left" id="deleteBtn2">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-trash-o"></i> {{'deleteArea'|_}}</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button" data-style="expand-left" id="typeBtn2">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-save"></i> {{'save'|_}}</span>
-                                            </button>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </div>
-                                    <div id="areaTypeInput3" class="areaTypeInput">
-                                        <div class="form-group">
-                                            <label>视频文件</label>
-                                            <span>( 仅支持mp4文件，如无法预览，则可能文件格式不正确 )</span>
-                                            <div style="margin: 6px;" id="videoFilePreview3"></div>
-                                            <div class="progress progress-striped active" id="videoFileProgressBar3" style="height: 6px;margin-bottom: 0px;">
-                                                <div class="progress-bar" role="progressbar" id="videoFileProgress3" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                            </div>
-                                            <input id="videoFile3" name="musicFile" type="file" style="display: block;" class="form-control" onchange="UploadFile('videoFile','3')">
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-sm btn-danger pull-left deleteBtn ladda-button" data-style="expand-left" id="deleteBtn3">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-trash-o"></i> {{'deleteArea'|_}}</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button" data-style="expand-left" id="typeBtn3">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-save"></i> {{'save'|_}}</span>
-                                            </button>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </div>
-                                    <div id="areaTypeInput4" class="areaTypeInput">
-                                        <div class="form-group">
-                                            <label>地图</label>
-                                            <select id="mapId" class="multiselect">';
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>位置</label>
-                                            <select id="mapGid" class="multiselect">';
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-sm btn-danger pull-left deleteBtn ladda-button" data-style="expand-left" id="deleteBtn4">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-trash-o"></i> {{'deleteArea'|_}}</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button" data-style="expand-left" id="typeBtn4">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-save"></i> {{'save'|_}}</span>
-                                            </button>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </div>
-                                    <div id="areaTypeInput5" class="areaTypeInput">
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-sm btn-danger pull-left deleteBtn ladda-button" data-style="expand-left" id="deleteBtn5">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-trash-o"></i> {{'deleteArea'|_}}</span>
-                                            </button>
-                                            <button type="button" class="btn btn-sm bg-purple2 pull-right ladda-button" data-style="expand-left" id="typeBtn5">
-                                                <span class="ladda-label">
-                                                    <i class="fa fa-save"></i> {{'save'|_}}</span>
-                                            </button>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div id="form_container" style="clear: both;">
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="am-u-sm-12 am-u-md-6 am-u-lg-6" id="areaTypeInput" style="display:none;margin-top: 20px;">
+                    <blockquote>
+                        <p id="clickAreaNumber" style="font-weight: bolder"></p>
+                        <br>
+                        <div class="select-style">
+                            <select id="areaTypeSelect" data-am-selected="{searchBox: 1,btnWidth: '100%', btnSize:'sm'}" title="选择类型">
+                                <option value="">&lt;选择类型&gt;</option>
+                                <!-- <option value="1">文字+音乐</option> -->
+                                <option value="2">图片+音乐</option>
+                                <option value="3">视频</option>
+                                <!--<option value="4">地图应用</option>-->
+                                <option value="5">屏幕区域</option>
+                            </select>
+                        </div>
+                    </blockquote>
+                    <div id="areaTypeInput1" class="areaTypeInput">
+                        <div class="am-form-group">
+                            <label>音乐文件</label>
+                            <span>( 仅支持mp3文件 )</span>
+                            <div style="margin: 6px;" id="musicFilePreview1"></div>
+                            <div class="am-progress am-progress-xs am-progress-striped am-active" id="musicFileProgressBar1">
+                                <div class="am-progress-bar am-progress-bar-success" id="musicFileProgress1"></div>
                             </div>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的音乐文件</button>
+                                <input id="musicFile1" name="musicFile" type="file" style="display: block;" onchange="UploadFile('musicFile','1')">
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label>
+                                <span style="color: red;">*</span> {{"content"|_}}
+                            </label>
+                            <span>( 仅支持纯文字 )</span>
+                            <label for="content1"></label>
+                            <textarea id="content1" name="content1" rows="12" required=""></textarea>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="button" class="am-btn am-btn-danger deleteBtn am-btn-sm am-radius" id="deleteBtn1"><span class="am-icon-trash-o"> {{'deleteArea'|_}}</span></button>
+                            <button type="button" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="typeBtn1"><span class="am-icon-save"> {{'save'|_}}</span></button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div id="areaTypeInput2" class="areaTypeInput">
+                        <div class="am-form-group">
+                            <label>音乐文件</label>
+                            <span>( 仅支持mp3文件 )</span>
+                            <div style="margin: 6px;" id="musicFilePreview2"></div>
+                            <div class="am-progress am-progress-xs am-progress-striped am-active" id="musicFileProgressBar2">
+                                <div class="am-progress-bar am-progress-bar-success" id="musicFileProgress2"></div>
+                            </div>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的音乐文件</button>
+                                <input id="musicFile2" name="musicFile" type="file" style="display: block;" onchange="UploadFile('musicFile','2')">
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <label>图片文件</label>
+                            <span>( 最多上传3张图片，图片分辨率：{{equipmentDetails["equipment_infrared_screen_width"]}} * {{equipmentDetails["equipment_infrared_screen_height"]}})</span>
+                            <div style="margin: 6px;width: 100%" id="screenImagePreview2"></div>
+                            <div style="clear:both;"></div>
+                            <div class="am-form-group am-form-file" style="margin-top: 10px;">
+                                <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                                <input id="screenImage2" name="screenImage2" type="file" style="display: block;" onchange="UploadAreaImage()">
+                            </div>
+                            <div class="am-progress am-progress-xs am-progress-striped am-active" id="screenImageProgressBar2">
+                                <div class="am-progress-bar am-progress-bar-success" id="screenImageProgress2"></div>
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="button" class="am-btn am-btn-danger deleteBtn am-btn-sm am-radius" id="deleteBtn2"><span class="am-icon-trash-o"> {{'deleteArea'|_}}</span></button>
+                            <button type="button" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="typeBtn2"><span class="am-icon-save"> {{'save'|_}}</span></button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div id="areaTypeInput3" class="areaTypeInput">
+                        <div class="am-form-group">
+                            <label>视频文件</label>
+                            <span>( 仅支持mp4文件，如无法预览，则可能文件格式不正确 )</span>
+                            <div style="margin: 6px;" id="videoFilePreview3"></div>
+                            <div class="am-progress am-progress-xs am-progress-striped am-active" id="videoFileProgressBar3">
+                                <div class="am-progress-bar am-progress-bar-success" id="videoFileProgress3"></div>
+                            </div>
+                            <div class="am-form-group am-form-file">
+                                <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的视频文件</button>
+                                <input id="videoFile3" name="musicFile" type="file" style="display: block;"onchange="UploadFile('videoFile','3')">
+                            </div>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="button" class="am-btn am-btn-danger deleteBtn am-btn-sm am-radius" id="deleteBtn3"><span class="am-icon-trash-o"> {{'deleteArea'|_}}</span></button>
+                            <button type="button" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="typeBtn3"><span class="am-icon-save"> {{'save'|_}}</span></button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div id="areaTypeInput4" class="areaTypeInput">
+                        <div class="am-form-group">
+                            <label for="mapId">地图</label>
+                            <select id="mapId">';
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <label for="mapGid">位置</label>
+                            <select id="mapGid">';
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <button type="button" class="am-btn am-btn-danger deleteBtn am-btn-sm am-radius" id="deleteBtn4"><span class="am-icon-trash-o"> {{'deleteArea'|_}}</span></button>
+                            <button type="button" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="typeBtn4"><span class="am-icon-save"> {{'save'|_}}</span></button>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    <div id="areaTypeInput5" class="areaTypeInput">
+                        <div class="am-form-group">
+                            <button type="button" class="am-btn am-btn-danger deleteBtn am-btn-sm am-radius" id="deleteBtn5"><span class="am-icon-trash-o"> {{'deleteArea'|_}}</span></button>
+                            <button type="button" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="typeBtn5"><span class="am-icon-save"> {{'save'|_}}</span></button>
+                            <div class="clearfix"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
-{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}} {{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
-<script>
-    var infraredInfo = {
-        infraredWidth: parseInt('{{equipmentDetails["equipment_infrared_width"]}}'),
-        infraredHeight: parseInt('{{equipmentDetails["equipment_infrared_height"]}}'),
-        screenWidth: parseInt('{{equipmentDetails["equipment_infrared_screen_width"]}}'),
-        screenheight: parseInt('{{equipmentDetails["equipment_infrared_screen_height"]}}'),
-        borderMaxWidth: 600,
-        borderMaxHeight: 600
-    };
-    var imgWidth, imgHeight, imgPercent, borderPercent, screenPercent;
-    var borderWidth, borderHeight;
-    var mapListJson = {{ mapListJson }};
-    var areaListJson = {{ areaListJson }};
 
-    var postData = {
-        equipment_infrared_id: '{{equipmentDetails["equipment_infrared_id"]}}',
-    };
-
-    function UploadAreaImage() {
-        console.log($("#screenImagePreview2 img").length);
-        // if ($("#screenImagePreview2 img").length > 4) {
-        //     alert('最多上传5张图片');
-        //     $('#screenImage2').val('');
-        //     return;
-        // }
-        // FormData 对象
-        var files = document.getElementById('screenImage2').files;
-        if (files[0] === undefined) {
-            alert("No file chosen")
-            return;
-        }
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            var data = e.target.result;
-            //加载图片获取图片真实宽度和高度
-            var image = new Image();
-            image.onerror = function (e) {
-                alert('图片错误');
-                $('#screenImage2').val('');
-            };
-            image.onload = function () {
-                if (image.width !== infraredInfo.screenWidth || image.height !== infraredInfo.screenheight) {
-                    alert('图片分辨率不正确');
-                    $('#screenImage2').val('');
-                    return;
-                }
-
-                $("#screenImageProgressBar2").show();
-                $("#screenImage2").hide();
-                var formData = new FormData();
-
-                formData.set('part', 'screenImage');
-                formData.set('Filedata', files[0]);
-                var xhr = new XMLHttpRequest();
-                xhr.overrideMimeType('text/plain; charset=utf-8');
-                // XMLHttpRequest 对象
-                xhr.upload.onprogress = function (ev) {
-                    var percent = 0;
-                    if (ev.lengthComputable) {
-                        percent = parseInt(100 * ev.loaded / ev.total);
-                        $("#screenImageProgress2").width(percent + "%");
-                    }
-                };
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4) {
-                        if (xhr.status == 200) {
-                            var idName = 'screenImage_' + xhr.responseText.replace(/[\/|.]/g, '');
-                            $("#screenImagePreview2").append('<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="btn btn-danger btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + idName + '\',\'screenImage\')">X</button></p><a href="' + xhr.responseText + '" target="_blank"><img src="' + xhr.responseText + '" width="60" data-url="' + xhr.responseText.replace(/\//, '') + '"/></a></div>');
-                        } else {
-                            alert('上传失败，请重试！');
-                        }
-                        $("#screenImage2").val('').show();
-                        $("#screenImageProgress2").width("0%");
-                    }
-                };
-                xhr.open("post", "/upload/upload", true);
-                xhr.send(formData);
-
-            };
-            image.src = data;
-
+    {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
+    <script>
+        var infraredInfo = {
+            infraredWidth: parseInt('{{equipmentDetails["equipment_infrared_width"]}}'),
+            infraredHeight: parseInt('{{equipmentDetails["equipment_infrared_height"]}}'),
+            screenWidth: parseInt('{{equipmentDetails["equipment_infrared_screen_width"]}}'),
+            screenheight: parseInt('{{equipmentDetails["equipment_infrared_screen_height"]}}'),
+            borderMaxWidth: 600,
+            borderMaxHeight: 600
         };
-        reader.readAsDataURL(files[0]);
+        var imgWidth, imgHeight, imgPercent, borderPercent, screenPercent;
+        var borderWidth, borderHeight;
+        var mapListJson = {{ mapListJson }};
+        var areaListJson = {{ areaListJson }};
 
-        //        var totalBytes = files[0].size;
-        //        if (totalBytes>102400){
-        //            alert('缩略图文件过大');
-        //            return;
-        //        }
-        // $("#userfile").attr("disabled","disabled");
-
-    }
-
-    function UploadFile(part, type) {
-        // FormData 对象
-        var files = document.getElementById(part + '' + type).files;
-        if (files[0] === undefined) {
-            alert("No file chosen")
-            return;
-        }
-        if (files[0].size > 1048576000) {
-            alert('文件过大，请限制在 1000 MB 内！');
-            $('#' + part + '' + type).val('');
-            return;
-        }
-        switch (part) {
-            case 'musicFile':
-                if (files[0].type !== 'audio/mp3') {
-                    alert('文件格式不正确');
-                    $('#' + part + '' + type).val('');
-                    return;
-                }
-                break;
-            case 'videoFile':
-                if (files[0].type !== 'video/mp4') {
-                    alert('文件格式不正确');
-                    $('#' + part + '' + type).val('');
-                    return;
-                }
-                break;
-        }
-        $('#' + part + '' + type).hide();
-        var formData = new FormData();
-
-        formData.set('part', part);
-        formData.set('Filedata', files[0]);
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain; charset=utf-8');
-        // XMLHttpRequest 对象
-        xhr.upload.onprogress = function (ev) {
-            var percent = 0;
-            if (ev.lengthComputable) {
-                percent = parseInt(100 * ev.loaded / ev.total);
-                $("#" + part + "Progress" + type).width(percent + "%");
-            }
+        var postData = {
+            equipment_infrared_id: '{{equipmentDetails["equipment_infrared_id"]}}',
         };
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    switch (part) {
-                        case 'screenImage':
-                            var idName = 'screenImage_' + xhr.responseText.replace(/[\/|.]/g, '');
-                            $("#" + part + "Preview" + type).append('<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="btn btn-danger btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + idName + '\',\'' + type + '\')">X</button></p><a href="' + xhr.responseText + '" target="_blank"><img src="' + xhr.responseText + '" width="60" data-url="' + xhr.responseText.replace(/\//, '') + '"/></a></div>');
-                            break;
-                        case 'videoFile':
-                            $("#" + part + "Preview" + type).html('<video width="90%" controls preload data-url="' + xhr.responseText + '"><source src="' + xhr.responseText + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\' /></video> <button type="button" class="btn btn-danger btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + part + '\',\'' + type + '\')">X</button>');
-                            break;
-                        default:
-                            $("#" + part + "Preview" + type).html('<audio src="' + xhr.responseText + '" controls preload="auto" data-url="' + xhr.responseText + '"> </audio> <button type="button" class="btn btn-danger btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + part + '\',\'' + type + '\')">X</button>');
-                            break;
-                    }
-                    $('#' + part + '' + type).show().val('');
-                    // fileInput.replaceWith(fileInput.val('').clone(true));
-                } else {
-                    alert(xhr.responseText);
-                    $('#' + part + '' + type).val('').show();
-                }
 
-                $("#" + part + "Progress" + type).width("0%");
-            }
-        };
-        xhr.open("post", "/upload/upload", true);
-        xhr.send(formData);
-    }
-
-    function removeFile(url, part, type) {
-        if (confirm('确定删除此文件？ ')) {
-            switch (type) {
-                case '1':
-                case '3':
-                    $('#' + part + 'Preview' + type).html('');
-                    break;
-                case '2':
-                    console.log(part);
-                    $('#' + part).remove();
-                    if (part === 'musicFile') $('#' + part + 'Preview' + type).html('');
-                    break;
-            }
-        }
-    }
-
-    function removeArea(id) {
-        var areaId = $('#img_area_' + id).attr('data-id');
-        $.ajax('/equipment/ajaxinfraredarearemove', {
-            data: { id: areaId },
-            type: 'post',
-            dataType: 'json',
-            success: function (data) {
-                alert(data.msg);
-                if (data.code === 0) {
-                    $('#areaTypeInput').hide();
-                    myimgmap.removeArea(id);
-                    myimgmap.currentid = '';
-                    lastClickId = '';
-                }
-            },
-            error: function () {
-                alert('请重试！');
-            }
-        })
-    }
-
-
-    function resetData(data) {
-        $('#img_area_' + myimgmap.currentid).css('background', '').attr('data-id', data.data.equipment_infrared_area_id);
-        $('#img_active_' + myimgmap.currentid).attr('checked', false);
-        areaListJson[data.data.equipment_infrared_area_id] = data.data;
-        myimgmap.currentid = '';
-        $('#areaTypeInput').hide();
-        $('.areaTypeInput').hide();
-        $('#musicFilePreview1').html('');
-        $('#content1').val('');
-        $('#musicFilePreview2').html('');
-        $('#screenImagePreview2').html('');
-        $('#videoFilePreview3').html('');
-        $('#areaTypeSelect').val('').multiselect('rebuild');
-        lastClickId = '';
-    }
-</script>
-<script type="text/javascript" src="/client/imgmap/imgmap.js"></script>
-<script type="text/javascript" src="/client/imgmap/default_interface.js"></script>
-<script>
-    $(document).ready(function () {
-        borderPercent = infraredInfo.infraredWidth / infraredInfo.infraredHeight;
-        screenPercent = infraredInfo.screenWidth / infraredInfo.screenheight;
-        if (borderPercent >= 1) {
-            borderWidth = infraredInfo.borderMaxWidth;
-            borderHeight = parseInt(borderWidth / borderPercent);
-        } else {
-            borderHeight = infraredInfo.borderMaxHeight;
-            borderWidth = parseInt(borderHeight * borderPercent);
-        }
-        postData.borderWidth = borderWidth;
-        postData.borderHeight = borderHeight;
-        gui_loadImage('https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{equipmentDetails["equipment_infrared_backgroundImage"]}}', borderWidth, borderHeight);
-        console.log(borderWidth, borderHeight);
-        $('#pic_container').css('width', borderWidth + 'px').css('height', borderHeight + 'px');
-        $('#typeBtn1').bind('click', function () {
-            var content = $.trim($('#content1').val());
-            if (content === '') {
-                alert('请填写内容！');
-                return;
-            }
-            var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
-            if (coords === '') {
-                alert('点击区域不正确！');
-                return;
-            }
-            var _postData = $.extend({}, postData);
-            _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
-            _postData['equipment_infrared_area_content'] = content;
-            _postData['equipment_infrared_area_coords'] = coords;
-            _postData['equipment_infrared_area_file'] = $('#musicFilePreview1 audio').attr('data-url');
-            var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
-            if (_id !== undefined && areaListJson[_id] !== undefined) {
-                _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
-            } else {
-                if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
-            }
-
-            var l = Ladda.create(document.querySelector('#typeBtn1'));
-            l.start();
-            $.ajax('/equipment/infraredareahandle', {
-                data: _postData,
-                type: 'post',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        resetData(data);
-                    }
-                    alert(data.msg);
-                    l.stop();
-                },
-                error: function () {
-                    alert('请重试！');
-                    l.stop();
-                }
-            });
-        });
-        $('#typeBtn2').bind('click', function () {
-            var _content = '';
-            var imgCount = 0;
-            $('#screenImagePreview2 img').each(function () {
-                _content += $(this).attr('data-url') + ',';
-                imgCount++;
-            });
-            // if (imgCount > 5) {
+        function UploadAreaImage() {
+            console.log($("#screenImagePreview2 img").length);
+            // if ($("#screenImagePreview2 img").length > 4) {
             //     alert('最多上传5张图片');
+            //     $('#screenImage2').val('');
             //     return;
             // }
-            if (_content === '') {
-                alert('请上传图片文件');
+            // FormData 对象
+            var files = document.getElementById('screenImage2').files;
+            if (files[0] === undefined) {
+                alert("No file chosen")
                 return;
             }
-            var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
-            if (coords === '') {
-                alert('点击区域不正确！');
-                return;
-            }
-            var _postData = $.extend({}, postData);
-            _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
-            _postData['equipment_infrared_area_content'] = _content;
-            _postData['equipment_infrared_area_coords'] = coords;
-            _postData['equipment_infrared_area_file'] = $('#musicFilePreview2 audio').attr('data-url');
-            var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
-            if (_id !== undefined && areaListJson[_id] !== undefined) {
-                _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
-            } else {
-                if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
-            }
-            var l = Ladda.create(document.querySelector('#typeBtn2'));
-            l.start();
-            $.ajax('/equipment/infraredareahandle', {
-                data: _postData,
-                type: 'post',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        resetData(data);
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                //加载图片获取图片真实宽度和高度
+                var image = new Image();
+                image.onerror = function (e) {
+                    alert('图片错误');
+                    $('#screenImage2').val('');
+                };
+                image.onload = function () {
+                    if (image.width !== infraredInfo.screenWidth || image.height !== infraredInfo.screenheight) {
+                        alert('图片分辨率不正确');
+                        $('#screenImage2').val('');
+                        return;
                     }
-                    alert(data.msg);
-                    l.stop();
-                },
-                error: function () {
-                    alert('请重试！');
-                    l.stop();
-                }
-            });
-        });
-        $('#typeBtn3').bind('click', function () {
-            var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
-            if (coords === '') {
-                alert('点击区域不正确！');
-                return;
-            }
-            var videoFile = $('#videoFilePreview3 video').attr('data-url');
-            if (videoFile === undefined) {
-                alert('请上传视频文件！');
-                return;
-            }
-            var _postData = $.extend({}, postData);
-            _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
-            _postData['equipment_infrared_area_coords'] = coords;
-            _postData['equipment_infrared_area_file'] = videoFile;
-            var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
-            if (_id !== undefined && areaListJson[_id] !== undefined) {
-                _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
-            } else {
-                if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
-            }
-            var l = Ladda.create(document.querySelector('#typeBtn3'));
-            l.start();
-            $.ajax('/equipment/infraredareahandle', {
-                data: _postData,
-                type: 'post',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        resetData(data);
-                    }
-                    alert(data.msg);
-                    l.stop();
-                },
-                error: function () {
-                    alert('请重试！');
-                    l.stop();
-                }
-            });
-        });
-        $('#typeBtn4').bind('click', function () {
-            var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
-            if (coords === '') {
-                alert('点击区域不正确！');
-                return;
-            }
-            var mapGid = $('#mapGid').val();
-            if (!mapGid) {
-                alert('请选择位置！');
-                return;
-            }
-            var _postData = $.extend({}, postData);
-            _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
-            _postData['equipment_infrared_area_coords'] = coords;
-            _postData['equipment_infrared_area_content'] = $('#mapId').val() + '|' + mapGid;
-            var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
-            if (_id !== undefined && areaListJson[_id] !== undefined) {
-                _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
-            } else {
-                if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
-            }
-            var l = Ladda.create(document.querySelector('#typeBtn4'));
-            l.start();
-            $.ajax('/equipment/infraredareahandle', {
-                data: _postData,
-                type: 'post',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        resetData(data);
-                    }
-                    alert(data.msg);
-                    l.stop();
-                },
-                error: function () {
-                    alert('请重试！');
-                    l.stop();
-                }
-            });
-        });
-        $('#typeBtn5').bind('click', function () {
-            var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
-            if (coords === '') {
-                alert('点击区域不正确！');
-                return;
-            }
-            var _postData = $.extend({}, postData);
-            _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
-            _postData['equipment_infrared_area_coords'] = coords;
-            var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
-            if (_id !== undefined && areaListJson[_id] !== undefined) {
-                _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
-            } else {
-                if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
-            }
-            var l = Ladda.create(document.querySelector('#typeBtn5'));
-            l.start();
-            $.ajax('/equipment/infraredareahandle', {
-                data: _postData,
-                type: 'post',
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        resetData(data);
-                    }
-                    alert(data.msg);
-                    l.stop();
-                },
-                error: function () {
-                    alert('请重试！');
-                    l.stop();
-                }
-            });
-        });
-        $('#areaTypeSelect').bind('change', function () {
-            $('.areaTypeInput').hide();
-            $('#areaTypeInput' + this.value).show();
-        });
-        $('.multiselect').multiselect({ enableFiltering: true, maxHeight: 300, buttonWidth: "400px" });
-        var nodes = {};
-        for (var i in areaListJson) {
-            var x = myimgmap.addNewArea();
-            myimgmap.initArea(x, 'rect');
-            nodes[x] = areaListJson[i].equipment_infrared_area_id;
-            $('#img_area_' + x).attr('data-id', areaListJson[i].equipment_infrared_area_id);
-            $('#img_coords' + x).val(areaListJson[i].equipment_infrared_area_coords);
-            myimgmap._recalculate(x, areaListJson[i].equipment_infrared_area_coords);//contains repaint
-            myimgmap.relaxArea(x);
-            myimgmap.fireEvent('onAreaChanged', myimgmap.areas[x]);
-        }
-        var _canvas = $('#pic_container canvas');
-        for (var i = 0; i < _canvas.length; i++) {
-            _canvas[i].setAttribute('data-id', nodes[i]);
-        }
-        var mapIdHtml = '<option value="">&lt;选择地图&gt;</option>';
-        for (var i in mapListJson) {
-            mapIdHtml += '<option value="' + mapListJson[i].map_id + '">' + mapListJson[i].map_name + '</option>';
-        }
-        $('#mapId').html(mapIdHtml).multiselect('rebuild');
-        $('#mapId').bind('change', function () {
-            if (this.value > 0) {
-                $.ajax('/polygon/ajaxgetlistbymapid', {
-                    data: { mapId: this.value },
-                    type: 'post',
-                    dataType: 'json',
-                    success: function (data) {
-                        console.log("ajaxgetlistbymapid", data);
-                        var mapGidHtml = '<option value="">&lt;选择位置&gt;</option>';
-                        if (data.code === 0) {
-                            for (var i = 0; i < data.data.length; i++) {
-                                mapGidHtml += '<option value="' + data.data[i].map_gid + '">' + data.data[i].name + '</option>';
+
+                    $("#screenImageProgressBar2").show();
+                    $("#screenImage2").hide();
+                    var formData = new FormData();
+
+                    formData.set('part', 'screenImage');
+                    formData.set('Filedata', files[0]);
+                    var xhr = new XMLHttpRequest();
+                    xhr.overrideMimeType('text/plain; charset=utf-8');
+                    // XMLHttpRequest 对象
+                    xhr.upload.onprogress = function (ev) {
+                        var percent = 0;
+                        if (ev.lengthComputable) {
+                            percent = parseInt(100 * ev.loaded / ev.total);
+                            $("#screenImageProgress2").width(percent + "%");
+                        }
+                    };
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 4) {
+                            if (xhr.status == 200) {
+                                var idName = 'screenImage_' + xhr.responseText.replace(/[\/|.]/g, '');
+                                $("#screenImagePreview2").append('<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + idName + '\',\'screenImage\')">X</button></p><a href="' + xhr.responseText + '" target="_blank"><img src="' + xhr.responseText + '" width="60" data-url="' + xhr.responseText.replace(/\//, '') + '"/></a></div>');
+                            } else {
+                                alert('上传失败，请重试！');
                             }
-                        } else {
-                            alert(data.msg);
+                            $("#screenImage2").val('').show();
+                            $("#screenImageProgress2").width("0%");
                         }
-                        $('#mapGid').html(mapGidHtml).multiselect('rebuild');
-                    },
-                    error: function () {
-                        alert('请重试！');
-                    }
-                });
+                    };
+                    xhr.open("post", "/upload/upload", true);
+                    xhr.send(formData);
+
+                };
+                image.src = data;
+
+            };
+            reader.readAsDataURL(files[0]);
+
+            //        var totalBytes = files[0].size;
+            //        if (totalBytes>102400){
+            //            alert('缩略图文件过大');
+            //            return;
+            //        }
+            // $("#userfile").attr("disabled","disabled");
+
+        }
+
+        function UploadFile(part, type) {
+            // FormData 对象
+            var files = document.getElementById(part + '' + type).files;
+            if (files[0] === undefined) {
+                alert("No file chosen")
+                return;
             }
-        });
-        $('#infraredUpdate').bind('click', function () {
-            $.ajax('/equipment/ajaxinfraredareaupdate', {
-                data: { id: $(this).attr('data-id') },
+            if (files[0].size > 1048576000) {
+                alert('文件过大，请限制在 1000 MB 内！');
+                $('#' + part + '' + type).val('');
+                return;
+            }
+            switch (part) {
+                case 'musicFile':
+                    if (files[0].type !== 'audio/mp3') {
+                        alert('文件格式不正确');
+                        $('#' + part + '' + type).val('');
+                        return;
+                    }
+                    break;
+                case 'videoFile':
+                    if (files[0].type !== 'video/mp4') {
+                        alert('文件格式不正确');
+                        $('#' + part + '' + type).val('');
+                        return;
+                    }
+                    break;
+            }
+            $('#' + part + '' + type).hide();
+            var formData = new FormData();
+
+            formData.set('part', part);
+            formData.set('Filedata', files[0]);
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('text/plain; charset=utf-8');
+            // XMLHttpRequest 对象
+            xhr.upload.onprogress = function (ev) {
+                var percent = 0;
+                if (ev.lengthComputable) {
+                    percent = parseInt(100 * ev.loaded / ev.total);
+                    $("#" + part + "Progress" + type).width(percent + "%");
+                }
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        switch (part) {
+                            case 'screenImage':
+                                var idName = 'screenImage_' + xhr.responseText.replace(/[\/|.]/g, '');
+                                $("#" + part + "Preview" + type).append('<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + idName + '\',\'' + type + '\')">X</button></p><a href="' + xhr.responseText + '" target="_blank"><img src="' + xhr.responseText + '" width="60" data-url="' + xhr.responseText.replace(/\//, '') + '"/></a></div>');
+                                break;
+                            case 'videoFile':
+                                $("#" + part + "Preview" + type).html('<video width="90%" controls preload data-url="' + xhr.responseText + '"><source src="' + xhr.responseText + '" type=\'video/mp4; codecs="avc1.42E01E, mp4a.40.2"\' /></video> <button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + part + '\',\'' + type + '\')">X</button>');
+                                break;
+                            default:
+                                $("#" + part + "Preview" + type).html('<audio src="' + xhr.responseText + '" controls preload="auto" data-url="' + xhr.responseText + '"> </audio> <button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + part + '\',\'' + type + '\')">X</button>');
+                                break;
+                        }
+                        $('#' + part + '' + type).show().val('');
+                        // fileInput.replaceWith(fileInput.val('').clone(true));
+                    } else {
+                        alert(xhr.responseText);
+                        $('#' + part + '' + type).val('').show();
+                    }
+
+                    $("#" + part + "Progress" + type).width("0%");
+                }
+            };
+            xhr.open("post", "/upload/upload", true);
+            xhr.send(formData);
+        }
+
+        function removeFile(url, part, type) {
+            if (confirm('确定删除此文件？ ')) {
+                switch (type) {
+                    case '1':
+                    case '3':
+                        $('#' + part + 'Preview' + type).html('');
+                        break;
+                    case '2':
+                        console.log(part);
+                        $('#' + part).remove();
+                        if (part === 'musicFile') $('#' + part + 'Preview' + type).html('');
+                        break;
+                }
+            }
+        }
+
+        function removeArea(id) {
+            var areaId = $('#img_area_' + id).attr('data-id');
+            $.ajax('/equipment/ajaxinfraredarearemove', {
+                data: { id: areaId },
                 type: 'post',
                 dataType: 'json',
                 success: function (data) {
-                    alert(data.msg + ' ' + data.data);
+                    alert(data.msg);
+                    if (data.code === 0) {
+                        $('#areaTypeInput').hide();
+                        myimgmap.removeArea(id);
+                        myimgmap.currentid = '';
+                        lastClickId = '';
+                    }
                 },
                 error: function () {
                     alert('请重试！');
                 }
-            });
-        });
-        $('.deleteBtn').bind('click', function () {
-            if (confirm('确定删除此区域？')) {
-                var id = $(this).attr('data-id');
-                var l = Ladda.create(document.querySelector('#' + this.id));
+            })
+        }
+
+
+        function resetData(data) {
+            $('#img_area_' + myimgmap.currentid).css('background', '').attr('data-id', data.data.equipment_infrared_area_id);
+            $('#img_active_' + myimgmap.currentid).attr('checked', false);
+            areaListJson[data.data.equipment_infrared_area_id] = data.data;
+            myimgmap.currentid = '';
+            $('#areaTypeInput').hide();
+            $('.areaTypeInput').hide();
+            $('#musicFilePreview1').html('');
+            $('#content1').val('');
+            $('#musicFilePreview2').html('');
+            $('#screenImagePreview2').html('');
+            $('#videoFilePreview3').html('');
+            $('#areaTypeSelect').val('');
+            lastClickId = '';
+        }
+    </script>
+    <script type="text/javascript" src="/client/imgmap/imgmap.js"></script>
+    <script type="text/javascript" src="/client/imgmap/default_interface.js"></script>
+    <script>
+        $(document).ready(function () {
+            borderPercent = infraredInfo.infraredWidth / infraredInfo.infraredHeight;
+            screenPercent = infraredInfo.screenWidth / infraredInfo.screenheight;
+            if (borderPercent >= 1) {
+                borderWidth = infraredInfo.borderMaxWidth;
+                borderHeight = parseInt(borderWidth / borderPercent);
+            } else {
+                borderHeight = infraredInfo.borderMaxHeight;
+                borderWidth = parseInt(borderHeight * borderPercent);
+            }
+            postData.borderWidth = borderWidth;
+            postData.borderHeight = borderHeight;
+            gui_loadImage('https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{equipmentDetails["equipment_infrared_backgroundImage"]}}', borderWidth, borderHeight);
+            // console.log(borderWidth, borderHeight);
+            $('#pic_container').css('width', borderWidth + 'px').css('height', borderHeight + 'px');
+            $('#typeBtn1').bind('click', function () {
+                var content = $.trim($('#content1').val());
+                if (content === '') {
+                    alert('请填写内容！');
+                    return;
+                }
+                var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
+                if (coords === '') {
+                    alert('点击区域不正确！');
+                    return;
+                }
+                var _postData = $.extend({}, postData);
+                _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
+                _postData['equipment_infrared_area_content'] = content;
+                _postData['equipment_infrared_area_coords'] = coords;
+                _postData['equipment_infrared_area_file'] = $('#musicFilePreview1 audio').attr('data-url');
+                var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
+                if (_id !== undefined && areaListJson[_id] !== undefined) {
+                    _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
+                } else {
+                    if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
+                }
+
+                var l = Ladda.create(document.querySelector('#typeBtn1'));
                 l.start();
-                $.ajax('/equipment/ajaxinfraredarearemove', {
-                    data: { id: id },
+                $.ajax('/equipment/infraredareahandle', {
+                    data: _postData,
                     type: 'post',
                     dataType: 'json',
                     success: function (data) {
-                        alert(data.msg);
                         if (data.code === 0) {
-                            $('#img_area_' + myimgmap.currentid).css('background', '').removeAttr('data-id');
-                            $('#img_active_' + myimgmap.currentid).attr('checked', false);
-                            if (areaListJson[id] !== undefined) delete areaListJson[id];
-                            myimgmap.currentid = '';
-                            $('#areaTypeInput').hide();
-                            $('.areaTypeInput').hide();
-                            $('#musicFilePreview1').html('');
-                            $('#content1').val('');
-                            $('#musicFilePreview2').html('');
-                            $('#screenImagePreview2').html('');
-                            $('#videoFilePreview3').html('');
-                            $('#areaTypeSelect').val('').multiselect('rebuild');
-                            lastClickId = '';
-                            location.reload();
+                            resetData(data);
                         }
+                        alert(data.msg);
                         l.stop();
                     },
                     error: function () {
@@ -765,7 +446,269 @@
                         l.stop();
                     }
                 });
+            });
+            $('#typeBtn2').bind('click', function () {
+                var _content = '';
+                var imgCount = 0;
+                $('#screenImagePreview2 img').each(function () {
+                    _content += $(this).attr('data-url') + ',';
+                    imgCount++;
+                });
+                // if (imgCount > 5) {
+                //     alert('最多上传5张图片');
+                //     return;
+                // }
+                if (_content === '') {
+                    alert('请上传图片文件');
+                    return;
+                }
+                var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
+                if (coords === '') {
+                    alert('点击区域不正确！');
+                    return;
+                }
+                var _postData = $.extend({}, postData);
+                _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
+                _postData['equipment_infrared_area_content'] = _content;
+                _postData['equipment_infrared_area_coords'] = coords;
+                _postData['equipment_infrared_area_file'] = $('#musicFilePreview2 audio').attr('data-url');
+                var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
+                if (_id !== undefined && areaListJson[_id] !== undefined) {
+                    _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
+                } else {
+                    if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
+                }
+                var l = Ladda.create(document.querySelector('#typeBtn2'));
+                l.start();
+                $.ajax('/equipment/infraredareahandle', {
+                    data: _postData,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            resetData(data);
+                        }
+                        alert(data.msg);
+                        l.stop();
+                    },
+                    error: function () {
+                        alert('请重试！');
+                        l.stop();
+                    }
+                });
+            });
+            $('#typeBtn3').bind('click', function () {
+                var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
+                if (coords === '') {
+                    alert('点击区域不正确！');
+                    return;
+                }
+                var videoFile = $('#videoFilePreview3 video').attr('data-url');
+                if (videoFile === undefined) {
+                    alert('请上传视频文件！');
+                    return;
+                }
+                var _postData = $.extend({}, postData);
+                _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
+                _postData['equipment_infrared_area_coords'] = coords;
+                _postData['equipment_infrared_area_file'] = videoFile;
+                var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
+                if (_id !== undefined && areaListJson[_id] !== undefined) {
+                    _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
+                } else {
+                    if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
+                }
+                var l = Ladda.create(document.querySelector('#typeBtn3'));
+                l.start();
+                $.ajax('/equipment/infraredareahandle', {
+                    data: _postData,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            resetData(data);
+                        }
+                        alert(data.msg);
+                        l.stop();
+                    },
+                    error: function () {
+                        alert('请重试！');
+                        l.stop();
+                    }
+                });
+            });
+            $('#typeBtn4').bind('click', function () {
+                var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
+                if (coords === '') {
+                    alert('点击区域不正确！');
+                    return;
+                }
+                var mapGid = $('#mapGid').val();
+                if (!mapGid) {
+                    alert('请选择位置！');
+                    return;
+                }
+                var _postData = $.extend({}, postData);
+                _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
+                _postData['equipment_infrared_area_coords'] = coords;
+                _postData['equipment_infrared_area_content'] = $('#mapId').val() + '|' + mapGid;
+                var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
+                if (_id !== undefined && areaListJson[_id] !== undefined) {
+                    _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
+                } else {
+                    if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
+                }
+                var l = Ladda.create(document.querySelector('#typeBtn4'));
+                l.start();
+                $.ajax('/equipment/infraredareahandle', {
+                    data: _postData,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            resetData(data);
+                        }
+                        alert(data.msg);
+                        l.stop();
+                    },
+                    error: function () {
+                        alert('请重试！');
+                        l.stop();
+                    }
+                });
+            });
+            $('#typeBtn5').bind('click', function () {
+                var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
+                if (coords === '') {
+                    alert('点击区域不正确！');
+                    return;
+                }
+                var _postData = $.extend({}, postData);
+                _postData['equipment_infrared_area_type'] = $('#areaTypeSelect').val();
+                _postData['equipment_infrared_area_coords'] = coords;
+                var _id = $('#img_area_' + myimgmap.currentid).attr('data-id');
+                if (_id !== undefined && areaListJson[_id] !== undefined) {
+                    _postData['equipment_infrared_area_id'] = areaListJson[_id].equipment_infrared_area_id;
+                } else {
+                    if (_postData.equipment_infrared_area_id !== undefined) delete _postData.equipment_infrared_area_id;
+                }
+                var l = Ladda.create(document.querySelector('#typeBtn5'));
+                l.start();
+                $.ajax('/equipment/infraredareahandle', {
+                    data: _postData,
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            resetData(data);
+                        }
+                        alert(data.msg);
+                        l.stop();
+                    },
+                    error: function () {
+                        alert('请重试！');
+                        l.stop();
+                    }
+                });
+            });
+            $('#areaTypeSelect').bind('change', function () {
+                $('.areaTypeInput').hide();
+                $('#areaTypeInput' + this.value).show();
+            });
+            var nodes = {};
+            for (var i in areaListJson) {
+                var x = myimgmap.addNewArea();
+                myimgmap.initArea(x, 'rect');
+                nodes[x] = areaListJson[i].equipment_infrared_area_id;
+                $('#img_area_' + x).attr('data-id', areaListJson[i].equipment_infrared_area_id);
+                $('#img_coords' + x).val(areaListJson[i].equipment_infrared_area_coords);
+                myimgmap._recalculate(x, areaListJson[i].equipment_infrared_area_coords);//contains repaint
+                myimgmap.relaxArea(x);
+                myimgmap.fireEvent('onAreaChanged', myimgmap.areas[x]);
             }
+            var _canvas = $('#pic_container canvas');
+            for (var i = 0; i < _canvas.length; i++) {
+                _canvas[i].setAttribute('data-id', nodes[i]);
+            }
+            var mapIdHtml = '<option value="">&lt;选择地图&gt;</option>';
+            for (var i in mapListJson) {
+                mapIdHtml += '<option value="' + mapListJson[i].map_id + '">' + mapListJson[i].map_name + '</option>';
+            }
+            $('#mapId').html(mapIdHtml);
+            $('#mapId').bind('change', function () {
+                if (this.value > 0) {
+                    $.ajax('/polygon/ajaxgetlistbymapid', {
+                        data: { mapId: this.value },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log("ajaxgetlistbymapid", data);
+                            var mapGidHtml = '<option value="">&lt;选择位置&gt;</option>';
+                            if (data.code === 0) {
+                                for (var i = 0; i < data.data.length; i++) {
+                                    mapGidHtml += '<option value="' + data.data[i].map_gid + '">' + data.data[i].name + '</option>';
+                                }
+                            } else {
+                                alert(data.msg);
+                            }
+                            $('#mapGid').html(mapGidHtml);
+                        },
+                        error: function () {
+                            alert('请重试！');
+                        }
+                    });
+                }
+            });
+            $('#infraredUpdate').bind('click', function () {
+                $.ajax('/equipment/ajaxinfraredareaupdate', {
+                    data: { id: $(this).attr('data-id') },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        alert(data.msg + ' ' + data.data);
+                    },
+                    error: function () {
+                        alert('请重试！');
+                    }
+                });
+            });
+            $('.deleteBtn').bind('click', function () {
+                if (confirm('确定删除此区域？')) {
+                    var id = $(this).attr('data-id');
+                    var l = Ladda.create(document.querySelector('#' + this.id));
+                    l.start();
+                    $.ajax('/equipment/ajaxinfraredarearemove', {
+                        data: { id: id },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (data) {
+                            alert(data.msg);
+                            if (data.code === 0) {
+                                $('#img_area_' + myimgmap.currentid).css('background', '').removeAttr('data-id');
+                                $('#img_active_' + myimgmap.currentid).attr('checked', false);
+                                if (areaListJson[id] !== undefined) delete areaListJson[id];
+                                myimgmap.currentid = '';
+                                $('#areaTypeInput').hide();
+                                $('.areaTypeInput').hide();
+                                $('#musicFilePreview1').html('');
+                                $('#content1').val('');
+                                $('#musicFilePreview2').html('');
+                                $('#screenImagePreview2').html('');
+                                $('#videoFilePreview3').html('');
+                                $('#areaTypeSelect').val('');
+                                lastClickId = '';
+                                location.reload();
+                            }
+                            l.stop();
+                        },
+                        error: function () {
+                            alert('请重试！');
+                            l.stop();
+                        }
+                    });
+                }
+            });
         });
-    });
-</script> {{partial("layout/footer")}}
+    </script>
+
+{% endblock %}

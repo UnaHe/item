@@ -1,197 +1,430 @@
-{{partial("layout/header")}}
-<style>
-    .conditionalPart {
-        display: none
-    }
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">{{"SpotHandle"|_}}</a></li>
-                <li class="crumb-icon"><a href="/{{routerProjectId}}/index/index"><span
-                        class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/{{routerProjectId}}/index/index">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">{{"ScenicManage"|_}}</li>
-            </ol>
-        </div>
-    </div>
-    <div id="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel">
-                    <div class="panel-heading"><span class="panel-title" style="font-size:16px;"> <span
-                            class="glyphicons glyphicons-unchecked"></span> {{mapPolygonDetails['name']}} </span></div>
-                    <div class="panel-body">
-                        <form class="cmxform" id="altForm">
-                            <div class="form-group">
-                                <label>{{"VoiceDescription"|_}}</label> <span>(大小限制 100KB)</span>
-                                <div style="margin: 6px;display: none;" id="previewDiv"><a href="" target="_blank"
-                                                                                           id="previewImageUrl"></a>
-                                    <button type="button" class="btn btn-info btn-gradient btn-xs"
-                                            style="margin-left: 30px;" onclick="removeVoice()">{{'delete'|_}}
-                                    </button>
-                                    <input type="hidden" id="voiceUrl" value="">
-                                </div>
-                                <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
-                                    <div class="progress-bar" role="progressbar" id="thumbnailProgress"
-                                         aria-valuemin="0" aria-valuemax="100" style="width: 0%;"><span class="sr-only">45% Complete</span>
-                                    </div>
-                                </div>
-                                <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple
-                                       onchange="UpLoadFile()">
-                            </div>
-                            <div class="form-group">
-                                <label>{{"ScenicDescription"|_}}</label>
-                                <textarea id="article_content" name="article_content" required="">{{mapPolygonDetails["map_polygon_description_content"]}}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <input class="submit btn bg-purple pull-right" type="submit" id="subBtn" value="{{"
-                                       Submit"|_}}">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+{% extends "layout/main.html" %}
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
-{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
-{{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
+{% block content %}
 
-    function bytesToSize(bytes) {
-        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if (bytes == 0) return '0 Byte';
-        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
-    };
-
-    function UpLoadFile() {
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain; charset=utf-8');
-        // FormData 对象
-        var formData = new FormData();
-        var files = document.getElementById('thumbnail').files;
-        if (files[0] == undefined) {
-            alert("No file chosen")
-            return;
+    <style>
+        .close_img {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #fff8f8;
+            text-align: center;
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border-radius: 100%;
+            line-height: 20px;
+            font-size: 15px;
+            color: red!important;
+            cursor: pointer;
         }
-        var totalBytes = files[0].size;
-//        if (totalBytes>102400){
-//          alert('缩略图文件过大');
-//          return;
-//        }
-        // $("#userfile").attr("disabled","disabled");
-        $("#thumbnail").attr("disabled", "disabled");
+        .image_box{
+            position: relative;
+            width: 95px;
+            float:left;
+            margin-right: 20px;
+            margin-bottom: 6px;
+        }
+    </style>
+    <div class="tpl-content-page-title am-icon-square-o">
+        {{"SpotHandle"|_}}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"ScenicManage"|_}}</li>
+        <li class="am-active"><a href="/scenic/spothandle" >{{"SpotHandle"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <form class="am-form"  id="altForm">
+                <fieldset>
+                    <legend>{{mapPolygonDetails['name']}}</legend>
+                    <div class="am-form-group">
+                        <!--缩略图-->
+                        <label>{{'Thumbnail'|_}}</label> <span>(长宽比例1:1，大小限制100KB)</span>
+                        <div style="margin: 6px;{{mapPolygonDetails['map_polygon_description_thumbnail'] ? '': 'display: none'}};" id="previewthumbnail">
+                            <a href="{%if  mapPolygonDetails['map_polygon_description_thumbnail']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_thumbnail']}}{%endif%}"  target="_blank" >
+                                <img style="max-width: 90px" src="{%if  mapPolygonDetails['map_polygon_description_thumbnail']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_thumbnail']}}{%endif%}" id="previewthumbnailUrl" >
+                            </a>
+                            <button type="button" class="am-close am-close-alt am-icon-close am-close-spin" style="margin-left: 30px;" onclick="remove('thumbnail')"></button>
+                            <input type="hidden" id="thumbnailUrl" value="{{mapPolygonDetails['map_polygon_description_thumbnail']}}">
+                        </div>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="thumbnailProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                            <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple  onchange="UpLoadFile('thumbnail')">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <!--相册-->
+                        <label>相册</label> <span>(大小限制1M)</span>
+                        <div style="margin: 6px;{{mapPolygonDetails['map_polygon_image'] ? '': 'display: none'}};" id="previewimage">
+                            {%for i in mapPolygonDetails['map_polygon_image_arr']%}
+                            <div style="" class="image_box">
+                                <a href="{{base_url}}{{i}}" target="_blank">
+                                    <img src="{{base_url}}{{i}}"  style="position: relative;max-width: 90px; max-height:160px;"/>
+                                </a>
+                                <span class="close_img btn_remove" style="" data-url="{{i}}">X</span>
+                            </div>
+                            {%endfor%}
+                        </div>
+                        <div style="clear:both;"></div>
+                        <input type="hidden" id="imageUrl" value="{{mapPolygonDetails['map_polygon_image']}}">
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="imageProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                            <input id="image" name="image" type="file" class="form-control" multiple  onchange="UpLoadFile('image')">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <!--音频-->
+                        <label>{{"VoiceDescription"|_}}</label> <span>(大小限制 100KB)</span>
+                        <div style="margin: 6px;{{mapPolygonDetails['map_polygon_description_voice'] ? '': 'display: none'}};" id="previewvoice">
+                            <a href="{%if mapPolygonDetails['map_polygon_description_voice']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_voice']}}{%endif%}" target="_blank" id="previewvoiceUrl">
+                                {%if  mapPolygonDetails['map_polygon_description_voice']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_voice']}}{%endif%}
+                            </a>
+                            <button type="button" class="am-close am-close-alt am-icon-close am-close-spin" style="margin-left: 30px;" onclick="remove('voice')"></button>
+                            <input type="hidden" id="voiceUrl" value="{{mapPolygonDetails['map_polygon_description_voice']}}">
+                        </div>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="voiceProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的音频文件</button>
+                            <input id="voice" name="voice" type="file" class="form-control" multiple onchange="UpLoadFile('voice')">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <!--视频-->
+                        <label>视频</label> <span>(大小限制 20M, 格式限制 MP4)</span>
+                        <div style="margin: 6px;{{mapPolygonDetails['map_polygon_description_video'] ? '': 'display: none'}};" id="previewvideo">
+                            <a href="{%if  mapPolygonDetails['map_polygon_description_video']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_video']}}{%endif%}" target="_blank" id="previewvideoUrl">
+                                {%if mapPolygonDetails['map_polygon_description_video']%}{{base_url}}{{mapPolygonDetails['map_polygon_description_video']}}{%endif%}
+                            </a>
+                            <button type="button" class="am-close am-close-alt am-icon-close am-close-spin" style="margin-left: 30px;" onclick="remove('video')"></button>
+                            <input type="hidden" id="videoUrl" value="{{mapPolygonDetails['map_polygon_description_video']}}">
+                        </div>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="videoProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的视屏文件</button>
+                            <input id="video" name="video" type="file" class="form-control" multiple onchange="UpLoadFile('video')">
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="article_content">{{"ScenicDescription"|_}}</label>
+                        <textarea id="article_content" name="article_content" required="">{{mapPolygonDetails["map_polygon_description_content"]}}</textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{"Submit"|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
 
-        formData.set('part', 'voice');
-        formData.set('Filedata', files[0]);
-        // XMLHttpRequest 对象
-        xhr.upload.onprogress = function (ev) {
-            var percent = 0;
-            if (ev.lengthComputable) {
-                percent = parseInt(100 * ev.loaded / ev.total);
-                $("#thumbnailProgress").width(percent + "%");
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
+    <script type="text/javascript">
+        var ext_arr = {
+            'image': {
+                "gif" : "gif",
+                "jpg" : "jpg",
+                "jpeg" : "jpeg",
+                "png" : "png",
+                "bmp" : "bmp"
+            },
+            'voice': {
+                "mp3" : "mp3",
+                "wav" : "wav",
+                "wav" : "wav",
+                "wma" : "wma",
+                "mid" : "mid",
+                "rm" : "rm"
+            },
+            'video': {
+                "mp4" : "mp4"
             }
         };
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    $("#previewImageUrl").attr("href", xhr.responseText).html(xhr.responseText);
-                    $("#voiceUrl").val(xhr.responseText);
-                    $("#previewDiv").show();
-                } else {
-                    alert(xhr.responseText);
-                    $('#thumbnail').val('');
+        function bytesToSize(bytes) {
+            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            if (bytes == 0) return '0 Byte';
+            var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+            return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+        }
+        function UpLoadFile(type) {
+            var files = document.getElementById(type).files[0];
+            if (files == undefined) {
+                alert("No file chosen");
+                return;
+            }
+            var totalBytes = files.size;
+            var ext = $("#"+type).val().substr($("#"+type).val().indexOf(".")+1);
+    
+            switch(type){
+                case 'thumbnail': //缩略图
+                    if(totalBytes>100*1024){
+                        alert('缩略图文件过大');
+                        return;
+                        remove(type);
+                    }
+                    if(!ext_arr.image[ext] || ext_arr.image[ext] == undefined){
+                        alert('缩略图格式不正确');
+                        remove(type);
+                        return;
+                    }
+                    getImageWidthAndHeight(files,function(obj){
+                        if (obj.width/obj.height > 1.2 || obj.width/obj.height < 0.8 ) {
+    //                    if (obj.width > 750 || obj.height > 380 ) {
+                            alert("缩略图必须是正方形,请重新上传！");
+                            $("#thumbnail").val("").focus();
+                            remove(type);
+                            return false;
+                        }else{
+                            submitUpload(type,files);
+                        }
+                    });
+                    break;
+                case 'image': //图片
+                    if(totalBytes>1024*1024){
+                        alert('图片文件过大');
+                        return;
+                        remove(type);
+                    }
+                    if(!ext_arr.image[ext] || ext_arr.image[ext] == undefined){
+                        alert('图片格式不正确');
+                        remove(type);
+                        return;
+                    }
+                    break;
+                case 'video':
+                    if(totalBytes>20*1024*1024){
+                        alert('视频文件过大');
+                        remove(type);
+                        return;
+                    }
+                    if(!ext_arr.video[ext] || ext_arr.video[ext] == undefined){
+                        alert('视频文件格式不正确');
+                        remove(type);
+                        return;
+                    }
+                    break;
+                case 'voice':
+                    if(totalBytes>2*1024*1024){
+                        alert('音频文件过大');
+                        remove(type);
+                        return;
+                    }
+                    if(!ext_arr.voice[ext] || ext_arr.voice[ext] == undefined){
+                        alert('音频文件格式不正确');
+                        remove(type);
+                        return;
+                    }
+                    break;
+                case 'image':
+                    if(totalBytes>100*1024){
+                        alert('图片文件过大');
+                        return;
+                        remove(type);
+                    }
+                    if(!ext_arr.thumbnail[ext] || ext_arr.thumbnail[ext] == undefined){
+                        alert('缩略图格式不正确');
+                        remove(type);
+                        return;
+                    }
+                    getImageWidthAndHeight(files,function(obj){
+                        if (obj.width > 750 || obj.height > 380) {
+                            alert("缩略图宽不能超过750像素，高不能超过375像素,请重新上传！");
+                            $("#thumbnail").val("").focus();
+                            remove(type);
+                            return false;
+                        }else{
+                            submitUpload(type,files);
+                        }
+                    });
+                    break;
+            }
+            if(type != 'thumbnail'){
+                submitUpload(type,files);
+            }
+        }
+    
+        function submitUpload(type,file){
+            resetProgressBar(type);
+            $(".sr-only-"+type).removeClass('hide');
+            // FormData 对象
+            var formData = new FormData();
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('text/plain; charset=utf-8');
+            $("#"+type).attr("disabled", "disabled");
+            $("#subBtn").attr("disabled", "disabled");
+            formData.set('part', type);
+            formData.set('Filedata', file);
+            // XMLHttpRequest 对象
+            xhr.upload.onprogress = function (ev) {
+                var percent = 0;
+                if (ev.lengthComputable) {
+                    percent = parseInt(100 * ev.loaded / ev.total);
+                    $("#thumbnailProgress").width(percent + "%");
                 }
-            }
-            $("#thumbnailProgress").width("0%");
-            $('#thumbnail').removeAttr("disabled");
-        };
-        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
-        xhr.send(formData);
-    }
-
-    function removeVoice() {
-        var fileInput = $('#thumbnail');
-        fileInput.replaceWith(fileInput.val('').clone(true));
-        $("#previewImageUrl").attr("href", '');
-        $("#previewDiv").hide();
-
-    }
-
-    function submitHandler() {
-        var content = $.trim(CKEDITOR.instances['article_content'].getData());
-        var voiceUrl = $.trim($('#voiceUrl').val());
-        $('#subBtn').attr('disabled', 'disabled');
-        $('#subBtn').parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , "width":"20")}}');
-        $.ajax('/{{routerProjectId}}/scenic/spothandle', {
-            data: {
+            };
+            xhr.upload.onprogress = function(evt){
+                // toFixed修正结果，只保留小数点后两位
+                // 计算上传大小的百分比
+                percent = (evt.loaded / evt.total).toFixed(2);
+                console.log(percent);
+                // 设置进度条样式
+                $("#"+type+"Progress").width(percent*100+"%");
+                $(".sr-only-"+type).removeClass('hide');
+                $(".sr-only-"+type+" .percent").html(percent*100+"%");
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        switch (type) {
+                            case "thumbnail":
+                                $("#preview"+type+"Url").parent("a").attr('href',xhr.responseText);
+                                $("#preview"+type+"Url").attr("src", xhr.responseText);
+                                $("#"+type+"Url").val(xhr.responseText);
+                                break;
+                            case "image":
+                                $("#preview"+type).append(' <div style="" class="image_box">'+
+                                    '<a href="'+xhr.responseText+'" target="_blank"><img src="'+xhr.responseText+'"  id="previewImage" style="position: relative;max-width: 90px; max-height:160px;"/></a>'+
+                                    '<span class="close_img btn_remove" style="" data-url="'+xhr.responseText+'">X</span>'+
+                                    '</div>');
+                                $("#imageUrl").val($("#imageUrl").val()+xhr.responseText+',');
+                                break;
+                            default:
+                                $("#preview"+type+"Url").attr("href", xhr.responseText).html(xhr.responseText);
+                                $("#"+type+"Url").val(xhr.responseText);
+                                break;
+                        }
+                        $("#preview"+type).show();
+                        $('#subBtn').removeAttr('disabled', 'disabled');
+                    } else {
+                        alert(xhr.responseText);
+                        $('#'+type).val('');
+                    }
+                }
+                $('#'+type).removeAttr("disabled");
+            };
+            xhr.open("post", "/upload/upload", true);
+            xhr.send(formData);
+        }
+    
+    
+        function remove(type) {
+            var fileInput = $('#'+type);
+            fileInput.replaceWith(fileInput.val('').clone(true));
+            $("#"+type+"Url").val('');
+            $("#preview"+type+"Url").attr("href", '');
+            $("#preview"+type).hide();
+            resetProgressBar(type);
+        }
+        function resetProgressBar(type){
+            $("#"+type+"Progress").width("0%");
+            $(".sr-only-"+type+" .percent").html("0%");
+            $(".sr-only-"+type).addClass('hide');
+        }
+        function getImageWidthAndHeight(file,callback) {
+            var _URL = window.URL || window.webkitURL;
+            var img = new Image();
+            img.onload = function () {
+                callback && callback({"width": this.width, "height": this.height, "filesize": file.size});
+            };
+            img.src = _URL.createObjectURL(file);
+        }
+    
+    
+        function submitHandler() {
+            var content = $.trim(CKEDITOR.instances['article_content'].getData());
+            var voiceUrl = $.trim($('#voiceUrl').val());
+            var thumbnailUrl = $.trim($('#thumbnailUrl').val());
+            var videoUrl = videoUrl;
+            var imageUrl = imageUrl;
+    
+            $('#subBtn').attr('disabled', 'disabled');
+            var data = {
                 id: '{{mapPolygonDetails['map_polygon_id']}}',
                 content: content,
                 voiceUrl: voiceUrl,
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (data) {
-                if (data.errcode == 0) {
-                    alert('操作成功');
-//                        location.replace('/{{routerProjectId}}/scenic/spots?map_id={{mapPolygonDetails['map_id']}}');
-                } else {
-                    alert(data.errmsg);
+                thumbnailUrl : thumbnailUrl,
+                videoUrl : $.trim($('#videoUrl').val()),
+                imageUrl : $.trim($('#imageUrl').val()),
+            };
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            $.ajax('/scenic/spothandle', {
+                data: data,
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code == 0) {
+                        alert('操作成功');
+                        location.replace('/scenic/spots?map_id={{mapPolygonDetails["map_id"]}}');
+                    } else {
+                        alert(data.msg);
+                        l.stop();
+                    }
+                },
+                error: function () {
+                    alert('服务器错误');
+                    l.stop();
+                },
+                complete: function () {
+                    $('#subBtn').removeAttr('disabled', 'disabled');
                 }
-            },
-            error: function () {
-                alert('服务器错误');
-            },
-            complete: function () {
-                $('#subBtn').removeAttr('disabled');
-            }
-        });
-        return false;
-    }
-
-    jQuery(document).ready(function () {
-        "use strict";
-        // Init Theme Core
-        Core.init();
-        {% if mapPolygonDetails["map_polygon_description_voice"] %}
-        $("#previewImageUrl").attr("href", '{{url.getStaticBaseUri()}}{{mapPolygonDetails["map_polygon_description_voice"]}}').html('{{mapPolygonDetails["map_polygon_description_voice"]}}');
-        $("#previewDiv").show();
-        $('#voiceUrl').val('{{mapPolygonDetails["map_polygon_description_voice"]}}');
-        {%endif %}
-        $("#altForm").validate({
-            submitHandler: submitHandler,
-            ignore: [],
-            rules: {
-                article_content: {
-                    required: function () {
-                        CKEDITOR.instances.article_content.updateElement();
+            });
+            return false;
+        }
+    
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            {% if mapPolygonDetails["map_polygon_description_voice"] %}
+            $("#previewthumbnailUrl").attr("href", '{{url.getStaticBaseUri()}}{{mapPolygonDetails["map_polygon_description_voice"]}}').html('{{mapPolygonDetails["map_polygon_description_voice"]}}');
+            $("#previewDiv").show();
+            $('#voiceUrl').val('{{mapPolygonDetails["map_polygon_description_voice"]}}');
+            {%endif %}
+            $("#altForm").validate({
+                submitHandler: submitHandler,
+                ignore: [],
+                rules: {
+                    article_content: {
+                        required: function () {
+                            CKEDITOR.instances.article_content.updateElement();
+                        }
+                    }
+                },
+                errorPlacement: function (error, element) {
+                    if (element.attr("name") == "article_content") {
+                        error.insertAfter("textarea#article_content");
+                    } else {
+                        error.insertAfter(element);
                     }
                 }
-            },
-            errorPlacement: function (error, element) {
-                if (element.attr("name") == "article_content") {
-                    error.insertAfter("textarea#article_content");
-                } else {
-                    error.insertAfter(element);
+            });
+            CKEDITOR.replace('article_content', {
+                extraPlugins: 'uploadimage',
+                filebrowserImageUploadUrl: '/upload/uploadtooss?part=client_spots'
+            });
+    
+            $("#previewimage").on('click','.close_img',function(){
+                var url_val = $(this).data('url');
+                $(this).parent("div").remove();
+                $("#imageUrl").val($("#imageUrl").val().replace(url_val+',',''));
+                if($("#imageUrl").val() == ''){
+                    resetProgressBar('image');
                 }
-            }
+            })
         });
-        CKEDITOR.replace('article_content', {
-            extraPlugins: 'uploadimage',
-            filebrowserImageUploadUrl: '/{{routerProjectId}}/upload/upload?part=client_spots',
-        });
+    </script>
 
-    });
-
-</script>
-
-</body>
-</html>
+{% endblock %}

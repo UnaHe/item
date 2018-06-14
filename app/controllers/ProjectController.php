@@ -23,14 +23,14 @@ class ProjectController extends ControllerBase
             $itemProjectModel = new ItemProjectModel();
             $itemProject = $itemProjectModel->getDetailsByProjectIdAndAccountId($input['project_id'],$this->user['item_account_id']);
 
-            $this->user['project_id'] = $input['project_id'];
+            $this->user['project_id'] = 93;
             $this->user['item_account_group_id'] = $itemProject['item_account_group_id'];
             $this->user['item_account_group_name'] = $itemProject['item_account_group_name'];
             $this->user['item_account_group_role'] = $itemProject['item_account_group_role'];
 
 
             $projectModel = new ProjectModel();
-            $projectDetails = $projectModel->getDetailsByProjectId($this->user['project_id']);
+            $projectDetails = $projectModel->getDetailsByProjectIdBase($this->user['project_id']);
 
             if (!$projectDetails){
                 $this->resultModel->setResult('-1');

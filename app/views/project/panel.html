@@ -1,107 +1,449 @@
-{{partial("layout/header")}}
-  <!-- Start: Content -->
-  <section id="content_wrapper">
+{% extends "layout/main.html" %}
 
-    <div id="topbar">
-      <div class="topbar-left">
-        <ol class="breadcrumb">
-          <li class="crumb-active"><a href="/">{{"Dashboard"|_}}</a></li>
-          <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-        </ol>
-      </div>
+{% block content %}
+
+    <!-- Start: Content -->
+    <style>
+        .isnull {
+            text-align:center;
+            border: 1px solid #c6c6c6;
+        }
+        .isnull span {
+            font-size: 4rem;
+            color: rgba(0,0,0,.2);
+        }
+    </style>
+    <div class="tpl-content-page-title">
+        统计
     </div>
-    <div id="content">
-      <div id="widget-dropdown" class="row">
-        {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-          {%if ((cpAclNew['resource']['doctor'] is defined) AND ('handle' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-          <div class="col-sm-3">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/handle';" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
-              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-user_add"><b></b></h2>
-              <h5 class="text-muted">{{"DoctorCreate"|_}}</h5>
-            </div>
-          </div>
-        </div>
-        {%endif%}
-            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('list' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <div class="col-sm-3">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/list';" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
-              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-group"><b></b></h2>
-              <h5 class="text-muted">{{"DoctorList"|_}}</h5>
-            </div>
-          </div>
-        </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li class="am-active"><a href="/project/panel" >统计</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <div class="am-g">
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption font-green ">
+                                <i class="am-icon-cloud-download"></i>
+                                <span> 点位扫码排序（前十）</span>
+                            </div>
+                            <div class="actions">
+                                <ul class="actions-btn" id="scan">
+                                    <li class="red-on" data-id="0">今天</li>
+                                    <li class="green" data-id="1">本周</li>
+                                    <li class="green" data-id="2">本月</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tpl-echarts" id="statistical-scan">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption font-red ">
+                                <i class="am-icon-send-o"></i>
+                                <span> 导航排序（前十）</span>
+                            </div>
+                            <div class="actions">
+                                <ul class="actions-btn" id="navigation">
+                                    <li class="red-on" data-id="0">今天</li>
+                                    <li class="green" data-id="1">本周</li>
+                                    <li class="green" data-id="2">本月</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tpl-echarts" id="statistical-navigation">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption " style="color: #659be0;">
+                                <i class="am-icon-bar-chart"></i>
+                                <span> 搜索关键字排序（前十）</span>
+                            </div>
+                            <div class="actions">
+                                <ul class="actions-btn" id="search">
+                                    <li class="red-on" data-id="0">今天</li>
+                                    <li class="green" data-id="1">本周</li>
+                                    <li class="green" data-id="2">本月</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tpl-echarts" id="statistical-search">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption " style="color: #fd7700;">
+                                <i class="am-icon-sort-numeric-desc"></i>
+                                <span> 目的地排序（前十）</span>
+                            </div>
+                            <div class="actions">
+                                <ul class="actions-btn" id="destination">
+                                    <li class="red-on" data-id="0">今天</li>
+                                    <li class="green" data-id="1">本周</li>
+                                    <li class="green" data-id="2">本月</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="tpl-echarts" id="statistical-destination">
+
+                        </div>
+                    </div>
+                </div>
+            {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                {%if ((cpAclNew['resource']['doctor'] is defined) AND ('handle' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
+                    <div class="dashboard-stat" onclick="location.href='/{{routerProjectId}}/doctor/handle';" style="cursor: pointer; color: rgba(255,255,255,0.1); background-color: #659be0;">
+                        <div class="visual">
+                            <i class="am-icon-user-plus"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number"></div>
+                            <div class="desc" style="color: #fff;"> {{"DoctorCreate"|_}} </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
+
+                {%if ((cpAclNew['resource']['doctor'] is defined) AND ('list' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
+                    <div class="dashboard-stat blue" onclick="location.href='/{{routerProjectId}}/doctor/list';" style="cursor: pointer;">
+                        <div class="visual">
+                            <i class="am-icon-list"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number"></div>
+                            <div class="desc"> {{"DoctorList"|_}} </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
+
+                {%if ((cpAclNew['resource']['doctor'] is defined) AND ('schedule' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
+                    <div class="dashboard-stat red" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
+                        <div class="visual">
+                            <i class="am-icon-file"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number"></div>
+                            <div class="desc"> {{"DoctorSchedule"|_}} </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
+
+                {%if ((cpAclNew['resource']['doctor'] is defined) AND ('job' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
+                    <div class="dashboard-stat purple" onclick="location.href='/{{routerProjectId}}/doctor/job';" style="cursor: pointer;">
+                        <div class="visual">
+                            <i class="am-icon-user-md"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number"></div>
+                            <div class="desc"> {{"DoctorJob"|_}} </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
             {%endif%}
-            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('schedule' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <div class="col-sm-3">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
-              <h2 class="mt15 lh15 text-purple fa fa-calendar"><b></b></h2>
-              <h5 class="text-muted">{{"DoctorSchedule"|_}}</h5>
-            </div>
-          </div>
-        </div>
+
+            {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
+                    <div class="dashboard-stat green" onclick="location.href='/{{routerProjectId}}/doctordepartment/department';" style="cursor: pointer;">
+                        <div class="visual">
+                            <i class="am-icon-hospital-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number"></div>
+                            <div class="desc"> {{"DoctorDepartmentInfo"|_}} </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
             {%endif%}
-            {%if ((cpAclNew['resource']['doctor'] is defined) AND ('job' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-            <div class="col-sm-3">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-purple"></i></div>
-              <h2 class="mt15 lh15 text-purple glyphicons glyphicons-certificate"><b></b></h2>
-              <h5 class="text-muted">{{"DoctorJob"|_}}</h5>
             </div>
-          </div>
         </div>
-        {%endif%}
-        {%endif%}
-        {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-        {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-        <div class="col-sm-3">
-          <div class="panel panel-overflow mb10">
-            <div class="panel-body pn pl20" onclick="location.href='/{{routerProjectId}}/doctordepartment/department';" style="cursor: pointer;">
-              <div class="icon-bg"><i class="glyphicons glyphicons-share text-info"></i></div>
-              <h2 class="mt15 lh15 text-info glyphicons glyphicons-building"><b></b></h2>
-              <h5 class="text-muted">{{"DoctorDepartmentInfo"|_}}</h5>
-            </div>
-          </div>
-        </div>
-            {%endif%}
-        {%endif%}
-      </div>
-  </section>
-  {{partial("layout/footer")}}
+    </div>
 
-<!-- Theme Javascript --> 
-<script type="text/javascript" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/client/js/main.js"></script>
-<script type="text/javascript">
-jQuery(document).ready(function () {
-	 "use strict";
-     // Init Theme Core
+    <!-- Theme Javascript -->
+    <script src="/assets/js/echarts.min.js"></script>
+    <script src="/assets/js/macarons.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('.project').bind('click', function () {
+                $.ajax('/project/panel', {
+                    data: {project_id: $(this).attr('data-id')},
+                    type: 'post',
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.code === 0) {
+                            location.href = '/project/panel';
+                            return;
+                        }
+                        alert(data.msg);
+                    },
+                    error: function () {
+                        alert("验证异常，请刷新重试！");
+                    },
+                });
+            });
 
+            // 无数据.
+            var isnull = '<div class="isnull"><span>暂无数据</span></div>';
 
-     $('.project').bind('click',function(){
-         $.ajax('/project/panel', {
-             data: {project_id:$(this).attr('data-id')},
-             type: 'post',
-             dataType: 'json',
-             success: function(data) {
-                 if (data.code===0){
-                     location.href= '/project/panel';
-                     return;
-                 }
-                 alert(data.msg);
-             },
-             error:function(){
-                 alert("验证异常，请刷新重试！");
-             },
-         });
-     });
+            var scan = 0;
+            $("#scan li").click(function(){
+                // 获取参数.
+                var scan_type = $(this).attr('data-id');
 
-  });
-</script>
-</body>
-</html>
+                if (scan === 1 && scan_type === $("#scan .red-on").attr('data-id')) {
+                    return;
+                }
+
+                // 替换样式.
+                $("#scan .red-on").addClass('green').removeClass('red-on');
+                $(this).addClass('red-on').removeClass('green');
+
+                $.ajax({
+                    url: '/ajax/getScanTop',
+                    type: "POST",
+                    dataType: 'JSON',
+                    data:{
+                        'scan_type': scan_type,
+                    },
+                    success: function(data){
+                        if(data.code == 0){
+                            if (data.data === false) {
+                                $('#statistical-scan').empty().append(isnull);
+                                return;
+                            }
+                            var content = [];
+                            $.each(data.data,function(i,j){
+                                if (content[i] === undefined) {
+                                    content[i] = [];
+                                    content[i].push(j.forward_name)
+                                }
+                                content[i].push(j.forward_count);
+                            });
+                            echarts_init(content, 'statistical-scan', '扫码', '#36c6d3')
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error: function() {
+                        alert('操作失败，请稍后重试！');
+                    }
+                });
+            });
+
+            var navigation = 0;
+            $("#navigation li").click(function(){
+                // 获取参数.
+                var navigation_type = $(this).attr('data-id');
+
+                if (navigation === 1 && navigation_type === $("#navigation .red-on").attr('data-id')) {
+                    return;
+                }
+
+                // 替换样式.
+                $("#navigation .red-on").addClass('green').removeClass('red-on');
+                $(this).addClass('red-on').removeClass('green');
+
+                $.ajax({
+                    url: '/ajax/getNavigationTop',
+                    type: "POST",
+                    dataType: 'JSON',
+                    data:{
+                        'navigation_type': navigation_type,
+                    },
+                    success: function(data){
+                        if(data.code == 0){
+                            if (data.data === false) {
+                                $('#statistical-navigation').empty().append(isnull);
+                                return;
+                            }
+                            var content = [];
+                            $.each(data.data,function(i,j){
+                                if (content[i] === undefined) {
+                                    content[i] = [];
+                                    content[i].push(j.mapname)
+                                }
+                                content[i].push(j.mapcount);
+                            });
+                            echarts_init(content, 'statistical-navigation', '导航', '#ff7da1')
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error: function() {
+                        alert('操作失败，请稍后重试！');
+                    }
+                });
+            });
+
+            var search = 0;
+            $("#search li").click(function(){
+                // 获取参数.
+                var search_type = $(this).attr('data-id');
+
+                if (search === 1 && search_type === $("#search .red-on").attr('data-id')) {
+                    return;
+                }
+
+                // 替换样式.
+                $("#search .red-on").addClass('green').removeClass('red-on');
+                $(this).addClass('red-on').removeClass('green');
+
+                $.ajax({
+                    url: '/ajax/getSearchTop',
+                    type: "POST",
+                    dataType: 'JSON',
+                    data:{
+                        'search_type': search_type,
+                    },
+                    success: function(data){
+                        if(data.code == 0){
+                            if (data.data === false) {
+                                $('#statistical-search').empty().append(isnull);
+                                return;
+                            }
+                            var content = [];
+                            $.each(data.data,function(i,j){
+                                if (content[i] === undefined) {
+                                    content[i] = [];
+                                    content[i].push(j.search_words)
+                                }
+                                content[i].push(j.searchcount);
+                            });
+                            echarts_init(content, 'statistical-search', '搜索关键字', '#0e90d2')
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error: function() {
+                        alert('操作失败，请稍后重试！');
+                    }
+                });
+            });
+
+            var destination = 0;
+            $("#destination li").click(function(){
+                // 获取参数.
+                var destination_type = $(this).attr('data-id');
+
+                if (destination === 1 && destination_type === $("#destination .red-on").attr('data-id')) {
+                    return;
+                }
+
+                // 替换样式.
+                $("#destination .red-on").addClass('green').removeClass('red-on');
+                $(this).addClass('red-on').removeClass('green');
+
+                $.ajax({
+                    url: '/ajax/getDestinationTop',
+                    type: "POST",
+                    dataType: 'JSON',
+                    data:{
+                        'destination_type': destination_type,
+                    },
+                    success: function(data){
+                        if(data.code == 0){
+                            if (data.data === false) {
+                                $('#statistical-destination').empty().append(isnull);
+                                return;
+                            }
+                            var content = [];
+                            $.each(data.data,function(i,j){
+                                if (content[i] === undefined) {
+                                    content[i] = [];
+                                    content[i].push(j.end_name)
+                                }
+                                content[i].push(j.mapcount);
+                            });
+                            echarts_init(content, 'statistical-destination', '导航目的地', '#f17608')
+                        }else{
+                            alert(data.msg);
+                        }
+                    },
+                    error: function() {
+                        alert('操作失败，请稍后重试！');
+                    }
+                });
+            });
+
+            function echarts_init(content, element, key, color) {
+                var source = [
+                    ['product', key],
+                ];
+
+                $.each(content,function(i,j){
+                    source.push(j);
+                });
+
+                var echarts_scan = echarts.init(document.getElementById(element), 'macarons'),
+                    option = {
+                        legend: {},
+                        tooltip: {formatter: '{a0}:{c0} 次'},
+                        dataset: {
+                            source: source
+                        },
+                        xAxis: {
+                            type: 'category',
+                            axisLabel: {
+                                interval:0,
+                                rotate:25
+                            },
+                        },
+                        yAxis: {},
+                        // Declare several bar series, each will be mapped
+                        // to a column of dataset.source by default.
+                        series: [
+                            {
+                                type: 'bar',
+                                itemStyle:{
+                                    normal:{
+                                        color: color
+                                    }
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    textStyle: {
+                                        color: color
+                                    }
+                                },
+                            },
+                        ],
+                    };
+                echarts_scan.setOption(option);
+            }
+
+            $("#scan li[data-id='0']").click();scan++;
+            $("#navigation li[data-id='0']").click();navigation++;
+            $("#search li[data-id='0']").click();search++;
+            $("#destination li[data-id='0']").click();destination++;
+        });
+    </script>
+
+{% endblock %}

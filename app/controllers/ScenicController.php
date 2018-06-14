@@ -21,6 +21,13 @@ class ScenicController extends ControllerBase
                 ),
                 'default' => null
             ),
+            'category_id' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 1
+                ),
+                'default' => null
+            ),
             'page' => array(
                 'filter' => FILTER_VALIDATE_INT,
                 'options' => array(
@@ -42,7 +49,11 @@ class ScenicController extends ControllerBase
                     'max_range' => 1
                 ),
                 'default' => 1
-            )
+            ),
+            'keywords' => array(
+                'filter' => FILTER_SANITIZE_STRING,
+                'default' => ''
+            ),
         );
         $filter = new FilterModel ($rules);
         if (!$filter->isValid($this->request->getQuery())) {
@@ -62,6 +73,21 @@ class ScenicController extends ControllerBase
             if (!isset($touched)) {
                 $this->alert($this->resultModel->getMsg('101'), '/map/manage');
             }
+            $mapPolygonCategoryModel = new MapPolygonCategoryModel();
+            $categoryList = $mapPolygonCategoryModel->getList(null,$this->user['project_id']);
+            if (!is_null($input['category_id'])) {
+                unset($touched);
+                foreach ($categoryList as $v) {
+                    if ($v['map_polygon_category_id'] == $input['category_id']) {
+                        $touched = 1;
+                        break;
+                    }
+                }
+                if (!isset($touched)) {
+                    $this->alert($this->resultModel->getMsg('101'), '/map/manage');
+                }
+            }
+            $this->view->categoryList = $categoryList;
         }
         $this->view->mapList = $mapList;
 
@@ -70,6 +96,7 @@ class ScenicController extends ControllerBase
             $mapPolygonModel = new MapPolygonModel();
             $this->view->mapPolygon = $mapPolygonModel->getListSimple($input);
         }
+        $this->view->base_url = 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/';
         $this->view->filter = $input;
     }
 
@@ -85,6 +112,18 @@ class ScenicController extends ControllerBase
                     'options' => array(
                         'min_range' => 0
                     )
+                ),
+                'thumbnailUrl' => array(
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => ''
+                ),
+                'imageUrl' => array(
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => ''
+                ),
+                'videoUrl' => array(
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'default' => ''
                 ),
                 'voiceUrl' => array(
                     'filter' => FILTER_SANITIZE_STRING,
@@ -115,43 +154,133 @@ class ScenicController extends ControllerBase
                 $mapPolygonDescriptionDetails = [];
             } else {
                 $this->logger->appendTitle('update');
-                $oldVoice = $mapPolygonDescriptionDetails['map_polygon_description_voice'];
+                $delete_resource = [];
+                if(!empty($mapPolygonDescriptionDetails['map_polygon_description_thumbnail']) && $mapPolygonDescriptionDetails['map_polygon_description_thumbnail'] != $input['thumbnailUrl']){
+                    $delete_resource[] = $mapPolygonDescriptionDetails['map_polygon_description_thumbnail'];
+                }
+                if(!empty($mapPolygonDescriptionDetails['map_polygon_description_video']) && $mapPolygonDescriptionDetails['map_polygon_description_video'] != $input['videoUrl']){
+                    $delete_resource[] = $mapPolygonDescriptionDetails['map_polygon_description_video'];
+                }
+                if(!empty($mapPolygonDescriptionDetails['map_polygon_description_voice']) && $mapPolygonDescriptionDetails['map_polygon_description_voice'] != $input['voiceUrl']){
+                    $delete_resource[] = $mapPolygonDescriptionDetails['map_polygon_description_voice'];
+                }
+
             }
+            $new_resource = [];
+            if($input['thumbnailUrl'] != '' && strpos($input['thumbnailUrl'], '/') === 0){
+                $new_resource['map_polygon_description_thumbnail'] = $input['thumbnailUrl'];
+            }
+            if($input['videoUrl'] != '' && strpos($input['videoUrl'], '/') === 0){
+                $new_resource['map_polygon_description_video'] = $input['videoUrl'];
+            }
+            if($input['voiceUrl'] != '' && strpos($input['voiceUrl'], '/') == 0){
+                $new_resource['map_polygon_description_voice'] = $input['voiceUrl'];
+            }
+
+            $mapPolygonDescriptionDetails['map_gid'] = $mapPolygonDetails['map_gid'];
+            $mapPolygonDescriptionDetails['map_polygon_description_content'] = $input['content'];
+//            $mapPolygonDescriptionDetails['map_polygon_image'] = $input['imageUrl'];
+            $mapPolygonDescriptionDetails['map_polygon_description_thumbnail'] = $input['thumbnailUrl'];
+            $mapPolygonDescriptionDetails['map_polygon_description_video'] = $input['videoUrl'];
+            $mapPolygonDescriptionDetails['map_polygon_description_voice'] =  $input['voiceUrl'];
 
             $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
             $ossClient->setConnectTimeout(5);
-            if ($input['voiceUrl'] != '' && strpos($input['voiceUrl'], '/') == 0) {
-                $objectName = ltrim($input['voiceUrl'], '/');
-                $mapPolygonDescriptionDetails['map_polygon_description_voice'] = $objectName;
-                try {
-                    $ossClient->putObject(self::$DefaultBucket, $objectName,
-                        file_get_contents(APP_PATH . 'public/' . $objectName));
-                    @unlink(APP_PATH . 'public/' . $objectName);
-                } catch (Exception $e) {
-                    $this->logger->addMessage('oss upload > voice: ' . $e->getMessage(),
-                        Phalcon\Logger::CRITICAL);
-                    $this->resultModel->setResult('701');
-                    return $this->resultModel->output();
+//            //上传新资源
+            if ($new_resource) {
+                foreach ($new_resource as $type=>$url){
+                    $objectName = ltrim($url, '/');
+                    try {
+                        $ossClient->putObject(self::$DefaultBucket, $objectName, file_get_contents(APP_PATH . 'public/' . $objectName));
+                        $mapPolygonDescriptionDetails[$type] = $objectName;
+                        @unlink(APP_PATH . 'public/' . $objectName);
+                    } catch (Exception $e) {
+                        //删除上传失败的资源
+                        $this->logger->addMessage('oss upload > '.$type.': ' . $e->getMessage(),
+                            Phalcon\Logger::CRITICAL);
+                        $this->resultModel->setResult('701');
+                        return $this->resultModel->output();
+                    }
                 }
             }
-            $mapPolygonDescriptionDetails['map_gid'] = $mapPolygonDetails['map_gid'];
-            $mapPolygonDescriptionDetails['map_polygon_description_content'] = $input['content'];
+            //相册资源
+            if(!empty($input['imageUrl'])){
+                $input['imageUrl'] = explode(',',rtrim($input['imageUrl'],','));
+                $oldImages = $uploadImages = [];
+                if (!empty($mapPolygonDescriptionDetails['map_polygon_image'])) {
+                    $oldImages = explode(',', $mapPolygonDescriptionDetails['map_polygon_image']);
+                }
+                if(!empty($oldImages)){
+                    $mapPolygonDescriptionDetails['map_polygon_image'] = '';
+                    foreach ($input['imageUrl']  as $v){
+                        if (strpos($v, '/') === 0) { //新增的
+                            $uploadImages[] = $v;
+                            continue;
+                        }
+                        $_key = array_search($v, $oldImages);
+                        if ($_key !== false) { //不删除的
+                            unset($oldImages[$_key]);
+                            $mapPolygonDescriptionDetails['map_polygon_image'] =   $mapPolygonDescriptionDetails['map_polygon_image'] ? $mapPolygonDescriptionDetails['map_polygon_image'].','.$v : $mapPolygonDescriptionDetails['map_polygon_image'].$v;
+                        }
+                    }
+                    $delete_resource = array_merge($delete_resource, $oldImages);
+                }else{
+                    $uploadImages = $input['imageUrl'];
+                }
+                if (!empty($uploadImages)) {
+                    try {
+                        if (!isset($ossClient)) {
+                            $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
+                            $ossClient->setConnectTimeout(5);
+                        }
+                        foreach ($uploadImages as $v) {
+                            $objectName = ltrim($v, '/');
+                            $ossClient->putObject(self::$DefaultBucket, $objectName, file_get_contents(APP_PATH . 'public/' . $objectName));
 
+                            $mapPolygonDescriptionDetails['map_polygon_image'] =  $mapPolygonDescriptionDetails['map_polygon_image'] ? $mapPolygonDescriptionDetails['map_polygon_image'].','.$objectName : $mapPolygonDescriptionDetails['map_polygon_image'].$objectName;
+                            @unlink(APP_PATH . 'public/' . $objectName);
+                        }
+                    } catch (Exception $e) {
+                        $this->logger->addMessage('oss upload err:' . $e->getLine() . ' ' . $e->getMessage(), Phalcon\Logger::CRITICAL);
+                        $this->resultModel->setResult('701', $e->getMessage());
+                        return $this->resultModel->output();
+                    }
+                }
+            }else{
+                if (!empty($mapPolygonDescriptionDetails['map_polygon_image'])) {
+                    $delete_resource = array_merge($delete_resource, explode(',', $mapPolygonDescriptionDetails['map_polygon_image']));
+                }
+                $mapPolygonDescriptionDetails['map_polygon_image'] = '';
+            }
+
+            $mapPolygonDescriptionDetails['map_polygon_image'] = $mapPolygonDescriptionDetails['map_polygon_image'] ? rtrim($mapPolygonDescriptionDetails['map_polygon_image'],',') : '';
             $cloneDetails = $mapPolygonDescriptionModel::cloneResult($mapPolygonDescriptionModel, $mapPolygonDescriptionDetails);
             $this->db->begin();
+//            print_r($mapPolygonDescriptionDetails);exit;
             try {
+                //提交信息
                 $cloneDetails->save();
                 $this->db->commit();
                 $this->logger->addMessage(json_encode($cloneDetails->toArray(), JSON_UNESCAPED_UNICODE), Phalcon\Logger::NOTICE);
             } catch (Exception $e) {
                 $this->db->rollback();
                 $this->logger->addMessage($e->getMessage(), Phalcon\Logger::CRITICAL);
-                if (isset($objectName)) {
+                //删除资源
+                if ($new_resource || $uploadImages) {
+                    $new_resource = array_merge($new_resource,$uploadImages);
+                    foreach ($new_resource as $k=>$v){
+                        $objectName = ltrim($url, '/');
+                        $new_resource[$k] = $objectName;
+                    }
+                    if (!isset($ossClient)) {
+                        $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
+                        $ossClient->setConnectTimeout(5);
+                    }
                     try {
-                        $ossClient->deleteObject(self::$DefaultBucket, $objectName);
-                        $this->logger->addMessage('oss delete tmp voice:' . $objectName, Phalcon\Logger::NOTICE);
+                        $ossClient->deleteObjects(self::$DefaultBucket, $new_resource);
+                        $this->logger->addMessage('oss delete tmp '.$type.':' . json_encode($objectName,JSON_UNESCAPED_UNICODE), Phalcon\Logger::NOTICE);
                     } catch (Exception $ex) {
-                        $this->logger->addMessage('oss delete tmp voice err:' . $ex->getMessage(),
+                        $this->logger->addMessage('oss delete tmp '.$type.' err:' . $ex->getMessage(),
                             Phalcon\Logger::CRITICAL);
                     }
                 }
@@ -159,40 +288,54 @@ class ScenicController extends ControllerBase
                 return $this->resultModel->output();
             }
 
-            if (isset($objectName) && !empty($oldVoice)) {
-                try {
-                    $ossClient->deleteObject(self::$DefaultBucket, $oldVoice);
-                    $this->logger->addMessage('oss delete old voice:' . $oldVoice, Phalcon\Logger::NOTICE);
-                } catch (Exception $ex) {
-                    $this->logger->addMessage('oss delete old voice err:' . $ex->getMessage(),
-                        Phalcon\Logger::CRITICAL);
+            //如果有新的资源则删除以前的资源数据
+
+            if ($delete_resource) {
+                if (!isset($ossClient)) {
+                    $ossClient = new OssClient(static::$AccessKeyId, static::$AccessKeySecret, static::$EndPoint);
+                    $ossClient->setConnectTimeout(5);
+                }
+                foreach ($delete_resource as $k=>$v){
+                    try {
+                        $ossClient->deleteObject(self::$DefaultBucket, $v);
+                        $this->logger->addMessage('oss delete old '.$k.':' . $v, Phalcon\Logger::NOTICE);
+                    } catch (Exception $ex) {
+                        $this->logger->addMessage('oss delete old '.$k.' err:' . $ex->getMessage(),
+                            Phalcon\Logger::CRITICAL);
+                    }
                 }
             }
             $this->resultModel->setResult('0');
             return $this->resultModel->output();
-        }
-        $rules = array(
-            'id' => array(
-                'filter' => FILTER_VALIDATE_INT,
-                'options' => array(
-                    'min_range' => 1
-                ),
-            )
-        );
-        $filter = new FilterModel ($rules);
-        if (!$filter->isValid($this->request->getQuery())) {
-            $this->alert($this->resultModel->getMsg('101'));
-        }
+        }else{
+            $rules = array(
+                'id' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => array(
+                        'min_range' => 1
+                    ),
+                )
+            );
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getQuery())) {
+                $this->alert($this->resultModel->getMsg('101'));
+            }
 
-        $input = $filter->getResult();
-        $this->tag->appendTitle($this->translate->_('SpotHandle'));
-        $mapPolygonModel = new MapPolygonModel();
-        $mapPolygonDetails = $mapPolygonModel->getDetailsByMapPolygonIdSimple($input['id']);
-        if (!$mapPolygonDetails) {
-            $this->alert($this->resultModel->getMsg('-1'));
+            $input = $filter->getResult();
+            $this->tag->appendTitle($this->translate->_('SpotHandle'));
+            $mapPolygonModel = new MapPolygonModel();
+            $mapPolygonDetails = $mapPolygonModel->getDetailsByMapPolygonIdSimple($input['id']);
+            if (!$mapPolygonDetails) {
+                $this->alert($this->resultModel->getMsg('-1'));
+            }
+
+            $this->view->base_url= $base_url = 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/';
+
+            $mapPolygonDetails['map_polygon_image_arr'] = $mapPolygonDetails['map_polygon_image'] ?  explode(',',$mapPolygonDetails['map_polygon_image']) : [];
+            $mapPolygonDetails['map_polygon_image'] = $mapPolygonDetails['map_polygon_image'] ? $mapPolygonDetails['map_polygon_image'].',' : '';
+            $this->view->mapPolygonDetails = $mapPolygonDetails;
+            $this->view->filter = $input;
         }
-        $this->view->mapPolygonDetails = $mapPolygonDetails;
-        $this->view->filter = $input;
     }
 
     /**
@@ -346,7 +489,7 @@ class ScenicController extends ControllerBase
             }
             $input['data'] = rtrim($input['data'], ';');
             $data = explode(';', $input['data']);
-            if (count($data) < 2) {
+            if (count($data) < 1) {
                 $this->resultModel->setResult('101');
                 return $this->resultModel->output();
             }

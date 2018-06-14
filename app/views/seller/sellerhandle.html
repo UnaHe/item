@@ -1,170 +1,155 @@
-{{partial("layout/header")}}
-<style>
-    .conditionalPart{display: none}
-</style>
-<section id="content_wrapper">
-    <div id="topbar">
-        <div class="topbar-left">
-            <ol class="breadcrumb">
-                <li class="crumb-active"><a href="#">账号编辑</a></li>
-                <li class="crumb-icon"><a href="/"><span class="glyphicon glyphicon-home"></span></a></li>
-                <li class="crumb-link"><a href="/">{{"Home"|_}}</a></li>
-                <li class="crumb-trail">账号管理</li>
-            </ol>
-        </div>
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-user">
+        账号编辑
     </div>
-    <div id="content">
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>账号管理</li>
+        <li class="am-active"><a href="/seller/sellerhandle" >账号编辑</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel"><div class="panel-heading"> <span class="panel-title"> <span class="glyphicons glyphicons-user_add"></span> {%if details['seller_id'] is defined%}账号编辑{%endif%} </span> </div>
-                    <div class="panel-body">
-                        <form class="cmxform" id="altForm">
-                            <input type="hidden" id="seller_id" value="{%if details['seller_id'] is defined%}{{details['seller_id']}}{%endif%}" />
-
-                            <div class="form-group">
-                                <label>{{"Photo"|_}}</label>
-                                <div style="margin: 6px;display: {%if details['seller_card_img'] is defined%}block{%else%}none{%endif%};" id="previewDiv">
-                                    <a href="" target="_blank" id="previewImageUrl">
-                                        <img src="" width="100" id="previewImage" />
-                                    </a>
-                                    <button type="button" class="btn btn-info btn-gradient btn-xs" style="margin-left: 30px;" onclick="removeImage()">remove image</button>
-                                    <input type="hidden" id="seller_card_img" value="">
-                                </div>
-                                <div class="progress progress-striped active" style="height: 3px;margin-bottom: 0px">
-                                    <div class="progress-bar" role="progressbar" id="thumbnailProgress" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
-                                </div>
-                                <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()" >
-                            </div>
-
-                            <div class="form-group">
-                                <label>店铺名</label>
-                                <input id="seller_shop_name" name="seller_shop_name" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_shop_name']}}{%endif%}">
-                            </div>
-
-                            <div class="form-group">
-                                <label>店主名</label>
-                                <input id="seller_name" name="seller_name" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_name']}}{%endif%}">
-                            </div>
-
-                            <div class="form-group">
-                                <label>商家电话</label>
-                                <input id="seller_tel" name="seller_tel" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_tel']}}{%endif%}">
-                            </div>
-
-                            <div class="form-group">
-                                <label>点位账号</label>
-                                <input id="map_gid" name="map_gid" type="text" class="form-control" autocomplete="off" disabled="disabled" required="" value="{%if details is defined%}{{details['map_gid']}}{%endif%}">
-                            </div>
-
-
-                            <div class="form-group">
-                                <label>主营类别</label>
-                                <div class="col-md-13">
-                                    <select class="multiselect single" id="goods_category_id" required="">
-                                        {%for i in goodscategoryList%}
-                                        <option value="{{i['goods_category_id']}}"{%if details['goods_category_id'] is defined AND i['goods_category_id']==details['goods_category_id']%} selected{%endif%}>{{i['goods_name']}}</option>
-                                        {%endfor%}
-                                    </select></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>店铺规模</label>
-                                <div class="col-md-13">
-                                    <select class="multiselect single" id="scale_id" required="">
-                                        {%for i in scaleList%}
-                                        <option value="{{i['scale_id']}}"{%if details['scale_id'] is defined AND i['scale_id']==details['scale_id']%} selected{%endif%}>{{i['scale_name']}}</option>
-                                        {%endfor%}
-                                    </select></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>{{"Status"|_}}</label>
-                                <div class="col-md-13">
-                                    <select class="multiselect single" id="seller_status">
-                                        <option value="0" {%if details['seller_status']==0%} selected {%endif%} >未激活</option>
-                                        <option value="1" {%if details['seller_status']==1%} selected {%endif%}>审核中</option>
-                                        <option value="2" {%if details['seller_status']==2%} selected {%endif%}>审核通过</option>
-                                        <option value="3" {%if details['seller_status']==3%} selected {%endif%}>审核未通过</option>
-                                    </select></div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>{{"Intro"|_}}</label>
-                                <textarea id="seller_profile" name="seller_profile" required="">{%if details is defined%}{{details["seller_profile"]}}{%endif%}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <input class="submit btn btn-info pull-right" type="submit" id="subBtn" value="{{"Submit"|_}}">
-                            </div>
-                        </form>
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <input type="hidden" id="seller_id" value="{%if details['seller_id'] is defined%}{{details['seller_id']}}{%endif%}" />
+                    <div class="am-form-group">
+                        <label>{{"Photo"|_}}</label>
+                        <div style="margin: 6px;display: {%if details['seller_card_img'] is defined%}block{%else%}none{%endif%};" id="previewDiv">
+                            <a href="" target="_blank" id="previewImageUrl">
+                                <img src="" width="100" id="previewImage" />
+                            </a>
+                            <button type="button" class="am-close am-close-alt am-icon-close am-close-spin" style="margin-left: 30px;" onclick="removeImage()"></button>
+                            <input type="hidden" id="seller_card_img" value="">
+                        </div>
+                        <div class="am-progress am-progress-xs am-progress-striped am-active">
+                            <div class="am-progress-bar am-progress-bar-success" id="thumbnailProgress"></div>
+                        </div>
+                        <div class="am-form-group am-form-file">
+                            <button type="button" class="am-btn am-btn-default am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                            <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()" >
+                        </div>
                     </div>
-                </div>
-            </div>
+                    <div class="am-form-group">
+                        <label for="seller_shop_name">店铺名</label>
+                        <input id="seller_shop_name" name="seller_shop_name" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_shop_name']}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="seller_name">店铺地址</label>
+                        <input id="seller_name" name="seller_name" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_name']}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="seller_tel">商家电话</label>
+                        <input id="seller_tel" name="seller_tel" type="text" class="form-control" autocomplete="off" required="" value="{%if details is defined%}{{details['seller_tel']}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="map_gid">点位账号</label>
+                        <input id="map_gid" name="map_gid" type="text" class="form-control" autocomplete="off" disabled="disabled" required="" value="{%if details is defined%}{{details['map_gid']}}{%endif%}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="goods_category_id">主营类别</label>
+                        <div>
+                            <select id="goods_category_id" required="" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                {%for i in goodscategoryList%}
+                                <option value="{{i['goods_category_id']}}"{%if details['goods_category_id'] is defined AND i['goods_category_id']==details['goods_category_id']%} selected{%endif%}>{{i['goods_name']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="scale_id">店铺规模</label>
+                        <div>
+                            <select id="scale_id" required="" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                {%for i in scaleList%}
+                                <option value="{{i['scale_id']}}"{%if details['scale_id'] is defined AND i['scale_id']==details['scale_id']%} selected{%endif%}>{{i['scale_name']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="seller_status">{{"Status"|_}}</label>
+                        <div>
+                            <select id="seller_status" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                <option value="0" {%if details['seller_status']==0%} selected {%endif%} >未激活</option>
+                                <option value="1" {%if details['seller_status']==1%} selected {%endif%}>审核中</option>
+                                <option value="2" {%if details['seller_status']==2%} selected {%endif%}>审核通过</option>
+                                <option value="3" {%if details['seller_status']==3%} selected {%endif%}>审核未通过</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="seller_profile">{{"Intro"|_}}</label>
+                        <textarea id="seller_profile" name="seller_profile" required="">{%if details is defined%}{{details["seller_profile"]}}{%endif%}</textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{"Submit"|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
         </div>
     </div>
-</section>
 
-{{partial ("layout/footer")}}
-{{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-{{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
-{{javascript_include('client/vendor/plugins/multiselect/bootstrap-multiselect.js')}}
-{{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
-{{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
-{{javascript_include('client/js/main.js')}}
-<script type="text/javascript">
-
-    var multiselectConfig = {maxHeight: 220,buttonWidth:"200px"};
-    function UpLoadFile() {
-        var xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain; charset=utf-8');
-        // FormData 对象
-        var formData = new FormData();
-        var files = document.getElementById('thumbnail').files;
-        if (files[0] ==undefined){
-            alert("No file chosen")
-            return;
-        }
-        var totalBytes = files[0].size;
-        // $("#userfile").attr("disabled","disabled");
-        $("#thumbnail").attr("disabled","disabled");
-
-        formData.set('part', 'wx_card_img');
-        formData.set('Filedata', files[0]);
-        // XMLHttpRequest 对象
-        xhr.upload.onprogress = function (ev) {
-            var percent = 0;
-            if (ev.lengthComputable) {
-                percent = parseInt(100 * ev.loaded / ev.total);
-                $("#thumbnailProgress").width(percent + "%");
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+    {{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+    {{javascript_include('client/vendor/editors/ckeditor/plugins/plugin_uploadImage.js')}}
+    <script type="text/javascript">
+        function UpLoadFile() {
+            var xhr = new XMLHttpRequest();
+            xhr.overrideMimeType('text/plain; charset=utf-8');
+            // FormData 对象
+            var formData = new FormData();
+            var files = document.getElementById('thumbnail').files;
+            if (files[0] ==undefined){
+                alert("No file chosen")
+                return;
             }
-        };
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState==4){
-                if (xhr.status == 200) {
-                    $("#previewImage").attr("src" , xhr.responseText);
-                    $("#previewImageUrl").attr("href" , xhr.responseText);
-                    $("#seller_card_img").val(xhr.responseText);
-                    $("#previewDiv").show();
-                    // fileInput.replaceWith(fileInput.val('').clone(true));
-                }else{
-                    alert(xhr.responseText)
+            var totalBytes = files[0].size;
+            // $("#userfile").attr("disabled","disabled");
+            $("#thumbnail").attr("disabled","disabled");
+
+            formData.set('part', 'wx_card_img');
+            formData.set('Filedata', files[0]);
+            // XMLHttpRequest 对象
+            xhr.upload.onprogress = function (ev) {
+                var percent = 0;
+                if (ev.lengthComputable) {
+                    percent = parseInt(100 * ev.loaded / ev.total);
+                    $("#thumbnailProgress").width(percent + "%");
                 }
+            };
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState==4){
+                    if (xhr.status == 200) {
+                        $("#previewImage").attr("src" , xhr.responseText);
+                        $("#previewImageUrl").attr("href" , xhr.responseText);
+                        $("#seller_card_img").val(xhr.responseText);
+                        $("#previewDiv").show();
+                        // fileInput.replaceWith(fileInput.val('').clone(true));
+                    }else{
+                        alert(xhr.responseText)
+                    }
+                }
+                $("#thumbnailProgress").width("0%");
+                $('#thumbnail').removeAttr("disabled");
             }
-            $("#thumbnailProgress").width("0%");
-            $('#thumbnail').removeAttr("disabled");
+            xhr.open("post", "/upload/upload", true);
+            xhr.send(formData);
         }
-        xhr.open("post", "/{{routerProjectId}}/upload/upload", true);
-        xhr.send(formData);
-    }
-    function removeImage(){
-        $("#previewImage").attr("src" , "");
-        var fileInput = $('#thumbnail');
-        fileInput.replaceWith(fileInput.val('').clone(true));
-        $("#previewImageUrl").attr("href" , '');
-        $("#previewDiv").hide();
-    }
-    function submitHandler(){
-        var seller_profile = $.trim(CKEDITOR.instances['seller_profile'].getData());
-        var seller_id      = parseInt($('#seller_id').val()),
+        function removeImage(){
+            $('#seller_card_img').val('');
+            $("#previewImage").attr("src" , "");
+            var fileInput = $('#thumbnail');
+            fileInput.replaceWith(fileInput.val('').clone(true));
+            $("#previewImageUrl").attr("href" , '');
+            $("#previewDiv").hide();
+        }
+        function submitHandler(){
+            var seller_profile = $.trim(CKEDITOR.instances['seller_profile'].getData());
+            var seller_id      = parseInt($('#seller_id').val()),
                 seller_card_img     = $.trim($('#seller_card_img').val()),
                 seller_shop_name = $('#seller_shop_name').val(),
                 seller_name        = $.trim($('#seller_name').val()),
@@ -172,108 +157,109 @@
                 goods_category_id        = $.trim($('#goods_category_id').val()),
                 scale_id        = $('#scale_id').val(),
                 seller_status        = $('#seller_status').val()
-        if (!seller_profile || !seller_card_img){
-            alert('请填写完整');
-            return false;
-        }
-        if(!(/^1(3|4|5|7|8)\d{9}$/.test(seller_tel))){
-            alert("手机号码有误，请重填");
-            return false;
-        }
-        $('#subBtn').attr('disabled', 'disabled');
-        $('#subLoading').remove();
-        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
-        $.ajax('/{{routerProjectId}}/seller/sellerhandle', {
-            data: {
-                seller_id      : seller_id,
-                seller_shop_name     : seller_shop_name,
-                seller_name : seller_name,
-                seller_tel    : seller_tel,
-                seller_profile   : seller_profile,
-                seller_card_img    : seller_card_img,
-                goods_category_id    : goods_category_id,
-                scale_id    : scale_id,
-                seller_status    : seller_status,
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function(data)
-            {
-                if (data.errcode == 0)
-                {
-                    alert('操作成功');
-                    location.replace('/{{routerProjectId}}/seller/sellerlist?seller_status='+seller_status);
-                }
-            },
-            error: function()
-            {
-                alert('服务器错误');
-            },
-            complete:function(){
-                $('#subBtn').removeAttr('disabled');
-                $('#subLoading').remove();
+            if (!seller_profile || !seller_card_img){
+                alert('请填写完整');
+                return false;
             }
-        });
-        return false;
-    }
-    jQuery(document).ready(function () {
-        "use strict";
-        // Init Theme Core
-        Core.init();
-        var baseImageUrl = '';
-        {%if details is defined%}
-
-        $('#seller_id').val('{{details["seller_id"]}}');
-
-        {%if details["seller_card_img"]%}
-        {%if details['seller_photo_source']=='locale'%}
-        baseImageUrl = 'https://apimerchant.signp.cn/';
-        {%else%}
-        baseImageUrl = 'http://signposs1.oss-cn-shenzhen.aliyuncs.com/';
-        {%endif%}
-
-
-        $("#previewImageUrl").attr("href" ,baseImageUrl+ '{{details["seller_card_img"]}}');
-        $("#previewDiv").show();
-        $('#previewImage').attr('src',baseImageUrl+'{{details["seller_card_img"]}}');
-        $('#seller_card_img').val('{{details["seller_card_img"]}}');
-        {%endif%}
-
-        {%endif%}
-//        $('#seller_id').multiselect({
-//            includeSelectAllOption: false
-//        });
-        $.validator.addMethod("needsSelection", function(value, element) {
-            return $(element).multiselect("getChecked").length > 0;
-        });
-
-        var validator = $("#altForm").validate({
-            submitHandler:submitHandler,
-            ignore: ':hidden:not("#seller_id")',
-            rules: {
-                seller_id: "required needsSelection",
-                seller_profile: {
-                    required: function()
+            if(!(/^1(3|4|5|7|8)\d{9}$/.test(seller_tel))){
+                alert("手机号码有误，请重填");
+                return false;
+            }
+            $('#subBtn').attr('disabled', 'disabled');
+            $('#subLoading').remove();
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            $.ajax('/seller/sellerhandle', {
+                data: {
+                    seller_id      : seller_id,
+                    seller_shop_name     : seller_shop_name,
+                    seller_name : seller_name,
+                    seller_tel    : seller_tel,
+                    seller_profile   : seller_profile,
+                    seller_card_img    : seller_card_img,
+                    goods_category_id    : goods_category_id,
+                    scale_id    : scale_id,
+                    seller_status    : seller_status,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    if (data.code == 0)
                     {
-                        CKEDITOR.instances.seller_profile.updateElement();
+                        alert('操作成功');
+                        location.replace('/seller/sellerlist?seller_status='+seller_status);
+                    }
+                },
+                error: function()
+                {
+                    l.stop();
+                    alert('服务器错误');
+                },
+                complete:function(){
+                    $('#subBtn').removeAttr('disabled');
+                    l.stop();
+                }
+            });
+            return false;
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            var baseImageUrl = '';
+            {%if details is defined%}
+
+            $('#seller_id').val('{{details["seller_id"]}}');
+
+            {%if details["seller_card_img"]%}
+            {%if details['seller_photo_source']=='locale'%}
+            baseImageUrl = 'https://apimerchant.signp.cn/';
+            {%else%}
+            baseImageUrl = 'http://signposs1.oss-cn-shenzhen.aliyuncs.com/';
+            {%endif%}
+
+
+            $("#previewImageUrl").attr("href" ,baseImageUrl+ '{{details["seller_card_img"]}}');
+            $("#previewDiv").show();
+            $('#previewImage').attr('src',baseImageUrl+'{{details["seller_card_img"]}}');
+            $('#seller_card_img').val('{{details["seller_card_img"]}}');
+            {%endif%}
+
+            {%endif%}
+    //        $('#seller_id').multiselect({
+    //            includeSelectAllOption: false
+    //        });
+            $.validator.addMethod("needsSelection", function(value, element) {
+                return $(element).multiselect("getChecked").length > 0;
+            });
+
+            var validator = $("#altForm").validate({
+                submitHandler:submitHandler,
+                ignore: ':hidden:not("#seller_id")',
+                rules: {
+                    seller_id: "required needsSelection",
+                    seller_profile: {
+                        required: function()
+                        {
+                            CKEDITOR.instances.seller_profile.updateElement();
+                        }
+                    }
+                },
+                errorPlacement: function(error, element)
+                {
+                    if (element.attr("name") == "seller_profile")
+                    {
+                        error.insertAfter("textarea#seller_profile");
+                    } else {
+                        error.insertAfter(element);
                     }
                 }
-            },
-            errorPlacement: function(error, element)
-            {
-                if (element.attr("name") == "seller_profile")
-                {
-                    error.insertAfter("textarea#seller_profile");
-                } else {
-                    error.insertAfter(element);
-                }
-            }
+            });
+            CKEDITOR.replace( 'seller_profile',{
+                extraPlugins: 'uploadimage',
+                filebrowserImageUploadUrl: '/upload/uploadtooss?part=seller_profile',
+            });
         });
-        CKEDITOR.replace( 'seller_profile');
-        $('.single').multiselect(multiselectConfig);
-    });
+    </script>
 
-</script>
-
-</body>
-</html>
+{% endblock %}

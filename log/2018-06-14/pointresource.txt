@@ -1,0 +1,15 @@
+[2018-06-14 17:51:04 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:/upload/point_resource_image/baedcf6bb52265307e7f570b22c010f1.jpg
+[2018-06-14 17:52:23 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:/upload/point_resource_image/4e2462d51322f3af170eeaa2f39b3edb.jpg
+[2018-06-14 17:52:45 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:/upload/point_resource_image/83a18c1160a975c5242fe98db32d1b66.jpg
+[2018-06-14 18:01:56 NOTICE] item_account_id:1 [POST pointresource/handle] create oss upload > image:upload/point_resource_image/8efc1b4eac4f8025c77fab065d2e242f.jpg
+[2018-06-14 18:01:56 NOTICE] item_account_id:1 [POST pointresource/handle] create {"point_resource_image_client":"upload\/point_resource_image\/8efc1b4eac4f8025c77fab065d2e242f.jpg,oss","point_id":"8542000","map_id":"854"}
+[2018-06-14 18:01:56 INFO] item_account_id:1 [POST pointresource/handle] create equipment push result:fail1 {"type":"tag","content":"{\"cmd\":\"updateResource\"}","to":"93|equipment|7F30CA2BE1E4A39772E4242F9488316E","project":93}
+[2018-06-14 18:21:34 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:https://signposs1.oss-cn-shenzhen.aliyuncs.com/upload/point_resource_image/8efc1b4eac4f8025c77fab065d2e242f.jpg
+[2018-06-14 18:22:38 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:https://signposs1.oss-cn-shenzhen.aliyuncs.com/upload/point_resource_image/8efc1b4eac4f8025c77fab065d2e242f.jpg
+[2018-06-14 18:30:30 NOTICE] item_account_id:1 [POST pointresource/handle] create oss upload > image:upload/point_resource_image/18689a6463001859ca736d2fcd4ed0a1.jpg
+[2018-06-14 18:30:30 NOTICE] item_account_id:1 [POST pointresource/handle] create {"point_resource_image_client":"upload\/point_resource_image\/18689a6463001859ca736d2fcd4ed0a1.jpg,oss","point_id":"8542000","map_id":"854"}
+[2018-06-14 18:30:30 INFO] item_account_id:1 [POST pointresource/handle] create equipment push result:fail1 {"type":"tag","content":"{\"cmd\":\"updateResource\"}","to":"93|equipment|7F30CA2BE1E4A39772E4242F9488316E","project":93}
+[2018-06-14 18:30:39 INFO] item_account_id:1 [POST pointresource/ajaxremovetmpresource] url:https://signposs1.oss-cn-shenzhen.aliyuncs.com/upload/point_resource_image/18689a6463001859ca736d2fcd4ed0a1.jpg
+[2018-06-14 18:31:00 NOTICE] item_account_id:1 [POST pointresource/handle] create oss upload > image:upload/point_resource_image/89dc94160729f6235f35dfc537e6e2f1.jpg
+[2018-06-14 18:31:00 NOTICE] item_account_id:1 [POST pointresource/handle] create {"point_resource_image_client":"upload\/point_resource_image\/89dc94160729f6235f35dfc537e6e2f1.jpg,oss","point_id":"8542000","map_id":"854"}
+[2018-06-14 18:31:00 INFO] item_account_id:1 [POST pointresource/handle] create equipment push result:fail1 {"type":"tag","content":"{\"cmd\":\"updateResource\"}","to":"93|equipment|7F30CA2BE1E4A39772E4242F9488316E","project":93}

@@ -12,12 +12,33 @@ class NoticeController extends ControllerBase
     {
         if ($this->request->isPost() && $this->request->isAjax()) {
             $rules = array(
+                'equipment_id' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => array(
+                        'min_range' => 1
+                    ),
+                    'default' => null
+                ),
+                'map_id' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => array(
+                        'min_range' => 0
+                    ),
+                    'default' => 0
+                ),
                 'toMobile' => array(
                     'filter' => FILTER_VALIDATE_INT,
                     'options' => array(
                         'min_range' => 0,
                         'max_range' => 1
                     ),
+                ),
+                'point_id' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => array(
+                        'min_range' => 0
+                    ),
+                    'default' => 0
                 ),
                 'level' => array(
                     'filter' => FILTER_VALIDATE_INT,
@@ -26,11 +47,23 @@ class NoticeController extends ControllerBase
                         'max_range' => 3,
                     ),
                 ),
+//                'title_cn' => [
+//                    'filter' => FILTER_UNSAFE_RAW,
+//                    'required'
+//                ],
                 'content_cn' => [
                     'filter' => FILTER_UNSAFE_RAW,
                     'required'
                 ],
-                'notice_timeout' => array(
+//                'title_en' => [
+//                    'filter' => FILTER_UNSAFE_RAW,
+//                    'default' => ''
+//                ],
+                'content_en' => [
+                    'filter' => FILTER_UNSAFE_RAW,
+                    'default' => ''
+                ],
+                'timeout' => array(
                     'filter' => FILTER_VALIDATE_INT,
                     'options' => array(
                         'min_range' => 1,
@@ -40,32 +73,67 @@ class NoticeController extends ControllerBase
 
             $filter = new FilterModel ($rules);
             if (!$filter->isValid($this->request->getPost())) {
-                $this->resultModel->setResult('101',$filter->getErrMsg());
+                $this->resultModel->setResult('101');
                 return $this->resultModel->output();
             }
             $input = $filter->getResult();
             $postClients = [];
             $title = $input['level'] == 1 ? '紧急信息' : '临时信息';
+            if (!empty($input['content_en'])) {
+                $title .= "\n" . ($input['level'] == 1 ? 'urgent message' : 'simple message');
+            }
             $content = [
                 'cmd' => 'notice',
                 'type' => 'text',
-                'content' => strip_tags($input['content_cn']),
+                'content' => $input['content_cn'] . (!empty($input['content_en']) ? "\n" . $input['content_en'] : ''),
                 'title' => $title,
                 'level' => $input['level'],
-                'timeout' => $input['notice_timeout'],
+                'timeout' => $input['timeout'],
             ];
             $equipmentModel = new EquipmentModel();
-            $equipment = $equipmentModel->getListSimple(['e_project_id' => $this->user['project_id']]);
-            if (!empty($equipment['data'])) {
-                $postClients[] = [
-                    'type' => 'group',
-                    'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
-                    'to' => 'equipmentView',
-                    'project' => $this->user['project_id'],
-                ];
+            if ($input['map_id'] == 0) {
+                $equipment = $equipmentModel->getListSimple(['project_id' => $this->user['project_id']]);
+                if (!empty($equipment['data'])) {
+                    $postClients[] = [
+                        'type' => 'group',
+                        'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
+                        'to' => 'equipmentView',
+                        'project' => $this->user['project_id'],
+                    ];
+                }
+            } else {
+                if ($input['map_id'] > 0 && $input['point_id'] == 0) {
+                    $equipment = $equipmentModel->getListSimple([
+                        'project_id' => $this->user['project_id'],
+                        'map_id' => $input['map_id']
+                    ]);
+                    if (!empty($equipment['data'])) {
+                        foreach ($equipment['data'] as $v) {
+                            $postClients[] = [
+                                'type' => 'tag',
+                                'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
+                                'to' => $this->user['project_id'] . '|equipment|' . $v['equipment_code'],
+                                'project' => $this->user['project_id'],
+                            ];
+                        }
+                    }
+                } else {
+                    if ($input['map_id'] > 0 && $input['point_id'] > 0 && !empty($input['equipment_id'])) {
+                        $equipmentDetails = $equipmentModel->getDetailsByIdSimple($input['equipment_id']);
+                        if (!$equipmentDetails) {
+                            $this->resultModel->setResult('-1');
+                            return $this->resultModel->output();
+                        }
+                        $postClients[] = [
+                            'type' => 'tag',
+                            'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
+                            'to' => $this->user['project_id'] . '|equipment|' . $equipmentDetails['equipment_code'],
+                            'project' => $this->user['project_id'],
+                        ];
+                    }
+                }
             }
-
-            if ($input['toMobile'] == 1) {
+            if ($input['toMobile']==1){
                 $postClients[] = [
                     'type' => 'group',
                     'content' => json_encode($content, JSON_UNESCAPED_UNICODE),
@@ -78,19 +146,19 @@ class NoticeController extends ControllerBase
                 'notice_level' => $input['level'],
                 'notice_content_zh_CN' => $input['content_cn'],
                 'notice_created_at' => time(),
+                'notice_content_en_US' => $input['content_en'],
                 'project_id' => $this->user['project_id'],
-                'client_id' => $this->user['item_account_id'],
+                'client_id' => $this->user['client_id'],
             ];
             $this->db->begin();
             try {
                 $noticeModel->create($params);
                 $this->db->commit();
-                $this->logger->addMessage('new notice:' . json_encode($noticeModel->toArray(), JSON_UNESCAPED_UNICODE));
+                $this->logger->addMessage('new notice:'.json_encode($noticeModel->toArray() , JSON_UNESCAPED_UNICODE));
             } catch (Exception $e) {
                 $this->db->rollback();
                 $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input), Phalcon\Logger::CRITICAL);
             }
-            $result = 'fail';
             if (!empty($postClients)) {
                 $settingModel = new SettingModel();
                 $setting = $settingModel->getByKeys(['socketUrl']);
@@ -100,15 +168,14 @@ class NoticeController extends ControllerBase
                         Roger\Request\Request::POST,
                         $v));
                 }
-                $result = $multiRequest->execute();
-                $this->logger->addMessage('result:' . json_encode($multiRequest->getResult()) . ' ' . json_encode($postClients));
+                $multiRequest->execute();
+                $this->logger->addMessage('result:' . json_encode($multiRequest->getResult()).' '.json_encode($postClients));
             }
 
             if (CACHING) {
-                $this->cache->clean(CacheBase::CLEANING_MODE_TAG,
-                    [NoticeModel::class . 'getList' . $this->user['project_id']]);
+                $this->cache->clean(CacheBase::CLEANING_MODE_TAG, [NoticeModel::class . 'getList'.$this->user['project_id']]);
             }
-            $this->resultModel->setResult('0',$result);
+            $this->resultModel->setResult('0');
             return $this->resultModel->output();
         }
         $rules = array(
@@ -143,7 +210,7 @@ class NoticeController extends ControllerBase
         $project = $projectModel->getList();
         $this->view->projectList = $project['data'];
 
-        $this->tag->setTitle($this->translate->_('MessagePush'));
+        $this->tag->appendTitle($this->translate->_('MessagePush'));
     }
 
 
@@ -186,7 +253,7 @@ class NoticeController extends ControllerBase
         $notice = $noticeModel->getListSimple($input);
         $this->view->noticeList = $notice['data'];
         $this->view->pageCount = $notice['pageCount'];
-        $this->tag->setTitle($this->translate->_('NoticeLog'));
+        $this->tag->appendTitle($this->translate->_('NoticeLog'));
     }
 
 
@@ -253,7 +320,6 @@ class NoticeController extends ControllerBase
                 'level' => $input['level'],
                 'timeout' => $input['timeout'],
             ];
-
             $equipmentModel = new EquipmentModel();
             $equipmentDetails = $equipmentModel->getDetailsByIdSimple($input['equipment_id']);
             if (!$equipmentDetails) {
@@ -269,19 +335,18 @@ class NoticeController extends ControllerBase
                 'project_id' => $this->user['project_id'],
                 'client_id' => $this->user['client_id'],
             ];
-//            $this->db->begin();
-//            try {
-//                $noticeModel->create($params);
-//                $this->db->commit();
-//                $this->logger->addMessage('new notice:' . json_encode($noticeModel->toArray(), JSON_UNESCAPED_UNICODE));
-//            } catch (Exception $e) {
-//                $this->db->rollback();
-//                $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input), Phalcon\Logger::CRITICAL);
-//            }
+            $this->db->begin();
+            try {
+                $noticeModel->create($params);
+                $this->db->commit();
+                $this->logger->addMessage('new notice:'.json_encode($noticeModel->toArray() , JSON_UNESCAPED_UNICODE));
+            } catch (Exception $e) {
+                $this->db->rollback();
+                $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input), Phalcon\Logger::CRITICAL);
+            }
 
             if (CACHING) {
-                $this->cache->clean(CacheBase::CLEANING_MODE_TAG,
-                    [NoticeModel::class . 'getList' . $this->user['project_id']]);
+                $this->cache->clean(CacheBase::CLEANING_MODE_TAG, [NoticeModel::class . 'getList'.$this->user['project_id']]);
             }
 
             $post_data = [
@@ -290,6 +355,7 @@ class NoticeController extends ControllerBase
                 'to' => $this->user['project_id'] . '|equipment|' . $equipmentDetails['equipment_code'],
                 'project' => $this->user['project_id'],
             ];
+
             $multiRequest = new Roger\Request\MultiRequest();
             $settingModel = new SettingModel();
             $setting = $settingModel->getByKeys(['socketUrl']);

@@ -1,0 +1,170 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <script type="text/javascript" src="/client/pagers.js"></script>
+    <div class="tpl-content-page-title am-icon-comment-o">
+        {%if categoryDetails is defined%}{{categoryDetails['name']}}{%else%}{{"CommentList"|_}}{%endif%}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"CommentManage"|_}}</li>
+        <li class="am-active"><a href="/comment/list" >{{"CommentList"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components" style="overflow: visible">
+        <div class="row" style="overflow: visible">
+            <div class="portlet-title">
+                <div class="tpl-portlet-input tpl-fz-ml">
+                    <div class="portlet-input input-inline">
+                        评论类型:
+                        <select title="请选择类型" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/comment/list?comment_obj='+this.value;">
+                            <option value=" ">请选择类型</option>
+                            {%for key,i in typeList%}
+                            <option value="{{key}}" {%if filter['comment_obj']==key%} selected="selected"{%endif%}>{{i['type']}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <form class="am-form">
+                <fieldset>
+                    {%if list is defined%}
+                    <table class="am-table am-table-striped am-table-hover am-table-compact">
+                        <thead>
+                        <tr>
+                            <th style="width: 6%">{{'Image'|_}}</th>
+                            <th style="width: 16%">评论人</th>
+                            <th style="width: 6%">类型</th>
+                            <th style="width: 20%">被评论对象</th>
+                            <th style="width: 6%">状态</th>
+                            <th style="width: 12%">评分</th>
+                            <th style="width: 8%">留言</th>
+                            <th style="width: 10%">发布时间</th>
+                            <th style="width: 16%">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in list%}
+                        <tr id="tr_{{i['comment_id']}}">
+                            <td><img width="40px" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/project/94/img/default-avatar.png" alt="">{{i['comment_created_image']}}</td>
+                            <td>{{i['comment_created_name']}}</td>
+                            <td>{{typeList[i['comment_obj']]['type']}}</td>
+                            <td>{{i[typeList[i['comment_obj']]['obj_name']]}}</td>
+                            <td  class="comment_status">
+                                {%if i['comment_status']==1%}
+                                <span class="label label-success">发布</span>
+                                {%elseif i['comment_status']==0%}
+                                <span class="label label-default">关闭</span>
+                                {%endif%}
+                            </td>
+                            <td>
+                                {%if i['comment_score'] > 0 %}
+                                {%for index in 1..i['comment_score'] %}
+                                <span class="am-icon-star"></span>
+                                {%endfor%}
+                                {%endif%}
+                                {%if 5-i['comment_score'] > 0 %}
+                                {%for j in 1..(5-i['comment_score']) %}
+                                <span class="am-icon-star-o"></span>
+                                {%endfor%}
+                                {%endif%}
+                            </td>
+                            <td title="{{ i['comment_info'] }}"><?php echo strlen($i['comment_info']) > 20 ? mb_substr($i['comment_info'],0,20,'utf-8').'...' : $i['comment_info']; ?></td>
+                            <td nowrap>{{date("Y-m-d",i['comment_created_at'])}}</td>
+                            <td nowrap>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="btn am-btn {{i['comment_status'] == 1 ? 'am-btn-warning' : 'am-btn-secondary'}} am-radius checkBtn" data-id="{{i['comment_id']}}" data-status="{{i['comment_status']}}" style="margin-left: 10px">{%if(i['comment_status'] == 1)%}{{"Closed"|_}}{%else%}发布{%endif%}</button>
+                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn"data-id="{{i['comment_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                    {%endif%}
+                </fieldset>
+            </form>
+            {%if list is defined%}
+            <div class="am-u-lg-12">
+                <div class="am-cf">
+                    <div class="am-fr">
+                        <script language="JavaScript">
+                            var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
+                        </script>
+                    </div>
+                </div>
+            </div>
+            {%endif%}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function deleteComment(id) {
+            $('.btn').attr('disabled', 'disabled');
+            $.ajax('/comment/ajaxdelete', {
+                data: {
+                    comment_id: id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code == 0) {
+                        $('#tr_' + id).remove()
+                    } else {
+                        alert(data.msg);
+                    }
+                },
+                error: function () {
+                    alert('服务器错误');
+                },
+                complete: function () {
+                    $('.btn').removeAttr('disabled');
+                    $(".loadImg").remove();
+                }
+            });
+        }
+        jQuery(document).ready(function () {
+            "use strict";
+            // Init Theme Core
+            $('.deleteBtn').each(function () {
+                $(this).on('click', function () {
+                    if (confirm("确定要删除此条评论吗？")) {
+                        $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg"  width="20" />');
+                        deleteComment($(this).attr('data-id'))
+                    }
+                });
+            })
+
+            $(".checkBtn").click(function () {
+                var comment_id = $(this).data('id'), comment_status = $(this).data('status'), msg = comment_status ? '关闭' : '打开';
+                if (confirm("确定要" + msg + "此条评论吗？")) {
+                    $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="loadImg" width="20" />');
+                    $('.btn').attr('disabled', 'disabled');
+                    $.ajax('/comment/ajaxchangestatus', {
+                        data: {
+                            comment_id: comment_id,
+                            comment_status: comment_status
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.code == 0) {
+                                location.reload();
+                            } else {
+                                alert(data.msg);
+                            }
+                        },
+                        error: function () {
+                            alert('服务器错误');
+                        },
+                        complete: function () {
+                            $('.btn').removeAttr('disabled');
+                            $(".loadImg").remove();
+                        }
+                    });
+                }
+            })
+        });
+    </script>
+
+{% endblock %}

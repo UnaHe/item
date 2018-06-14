@@ -41,9 +41,9 @@ $.extend( $.fn.dataTableExt.oPagination, {
 				}
 			};
 			$(nPaging).append(
-				'<ul class="pagination pagination-sm">'+
-					'<li class="prev disabled"><a href="#"><i class="fa fa-caret-left"></i> &nbsp;'+oLang.sPrevious+'</a></li>'+
-					'<li class="next disabled"><a href="#">'+oLang.sNext+'&nbsp;<i class="fa fa-caret-right"></i> </a></li>'+
+				'<ul class="am-pagination tpl-pagination">'+
+					'<li class="prev am-disabled"><a href="#">&laquo;'+oLang.sPrevious+'</a></li>'+
+					'<li class="next am-disabled"><a href="#">'+oLang.sNext+'&raquo; </a></li>'+
 				'</ul>'
 			);
 			var els = $('a', nPaging);
@@ -72,7 +72,7 @@ $.extend( $.fn.dataTableExt.oPagination, {
 			for ( i=0, ien=an.length ; i<ien ; i++ ) {
 				$('li:gt(0)', an[i]).filter(':not(:last)').remove();
 				for ( j=iStart ; j<=iEnd ; j++ ) {
-					sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
+					sClass = (j==oPaging.iPage+1) ? 'class="am-active"' : '';
 					$('<li '+sClass+'><a href="#">'+j+'</a></li>')
 						.insertBefore( $('li:last', an[i])[0] )
 						.bind('click', function (e) {
@@ -82,15 +82,15 @@ $.extend( $.fn.dataTableExt.oPagination, {
 						} );
 				}
 				if ( oPaging.iPage === 0 ) {
-					$('li:first', an[i]).addClass('disabled');
+					$('li:first', an[i]).addClass('am-disabled');
 				} else {
-					$('li:first', an[i]).removeClass('disabled');
+					$('li:first', an[i]).removeClass('am-disabled');
 				}
 
 				if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-					$('li:last', an[i]).addClass('disabled');
+					$('li:last', an[i]).addClass('am-disabled');
 				} else {
-					$('li:last', an[i]).removeClass('disabled');
+					$('li:last', an[i]).removeClass('am-disabled');
 				}
 			}
 		}
@@ -106,7 +106,7 @@ $.extend( $.fn.dataTableExt.oPagination, {
 					fnCallbackDraw( oSettings );
 				}
 			};
-			var sAppend = '<ul class="pagination">'+
+			var sAppend = '<ul class="am-pagination tpl-pagination">'+
 				'<li class="prev"><a class="'+oSettings.oClasses.sPagePrevDisabled+'" tabindex="'+oSettings.iTabIndex+'" role="button"><span class="glyphicon glyphicon-chevron-left"></span>&nbsp;'+oLang.sPrevious+'</a></li>'+
 				'<li class="next"><a class="'+oSettings.oClasses.sPageNextDisabled+'" tabindex="'+oSettings.iTabIndex+'" role="button">'+oLang.sNext+'&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></a></li>'+
 				'</ul>';
@@ -138,15 +138,15 @@ $.extend( $.fn.dataTableExt.oPagination, {
 			for ( var i=0, iLen=an.length ; i<iLen ; i++ )
 			{
 				if ( oPaging.iPage === 0 ) {
-					$('li:first', an[i]).addClass('disabled');
+					$('li:first', an[i]).addClass('am-disabled');
 				} else {
-					$('li:first', an[i]).removeClass('disabled');
+					$('li:first', an[i]).removeClass('am-disabled');
 				}
 
 				if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-					$('li:last', an[i]).addClass('disabled');
+					$('li:last', an[i]).addClass('am-disabled');
 				} else {
-					$('li:last', an[i]).removeClass('disabled');
+					$('li:last', an[i]).removeClass('am-disabled');
 				}
 			}
 		}
@@ -163,9 +163,9 @@ $.extend( $.fn.dataTableExt.oPagination, {
 					}
 				};
 				$(nPaging).append(
-					'<ul class="pagination">'+
-					'<li class="disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageFirst+'"><span class="glyphicon glyphicon-backward"></span>&nbsp;'+oLang.sFirst+'</a></li>'+
-					'<li class="disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPagePrevious+'"><span class="glyphicon glyphicon-chevron-left"></span>&nbsp;'+oLang.sPrevious+'</a></li>'+
+					'<ul class="am-pagination tpl-pagination">'+
+					'<li class="am-disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageFirst+'"><span class="glyphicon glyphicon-backward"></span>&nbsp;'+oLang.sFirst+'</a></li>'+
+					'<li class="am-disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPagePrevious+'"><span class="glyphicon glyphicon-chevron-left"></span>&nbsp;'+oLang.sPrevious+'</a></li>'+
 					'<li><a tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageNext+'">'+oLang.sNext+'&nbsp;<span class="glyphicon glyphicon-chevron-right"></span></a></li>'+
 					'<li><a tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageLast+'">'+oLang.sLast+'&nbsp;<span class="glyphicon glyphicon-forward"></span></a></li>'+
 					'</ul>'
@@ -201,19 +201,19 @@ $.extend( $.fn.dataTableExt.oPagination, {
 				for ( var i=0, iLen=an.length ; i<iLen ; i++ )
 				{
 					if ( oPaging.iPage === 0 ) {
-						$('li:eq(0)', an[i]).addClass('disabled');
-						$('li:eq(1)', an[i]).addClass('disabled');
+						$('li:eq(0)', an[i]).addClass('am-disabled');
+						$('li:eq(1)', an[i]).addClass('am-disabled');
 					} else {
-						$('li:eq(0)', an[i]).removeClass('disabled');
-						$('li:eq(1)', an[i]).removeClass('disabled');
+						$('li:eq(0)', an[i]).removeClass('am-disabled');
+						$('li:eq(1)', an[i]).removeClass('am-disabled');
 					}
 
 					if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-						$('li:eq(2)', an[i]).addClass('disabled');
-						$('li:eq(3)', an[i]).addClass('disabled');
+						$('li:eq(2)', an[i]).addClass('am-disabled');
+						$('li:eq(3)', an[i]).addClass('am-disabled');
 					} else {
-						$('li:eq(2)', an[i]).removeClass('disabled');
-						$('li:eq(3)', an[i]).removeClass('disabled');
+						$('li:eq(2)', an[i]).removeClass('am-disabled');
+						$('li:eq(3)', an[i]).removeClass('am-disabled');
 					}
 				}
 			}
@@ -230,9 +230,9 @@ $.extend( $.fn.dataTableExt.oPagination, {
 					}
 				};
 				$(nPaging).append(
-					'<ul class="pagination">'+
-					'<li class="disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageFirst+'">'+oLang.sFirst+'</a></li>'+
-					'<li class="disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPagePrevious+'">'+oLang.sPrevious+'</a></li>'+
+					'<ul class="am-pagination tpl-pagination">'+
+					'<li class="am-disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageFirst+'">'+oLang.sFirst+'</a></li>'+
+					'<li class="am-disabled"><a  tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPagePrevious+'">'+oLang.sPrevious+'</a></li>'+
 					'<li><a tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageNext+'">'+oLang.sNext+'</a></li>'+
 					'<li><a tabindex="'+oSettings.iTabIndex+'" class="'+oClasses.sPageButton+" "+oClasses.sPageLast+'">'+oLang.sLast+'</a></li>'+
 					'</ul>'
@@ -308,7 +308,7 @@ $.extend( $.fn.dataTableExt.oPagination, {
 				{
 					sList += (iCurrentPage !== i) ?
 						'<li><a tabindex="'+oSettings.iTabIndex+'">'+oSettings.fnFormatNumber(i)+'</a></li>' :
-						'<li class="active"><a tabindex="'+oSettings.iTabIndex+'">'+oSettings.fnFormatNumber(i)+'</a></li>';
+						'<li class="am-active"><a tabindex="'+oSettings.iTabIndex+'">'+oSettings.fnFormatNumber(i)+'</a></li>';
 				}
 				for ( i=0, iLen=an.length ; i<iLen ; i++ )
 				{
@@ -319,18 +319,18 @@ $.extend( $.fn.dataTableExt.oPagination, {
 					}
 					$('li:gt(1)', an[i]).filter(':not(li:eq(-2))').filter(':not(li:eq(-1))').remove();
 					if ( oPaging.iPage === 0 ) {
-						$('li:eq(0)', an[i]).addClass('disabled');
-						$('li:eq(1)', an[i]).addClass('disabled');
+						$('li:eq(0)', an[i]).addClass('am-disabled');
+						$('li:eq(1)', an[i]).addClass('am-disabled');
 					} else {
-						$('li:eq(0)', an[i]).removeClass('disabled');
-						$('li:eq(1)', an[i]).removeClass('disabled');
+						$('li:eq(0)', an[i]).removeClass('am-disabled');
+						$('li:eq(1)', an[i]).removeClass('am-disabled');
 					}
 					if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-						$('li:eq(-1)', an[i]).addClass('disabled');
-						$('li:eq(-2)', an[i]).addClass('disabled');
+						$('li:eq(-1)', an[i]).addClass('am-disabled');
+						$('li:eq(-2)', an[i]).addClass('am-disabled');
 					} else {
-						$('li:eq(-1)', an[i]).removeClass('disabled');
-						$('li:eq(-2)', an[i]).removeClass('disabled');
+						$('li:eq(-1)', an[i]).removeClass('am-disabled');
+						$('li:eq(-2)', an[i]).removeClass('am-disabled');
 					}
 					$(sList)
 						.insertBefore('li:eq(-2)', an[i])

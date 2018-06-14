@@ -56,7 +56,9 @@ class PolygonsortModel extends ModelBase
             }
 
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $limit = $this->sqlLimit($sqlTemplate , 'COUNT(pps.project_polygon_sort_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $res = $this->sqlLimit($sqlTemplate , 'COUNT(pps.project_polygon_sort_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $limit = $res['limit'];
+                $pageCount = $res['pageCount'];
             }
             $sql = sprintf($sqlTemplate, "m.map_name,mp.name,pps.*") . $where . $orderBy . $limit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,

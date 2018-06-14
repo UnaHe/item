@@ -101,7 +101,7 @@ function gui_row_click(e) {
     if (areaId !== undefined) {
         setAreaValue(areaId);
     } else {
-        $('#areaTypeSelect').val('').multiselect('rebuild');
+        $('#areaTypeSelect').val('');
         $('#musicFilePreview1').html('');
         $('#musicFile1,#content1').val('');
         $('.areaTypeInput').hide();
@@ -122,20 +122,20 @@ function setAreaValue(areaId) {
         postData['equipment_infrared_area_id'] = areaId;
         switch (_data.equipment_infrared_area_type) {
             case '1':
-                $('#areaTypeSelect').val(_data.equipment_infrared_area_type).multiselect('rebuild');
+                $('#areaTypeSelect').val(_data.equipment_infrared_area_type);
                 if (_data.equipment_infrared_area_file !== undefined && _data.equipment_infrared_area_file !== '') {
                     var _file = (_data.equipment_infrared_area_file_source == "oss" ? 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/' : '/') + _data.equipment_infrared_area_file;
-                    $('#musicFilePreview1').html('<audio src="' + _file + '" controls preload="auto" data-url="' + _data.equipment_infrared_area_file + '"> </audio> <button type="button" class="btn btn-danger btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _file + '\',\'musicFilePreview1\')">X</button>');
+                    $('#musicFilePreview1').html('<audio src="' + _file + '" controls preload="auto" data-url="' + _data.equipment_infrared_area_file + '"> </audio> <button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _file + '\',\'musicFilePreview1\')">X</button>');
                 } else {
                     $('#musicFilePreview1').html('');
                 }
                 $('#content1').val(_data.equipment_infrared_area_content);
                 break;
             case '2':
-                $('#areaTypeSelect').val(_data.equipment_infrared_area_type).multiselect('rebuild');
+                $('#areaTypeSelect').val(_data.equipment_infrared_area_type);
                 if (_data.equipment_infrared_area_file !== undefined && _data.equipment_infrared_area_file !== '') {
                     var _file = (_data.equipment_infrared_area_file_source == "oss" ? 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/' : '/') + _data.equipment_infrared_area_file;
-                    $('#musicFilePreview2').html('<audio src="' + _file + '" controls preload="auto" data-url="' + _data.equipment_infrared_area_file + '"> </audio> <button type="button" class="btn btn-danger btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _data.equipment_infrared_area_file + '\',\'musicFile\',\'2\')">X</button>');
+                    $('#musicFilePreview2').html('<audio src="' + _file + '" controls preload="auto" data-url="' + _data.equipment_infrared_area_file + '"> </audio> <button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _data.equipment_infrared_area_file + '\',\'musicFile\',\'2\')">X</button>');
                 } else {
                     $('#musicFilePreview2').html('');
                 }
@@ -143,23 +143,23 @@ function setAreaValue(areaId) {
                 var content2Html = '';
                 for (var i = 0; i < _content.length; i++) {
                     var idName = 'screenImage_' + _content[i].replace(/[\/|.]/g, '');
-                    content2Html += '<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="btn btn-danger btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + _content[i] + '\',\'' + idName + '\',\'' + _data.equipment_infrared_area_type + '\')">X</button></p><a href="' + staticBaseUrl + _content[i] + '" target="_blank"><img src="' + staticBaseUrl + _content[i] + '" width="60" data-url="' + _content[i] + '"/></a></div>';
+                    content2Html += '<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + _content[i] + '\',\'' + idName + '\',\'' + _data.equipment_infrared_area_type + '\')">X</button></p><a href="' + staticBaseUrl + _content[i] + '" target="_blank"><img src="' + staticBaseUrl + _content[i] + '" width="60" data-url="' + _content[i] + '"/></a></div>';
                 }
                 $('#screenImagePreview2').html(content2Html);
                 break;
             case '3':
-                $('#areaTypeSelect').val(_data.equipment_infrared_area_type).multiselect('rebuild');
+                $('#areaTypeSelect').val(_data.equipment_infrared_area_type);
                 if (_data.equipment_infrared_area_file !== undefined && _data.equipment_infrared_area_file !== '') {
                     var _file = (_data.equipment_infrared_area_file_source == "oss" ? 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/' : '/') + _data.equipment_infrared_area_file;
-                    $('#videoFilePreview3').html('<video src="' + _file + '" width="90%" controls preload data-url="' + _data.equipment_infrared_area_file + '">您的浏览器不支持播放。</video> <button type="button" class="btn btn-danger btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _data.equipment_infrared_area_file + '\',\'videoFile\',\'3\')">X</button>');
+                    $('#videoFilePreview3').html('<video src="' + _file + '" width="90%" controls preload data-url="' + _data.equipment_infrared_area_file + '">您的浏览器不支持播放。</video> <button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 10px;margin-bottom: 20px;" onclick="removeFile(\'' + _data.equipment_infrared_area_file + '\',\'videoFile\',\'3\')">X</button>');
                 } else {
                     $('#videoFilePreview3').html('');
                 }
                 break;
             case '4':
-                $('#areaTypeSelect').val(_data.equipment_infrared_area_type).multiselect('rebuild');
+                $('#areaTypeSelect').val(_data.equipment_infrared_area_type);
                 var _content = _data.equipment_infrared_area_content.split('|');
-                $('#mapId').val(_content[0]).multiselect('rebuild');
+                $('#mapId').val(_content[0]);
                 $.ajax('/polygon/ajaxgetlistbymapid', {
                     data: {mapId:_content[0]},
                     type: 'post',
@@ -175,14 +175,14 @@ function setAreaValue(areaId) {
                         }else{
                             alert(data.msg);
                         }
-                        $('#mapGid').html(mapGidHtml).multiselect('rebuild');
+                        $('#mapGid').html(mapGidHtml);
                     },
                     error: function () {
                     }
                 });
                 break;
             case '5':
-                $('#areaTypeSelect').val(_data.equipment_infrared_area_type).multiselect('rebuild');
+                $('#areaTypeSelect').val(_data.equipment_infrared_area_type);
                 break;
         }
         $('#deleteBtn'+_data.equipment_infrared_area_type).attr('data-id' , areaId);
@@ -671,15 +671,18 @@ function gui_selectArea(obj) {
     }
     lastClickId = obj.aid;
     var areaId = $("#img_area_"+obj.aid).attr('data-id');
-    console.dir(obj);
+    // console.dir(obj);
     gui_row_select(obj.aid, true, false);
     $('#areaTypeInput').show();
+    var type = areaListJson[areaId].equipment_infrared_area_type;
+    $("#areaTypeSelect option[value=" + type + "]").attr("selected", true);
+    $("#areaTypeSelect").trigger('changed.selected.amui');
     // $('#areaTypeInput'+this.value).show();
     $('#clickAreaNumber').html(obj.aid + ' 号区域');
     if (areaId>=0) {
         setAreaValue(areaId);
     } else {
-        $('#areaTypeSelect').val('').multiselect('rebuild');
+        $('#areaTypeSelect').val('');
         $('#musicFilePreview1,#musicFilePreview2,#screenImagePreview2,#videoFilePreview3').html('');
         $('#musicFile1,#content1').val('');
         $('.areaTypeInput').hide();

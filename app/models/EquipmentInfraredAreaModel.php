@@ -55,7 +55,9 @@ class EquipmentInfraredAreaModel extends ModelBase
             }
 
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $limit = $this->sqlLimit($sqlTemplate , 'COUNT(eia.equipment_infrared_area_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $res = $this->sqlLimit($sqlTemplate , 'COUNT(eia.equipment_infrared_area_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $limit = $res['limit'];
+                $pageCount = $res['pageCount'];
             }
             $sql = sprintf($sqlTemplate, "eia.*") . $where . $orderBy . $limit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,

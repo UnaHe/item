@@ -48,7 +48,7 @@ class AccessPlugin extends Plugin
         // $this->session->remove ( 'SecurityPlugin' );
         // unset ( $this->persistent->$aclName );
 
-        if (1 || !isset ($this->persistent->$aclName)) {
+        if (!isset ($this->persistent->$aclName)) {
             $acl = new AclList ();
 
             $acl->setDefaultAction(Acl::DENY);

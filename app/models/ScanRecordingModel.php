@@ -197,4 +197,45 @@ class ScanRecordingModel extends ModelBase {
 	public function getSource() {
 		return DB_PREFIX . 'scan_recording';
 	}
+
+    /**
+     * 获取点位扫码次数(前十).
+     * @param array $params
+     * @return array|bool
+     */
+	public function getScanTop($params = [])
+    {
+        $tag = CacheBase::makeTag(self::TAG_PREFIX . 'getScanTop', json_encode($params));
+        $result = CACHING ? $this->cache->get($tag) : false;
+        if (!$result) {
+            $where = '';
+            $bindParams = [];
+
+            if(isset($params['project_id']) && !empty($params['project_id'])){
+                $where .= (empty($where)?' WHERE':' AND').' m.project_id = ?';
+                $bindParams[] = $params['project_id'];
+            }
+
+            if(isset($params['startTime']) && !empty($params['startTime'])){
+                $where .= (empty($where)?' WHERE':' AND').' sr.scan_time >= ?';
+                $bindParams[] = $params['startTime'];
+            }
+
+            if(isset($params['endTime']) && !empty($params['endTime'])){
+                $where .= (empty($where)?' WHERE':' AND').' sr.scan_time <= ?';
+                $bindParams[] = $params['endTime'];
+            }
+
+            $sql = 'SELECT sr.forward_id, sr.name AS forward_name, COUNT(*) AS forward_count FROM n_scan_recording AS sr LEFT JOIN n_forward AS f ON sr.forward_id = f.forward_id  LEFT JOIN n_map AS m ON f.map_id = m .map_id' . $where . ' GROUP BY sr.forward_id, sr.name  ORDER BY forward_count DESC  LIMIT 10';
+
+            $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,$this->getReadConnection()->query($sql, $bindParams));
+
+            $result = $data->valid() ? $data->toArray() : false;
+            if (CACHING) {
+                $this->cache->save($tag, $result);
+            }
+        }
+        return $result;
+    }
+
 }
