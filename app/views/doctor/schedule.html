@@ -20,7 +20,6 @@
             line-height: 44px;
             text-align: center;
             color: #0e90d2;
-            display: block;
             word-wrap: normal;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -134,7 +133,7 @@
             </div>
             <div class="am-modal-footer" style="text-align: right;">
                 <span type="button" class="btn am-modal-btn" data-am-modal-cancel>取消</span>
-                <span type="button" class="btn my-btn" onclick="addEventSchedule()">修改</span>
+                <span type="button" class="btn my-btn" onclick="addEventSchedule()">增加</span>
             </div>
         </div>
     </div>
@@ -178,7 +177,7 @@
                 <button type="button" class="btn am-btn am-btn-danger am-radius am-btn-xs" data-dismiss="modal" id="delScheduleBtn" data-id=""><i class="am-icon-trash"></i> 删除</button>　　　　　　　　　
                 <div class="am-btn-group">
                     <span type="button" class="btn am-modal-btn" data-am-modal-cancel>取消</span>
-                    <span type="button" class="btn my-btn" id="subEditBtn" data-id="" data-date="">增加</span>
+                    <span type="button" class="btn my-btn" id="subEditBtn" data-id="" data-date="">修改</span>
                 </div>
             </div>
         </div>
@@ -295,13 +294,13 @@
 
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
             $('#delScheduleBtn').bind('click',function(){
                 var id = $(this).attr('data-id');
                 console.log(id);
                 if (id>0){
                     if (confirm('确定删除此排班计划？')){
-                        $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="20" />').insertBefore($(this));
+                        var l = Ladda.create(this);
+                        l.start();
                         $('.btn').attr('disabled','disabled');
                         $.ajax('/doctor/ajaxscheduledelete', {
                             data: {
@@ -325,7 +324,7 @@
                                 alert('服务器错误');
                             },
                             complete:function(){
-                                $('.loadImg').remove();
+                                l.stop();
                             }
                         })
                     }
@@ -367,7 +366,8 @@
                     alert('时间段不正确');
                     return;
                 }
-                $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="" />').insertBefore($(this));
+                var l = Ladda.create(this);
+                l.start();
                 $('.btn').attr('disabled','disabled');
                 $.ajax('/doctor/ajaxscheduleupdate', {
                     data: {
@@ -394,14 +394,15 @@
                         alert('服务器错误');
                     },
                     complete:function(){
-                        $('.loadImg').remove();
+                        l.stop();
                     }
                 })
             });
 
             $('.updateEquipment').bind('click',function(){
                 if (confirm("确定更新排班显示屏？")){
-                    $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg" width="" />').insertBefore($(this));
+                    var l = Ladda.create(this);
+                    l.start();
                     $('.btn').attr('disabled','disabled');
                     $.ajax('/doctor/ajaxscheduleequipmentupdate', {
                         data: {},
@@ -419,7 +420,7 @@
                             $('.btn').removeAttr('disabled');
                         },
                         complete:function(){
-                            $('.loadImg').remove();
+                            l.stop();
                         }
                     })
                 }

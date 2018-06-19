@@ -45,7 +45,7 @@ label.error {
 #clickAreaNumber {
     font-family: "微软雅黑", serif;
     font-weight: bolder;
-    color: darkred;
+    color: #8b0000;
 }
 
 .areaTypeInput {
@@ -66,8 +66,8 @@ label {
 }
 
 .am-icon-close {
-    background-color: red !important;
-    color: white;
+    background-color: #ff0000 !important;
+    color: #fff;
 }
 
 /*spinner*/
@@ -111,7 +111,7 @@ label {
 }
 .dd-handle {
     color: #666;
-    border: 1px solid #cccccc;
+    border: 1px solid #ccc;
     padding: 5px 10px;
     margin: 5px 0;
     cursor: pointer;
@@ -175,14 +175,7 @@ label {
     border-radius: 2px;
     border: 1px solid #CCC;
     border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.18);
-    background-color: #f2f2f2;
-    /*
-    border-color: #cccccc rgba(0, 0, 0, 0.19) rgba(0, 0, 0, 0.18);
-    background-color: #f28900;
-    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.1) 100%);
-    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 10%, rgba(255, 255, 255, 0.1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80ffffff',endColorstr='#00ffffff',GradientType=0);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);*/ }
+    background-color: #f2f2f2;}
 
 .cBox.cBox-gradient label:before {
     border-color: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.18);

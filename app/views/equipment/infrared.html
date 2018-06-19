@@ -7,7 +7,7 @@
         {{'infraredList'|_}}
     </div>
     <ol class="am-breadcrumb">
-        <li><a href="/" class="am-icon-home">首页</a></li>
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
         <li>{{"equipmentManage"|_}}</li>
         <li class="am-active"><a href="/equipment/infrared" >{{'infraredList'|_}}</a></li>
     </ol>
@@ -16,13 +16,13 @@
             <div class="am-g">
                 <div class="tpl-table-images">
                     {%for i in equipment['data']%}
-                    <div class="am-u-sm-12 am-u-md-6 am-u-lg-3 u-float-left">
+                    <div class="am-u-sm-12 am-u-md-6 am-u-lg-3 u-float-left" data-am-scrollspy>
                         <div class="tpl-table-images-content">
                             <div class="tpl-table-images-content-i-time">{{ date('Y-h-d H:i:s', i['equipment_create_at']) }}</div>
                             <div class="tpl-i-title" title="{{i['equipment_code']}}">
                                 {{i['equipment_code']}}
                             </div>
-                            <a href="javascript:;" class="tpl-table-images-content-i">
+                            <a href="javascript:void(null);" class="tpl-table-images-content-i">
                                 <span class="tpl-table-images-content-i-shadow"></span>
                                 <img src="/echo/images/blank.gif" data-echo="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="200px">
                             </a>

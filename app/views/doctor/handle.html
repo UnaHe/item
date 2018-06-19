@@ -152,8 +152,8 @@
                 return false;
             }
             $('#subBtn').attr('disabled', 'disabled');
-            $('#subLoading').remove();
-            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
             $.ajax('/doctor/handle', {
                 data: {
                     doctor_id      : doctor_id,
@@ -182,14 +182,13 @@
                 },
                 complete:function(){
                     $('#subBtn').removeAttr('disabled');
-                    $('#subLoading').remove();
+                    l.stop();
                 }
             });
             return false;
         }
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
             var baseImageUrl = '{{url.getStaticBaseUri()}}';
             {%if details is defined%}
             $('#doctor_id').val('{{details["doctor_id"]}}');

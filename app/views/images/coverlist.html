@@ -7,7 +7,7 @@
         {{"CoverList"|_}}
     </div>
     <ol class="am-breadcrumb">
-        <li><a href="/" class="am-icon-home">首页</a></li>
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
         <li>{{"CoverManage"|_}}</li>
         <li class="am-active"><a href="/images/coverlist" >{{"CoverList"|_}}</a></li>
     </ol>
@@ -109,7 +109,6 @@
 
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
             $('#datatable').dataTable({
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],

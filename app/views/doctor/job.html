@@ -18,7 +18,7 @@
                         <label for="editDepart">要编辑的职称</label>
                         <div>
                             <select id="editDepart" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}" placeholder="请选择要编辑的职称">
-                                <option value=""></option>
+                                <option value="0"></option>
                                 {%for i in jobList%}
                                 <option value="{{i['doctor_job_id']}}">{{i['doctor_job_title']}}</option>
                                 {%endfor%}
@@ -80,7 +80,6 @@
         var jobListJson = {{jobListJson}};
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
             $('#altForm').validate({submitHandler:submitHandler,ignore: ''});
             var depart = $('#editDepart');
             depart.change(function(event)

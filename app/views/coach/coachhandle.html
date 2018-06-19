@@ -51,11 +51,11 @@
                     </div>
                     <div class="am-form-group">
                         <label for="coach_age">年龄</label>
-                        <input id="coach_age" name="coach_age" type="text" class="form-control" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_age"]}}{%endif%}">
+                        <input id="coach_age" name="coach_age" type="number" class="form-control" min="18" max="80" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_age"]}}{%endif%}">
                     </div>
                     <div class="am-form-group">
                         <label for="coach_seniority">驾龄</label>
-                        <input id="coach_seniority" name="coach_seniority" class="form-control" type="text" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_seniority"]}}{%endif%}">
+                        <input id="coach_seniority" name="coach_seniority" class="form-control" type="number" min="0" max="60" autocomplete="off" required="" value="{%if coachDetails is defined%}{{coachDetails["coach_seniority"]}}{%endif%}">
                     </div>
                     <div class="am-form-group">
                         <label for="coach_intro">{{"Intro"|_}}</label>

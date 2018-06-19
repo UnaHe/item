@@ -47,14 +47,14 @@
                 </li>
 
                 {# 轮播图 #}
-                {%if (cpAclNew['resource']['pointresource'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                {#{%if (cpAclNew['resource']['pointresource'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
                     <a href="/pointresource/handle" class="nav-link {{ controller == 'pointresource' AND action == 'handle' ? 'active' : null }}">
                         <i class="am-icon-image"></i>
                         <span >{{"PointResourceManage"|_}}</span>
                     </a>
                 </li>
-                {%endif%}
+                {%endif%}#}
 
                 {# 文章 #}
                 {%if ((cpAclNew['resource']['article'] is defined) AND ('list' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
@@ -70,7 +70,7 @@
                     {%endif%}
 
                 {#<li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'article' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'article' ? 'active' : null }}">
                         <i class="am-icon-bookmark-o"></i>
                         <span>{{"ArticleManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -109,7 +109,7 @@
                 {# 设备 #}
                 {%if (cpAclNew['resource']['equipment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'equipment' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'equipment' ? 'active' : null }}">
                         <i class="am-icon-wpforms"></i>
                         <span>{{ "equipmentManage"|_ }}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -130,7 +130,7 @@
                 {# 医生 #}
                 {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'doctor' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'doctor' ? 'active' : null }}">
                         <i class="am-icon-hospital-o"></i>
                         <span>{{"DoctorManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -172,7 +172,7 @@
                 {# 医生部门 #}
                 {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'doctordepartment' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'doctordepartment' ? 'active' : null }}">
                         <i class="am-icon-building"></i>
                         <span>{{"DoctorDepartmentManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -200,7 +200,7 @@
                 {# 消息 #}
                 {%if (cpAclNew['resource']['notice'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'notice' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'notice' ? 'active' : null }}">
                         <i class="am-icon-envelope"></i>
                         <span>{{ "NoticeManage"|_ }}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -228,7 +228,7 @@
                 {# 点位 #}
                 {%if (cpAclNew['resource']['polygonsort'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'polygonsort' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'polygonsort' ? 'active' : null }}">
                         <i class="am-icon-sort-amount-asc"></i>
                         <span>{{ "polygonsortManage"|_ }}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -256,7 +256,7 @@
                 {# 帐号 #}
                 {%if (cpAclNew['resource']['account'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'account' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'account' ? 'active' : null }}">
                         <i class="am-icon-users"></i>
                         <span>{{"AccountManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -291,7 +291,7 @@
                 {# 封面 #}
                 {%if (cpAclNew['resource']['images'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'images' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'images' ? 'active' : null }}">
                         <i class="am-icon-file-image-o"></i>
                         <span>{{ "CoverManage"|_ }}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -319,7 +319,7 @@
                 {# 教练 #}
                 {%if (cpAclNew['resource']['coach'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'coach' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'coach' ? 'active' : null }}">
                         <i class="am-icon-th"></i>
                         <span>{{"CoachManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -361,7 +361,7 @@
                 {# 商家帐号 #}
                 {%if (cpAclNew['resource']['seller'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'seller' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'seller' ? 'active' : null }}">
                         <i class="am-icon-sellsy"></i>
                         <span>商家管理</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -403,7 +403,7 @@
                 {# 景区 #}
                 {%if (cpAclNew['resource']['scenic'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'scenic' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'scenic' ? 'active' : null }}">
                         <i class="am-icon-building"></i>
                         <span>{{"ScenicManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
@@ -445,7 +445,7 @@
                 {# 评论 #}
                 {%if (cpAclNew['resource']['comment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
-                    <a href="javascript:;" class="nav-link tpl-left-nav-link-list {{ controller == 'comment' ? 'active' : null }}">
+                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'comment' ? 'active' : null }}">
                         <i class="am-icon-comments"></i>
                         <span>{{"CommentManage"|_}}</span>
                         <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>

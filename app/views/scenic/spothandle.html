@@ -387,7 +387,6 @@
     
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
             {% if mapPolygonDetails["map_polygon_description_voice"] %}
             $("#previewthumbnailUrl").attr("href", '{{url.getStaticBaseUri()}}{{mapPolygonDetails["map_polygon_description_voice"]}}').html('{{mapPolygonDetails["map_polygon_description_voice"]}}');
             $("#previewDiv").show();

@@ -9,13 +9,15 @@
 
     <div class="am-icon-list tpl-header-nav-hover-ico am-fl am-margin-right">
     </div>
+    <div class="am-icon-list settings_menu am-hide-md-up am-fl am-margin-right" style="color: red;font-size: 19px;">
+    </div>
 
     <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#topbar-collapse'}">
         <span class="am-sr-only">导航切换</span>
         <span class="am-icon-bars"></span>
     </button>
 
-    <div id="settings_menu">
+    <div class="am-show-md-up" id="settings_menu">
         {%if user['projectDetails'] is defined%}
             <button class="am-btn {{ user['projectDetails']['project_emergency_evacuation']==1 ? 'am-btn-danger' : 'am-btn-success' }} am-btn-sm" onclick="location.href='/evacuate/opt';" style="margin-right: 20px;">
                 {{ user['projectDetails']['project_emergency_evacuation']==1 ? '撤销紧急疏散' : '紧急疏散' }}
@@ -28,19 +30,31 @@
             </select>
         {%endif%}
     </div>
+    <script>
+        $(function () {
+            $('.settings_menu').on('click',function () {
+                var item = $('#settings_menu');
+                if (item.hasClass('am-show-md-up')) {
+                    item.removeClass('am-show-md-up');
+                } else {
+                    item.addClass('am-show-md-up');
+                }
+            });
+        })
+    </script>
 
     <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
 
         <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list tpl-header-list">
             <li class="am-hide-sm-only">
-                <a href="javascript:;" id="admin-fullscreen" class="tpl-header-list-link">
+                <a href="javascript:void(null);" id="admin-fullscreen" class="tpl-header-list-link">
                     <span class="am-icon-arrows-alt"></span>
                     <span class="admin-fullText">开启全屏</span>
                 </a>
             </li>
 
             <li class="am-dropdown" data-am-dropdown data-am-dropdown-toggle>
-                <a class="am-dropdown-toggle tpl-header-list-link" href="javascript:;">
+                <a class="am-dropdown-toggle tpl-header-list-link" href="javascript:void(null);">
                     <span class="tpl-header-list-user-nick">{{ user['item_account_username'] }}</span>
                     <span class="tpl-header-list-user-ico">
                         <img class="br64" src="{{ user['item_account_avatar'] is defined and user['item_account_avatar'] is not empty ? user['item_account_avatar'] : '/user_default.jpg' }}">

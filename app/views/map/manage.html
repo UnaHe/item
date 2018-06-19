@@ -447,8 +447,6 @@
         }
         jQuery(document).ready(function () {
             "use strict";
-            // Init Theme Core
-            // Core.init();
             {%if filter['map_id']>0%}
             var maxBounds = L.latLngBounds([-len*'{{clientMapSetting[3]}}',-len*'{{clientMapSetting[2]}}'], [len*'{{clientMapSetting[3]}}',len*'{{clientMapSetting[2]}}']);
             var params = {

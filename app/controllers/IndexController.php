@@ -32,6 +32,6 @@ class IndexController extends ControllerBase
     public function refreshAction()
     {
         $this->session->remove('AccessPlugin');
-        $this->alert("OK", '/' . $this->user['project_id'] . '/index/index');
+        $this->alert("OK", '/project/panel');
     }
 }

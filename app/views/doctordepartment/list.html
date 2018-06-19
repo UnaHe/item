@@ -89,7 +89,7 @@
     <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         var department_id = "{{departmentList['data'][0]['department_id']}}",submit_flag = false;
-        var image_type="{{imageType}}",minZoom = '{{clientMapSetting[0]}}',maxZoom = '{{clientMapSetting[1]}}'
+        var image_type="{{imageType}}",minZoom = parseInt('{{clientMapSetting[0]}}'),maxZoom = parseInt('{{clientMapSetting[1]}}');
         var len = 0.002197,sh = $(window).height()-400;
     
         var greenPulse = {heartbeat: false,color:"green"};
