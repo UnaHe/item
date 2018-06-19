@@ -1,1 +1,0 @@
-[2018-06-06 12:58:19 CRITICAL] item_account_id:1 [POST equipment/infraredareahandle] oss delete object err:805 cURL resource: Resource id #33; cURL error: Failed to connect to signposs1.oss-cn-shenzhen-internal.aliyuncs.com port 80: Timed out (7)
