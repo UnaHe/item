@@ -2,6 +2,7 @@
 
 {% block content %}
 
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
     <div class="tpl-content-page-title am-icon-user">
         {{"AccountList"|_}}
     </div>
@@ -14,7 +15,7 @@
         <div class="row">
             <form class="am-form">
                 <fieldset>
-                    <table class="am-table am-table-striped am-table-hover am-table-compact">
+                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
                         <thead>
                         <tr>
                             <th>图片</th>
@@ -58,6 +59,7 @@
         </div>
     </div>
 
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function () {
             "use strict";
@@ -67,10 +69,10 @@
                 var group_id = $('#group_'+openid).val()
                 var status = $('#status_'+openid).val()
                 if (name==''){
-                    alert('请填写名称');
+                    layer.alert('请填写名称', {icon: 0});
                     return;
                 }
-                if (confirm('确定编辑人员？')){
+                layer.confirm('确定编辑人员？', function () {
                     $('.btn').attr('disabled','disabled');
                     var l = Ladda.create(this);
                     l.start();
@@ -84,19 +86,33 @@
                         type: 'post',
                         dataType: 'json',
                         success: function(data) {
-                            alert(data.msg);
-                            if (data.code == 0) {
-                                location.reload();
-                            }
+                            layer.alert(data.msg, {
+                                yes: function () {
+                                    if (data.code == 0) {
+                                        location.reload();
+                                    }
+                                }
+                            });
                             l.stop();
+                        },
+                        error: function(data)
+                        {
+                            l.stop();
+                            layer.alert('服务器错误', {icon: 3});
+                            $('.btn').removeAttr('disabled');
                         },
                         complete: function() {
                             l.stop();
-                            $('.btn').removeAttr('disabled');
                         }
                     });
-                }
-            })
+                });
+            });
+            $('#datatable').DataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
         });
     </script>
 

@@ -16,14 +16,14 @@
                 <fieldset>
                     <div class="am-form-group">
                         <label for="remark">情况说明</label>
-                        <input type="text" class="postData form-control" id="remark" value="紧急通知：女士们先生们，现在医院发生火警，请您从最近的消防通道疏散到一楼，请不要乘坐电梯，听从医院服务人员的指挥，感谢您的配合！">
+                        <input type="text" class="postData form-control" id="remark" {{ evacuation == 1 ? 'readonly' : null }} value="{{ evacuation == 1 ? '取消紧急疏散' : '紧急通知：女士们先生们，现在医院发生火警，请您从最近的消防通道疏散到一楼，请不要乘坐电梯，听从医院服务人员的指挥，感谢您的配合！' }}">
                     </div>
                     <div class="am-form-group">
                         <label for="evacutePass">请输入密码</label>
                         <input type="password" class="postData form-control" id="evacutePass">
                     </div>
                     <div class="am-form-group">
-                        <button type="button" class="am-btn am-btn-secondary am-radius pull-right" id="subBtn"><span class="am-icon-share"> {{'push'|_}}</span></button>
+                        <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius pull-right" id="subBtn"><span class="am-icon-share"> {{'push'|_}}</span></button>
                     </div>
                 </fieldset>
             </form>
@@ -37,33 +37,36 @@
                 remark: $.trim($('#remark').val()),
             };
             if (postData.evacutePass === '') {
-                alert('请填写密码!');
+                layer.alert('请填写密码!', {icon: 0});
                 return false;
             }
             var _text = '确定紧急疏散？';
             if (1 == '{{user["projectDetails"]["project_emergency_evacuation"]}}') {
                 _text = '确定撤销紧急疏散？';
             }
-            if (confirm(_text)) {
-                var l = Ladda.create(document.querySelector('#' + this.id));
+            layer.confirm(_text, function () {
+                var l = Ladda.create(this);
                 l.start();
                 $.ajax('/evacuate/opt', {
                     data: postData,
                     type: 'post',
                     dataType: 'json',
                     success: function (data) {
-                        alert(data.msg);
-                        if (data.code == 0) {
-                            location.href = '/';
-                        }
+                        layer.alert(data.msg, {
+                            yes: function () {
+                                if (data.code == 0) {
+                                    location.href = '/';
+                                }
+                            }
+                        });
                         l.stop();
                     },
                     error: function () {
-                        alert('推送失败，请重试');
+                        layer.alert('推送失败，请重试', {icon: 3});
                         l.stop();
                     },
                 });
-            }
+            });
         }
 
         jQuery(document).ready(function () {

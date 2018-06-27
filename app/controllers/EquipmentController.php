@@ -57,8 +57,8 @@ class EquipmentController extends ControllerBase
 
     /**
      * MarkActionName(红外设备编辑)
-     * 
      * @return mixed
+     * @throws \OSS\Core\OssException
      */
     public function infraredhandleAction()
     {

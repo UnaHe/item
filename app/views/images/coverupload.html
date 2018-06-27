@@ -16,6 +16,16 @@
             <form class="am-form" id="altForm">
                 <fieldset>
                     <div class="am-form-group">
+                        <label for="images_type">请选择图片类型</label>
+                        <div>
+                            <select id="images_type" data-am-selected="{btnSize:'sm'}" placeholder="请选择图片类型">
+                                <option value=""></option>
+                                <option value="cover">封面图</option>
+                                <option value="round">轮播图</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
                         <div style="margin: 6px;{{ image['images_path'] is defined ? 'display: block;' : 'display: none;'}}" id="previewDiv">
                             <a href="" target="_blank" id="previewImageUrl">
                                 <img src="{{ image['images_path'] is defined ? image['images_path'] : '' }}" width="100" id="previewImage" />
@@ -27,12 +37,12 @@
                             <div class="am-progress-bar am-progress-bar-success" id="thumbnailProgress"></div>
                         </div>
                         <div class="am-form-group am-form-file">
-                            <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的文件</button>
-                            <input id="thumbnail" name="thumbnail" type="file" class="form-control" multiple onchange="UpLoadFile()" >
+                            <button type="button" class="am-btn am-btn-sm"><i class="am-icon-cloud-upload"></i> 选择要上传的图片文件</button>
+                            <input id="thumbnail" name="thumbnail" type="file" class="form-control" onchange="UpLoadFile()" >
                         </div>
                     </div>
                     <div class="am-form-group">
-                        <input class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" type="submit" onclick="savepath()" value="{{"Submit"|_}}">
+                        <input class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" type="button" onclick="savepath()" value="{{"Submit"|_}}">
                     </div>
                 </fieldset>
             </form>
@@ -40,42 +50,46 @@
     </div>
     
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
-    {{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
     <script type="text/javascript">
         function savepath() {
-            var path = $.trim($('#cover_photo').val());
+            var path = $.trim($('#cover_photo').val()),
+                type = $.trim($('#images_type').val());
     
             if (!path) {
-                alert('请选择需要上传的图片');
+                layer.alert('请选择需要上传的图片', {icon: 0});
                 return;
             }
-    
-            var r = confirm('确定上传图片？');
-            if (r == true) {
+
+            layer.confirm('确定上传图片？', function () {
                 $.ajax('/images/coverupload', {
                     type: "POST",
                     dataType: 'JSON',
                     data: {
-                        'images_type': 'cover',
+                        'images_type': type,
                         'images_path': path,
                     },
                     success:function(data){
                         console.log(data);
                         if(data.code == 0) {
-                            alert(data.msg);
-                            window.location.replace('/images/coverlist');
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                yes: function () {
+                                    window.location.replace('/images/coverlist');
+                                }
+                            });
                         }else if(data.code == 400){
-                            alert(data.data);
+                            layer.alert(data.data);
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error:function(){
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 })
-            }
+            });
         }
     
         function UpLoadFile() {
@@ -85,29 +99,29 @@
             var formData = new FormData();
             var files = document.getElementById('thumbnail').files;
             if (files[0] == undefined) {
-                alert("No file chosen");
+                layer.alert("No file chosen", {icon: 0});
                 return;
             }
     
             //验证图片的格式和尺寸开始
             if (!/.(gif|jpg|png|GIF|JPG|PNG)$/.test($("#thumbnail").val())) {
-                alert("图片限于gif,jpg,png格式");
+                layer.alert("图片限于gif,jpg,png格式", {icon: 0});
                 $("#thumbnail").val("").focus();
                 return false;
             }
             //宽高
             getImageWidthAndHeight(files[0], function (obj) {
-                var proportion = (obj.width * 1) / (obj.height * 1);
-                if (obj.width < 1080 || obj.height < 1920 || proportion < 0.5 || proportion > 0.57) {
-                    alert("为了布局美观，请上传宽大于1080px,高不大于1920px，宽高比例为9:16的图片");
-                    $("#thumbnail").val("").focus();
-                    return false;
-                } else {
+                // var proportion = (obj.width * 1) / (obj.height * 1);
+                // if (obj.width < 1080 || obj.height < 1920 || proportion < 0.5 || proportion > 0.57) {
+                //     layer.alert("为了布局美观，请上传宽大于1080px,高不大于1920px，宽高比例为9:16的图片", {icon: 0});
+                //     $("#thumbnail").val("").focus();
+                //     return false;
+                // } else {
                     //验证图片的格式和尺寸结束
                     //上传
                     var totalBytes = files[0].size;
                     if (totalBytes > 2097152) {
-                        alert("上传图片应小于2兆");
+                        layer.alert("上传图片应小于2兆", {icon: 0});
                         return false;
                     }
                     $("#thumbnail").attr("disabled", "disabled");
@@ -131,7 +145,7 @@
                                 $("#cover_photo").val(xhr.responseText);
                                 $("#previewDiv").show();
                             }else{
-                                alert(xhr.responseText)
+                                layer.alert(xhr.responseText)
                             }
                         }
                         $("#thumbnailProgress").width("0%");
@@ -139,7 +153,7 @@
                     };
                     xhr.open("post", "/upload/upload", true);
                     xhr.send(formData);
-                }
+                // }
             });
         }
     

@@ -660,6 +660,7 @@ class DoctorController extends ControllerBase
     /**
      * MarkActionName(医生添加/编辑)
      * @return mixed
+     * @throws \OSS\Core\OssException
      */
 
     public function handleAction()

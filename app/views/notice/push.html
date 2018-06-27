@@ -45,8 +45,8 @@
                         <label>{{"NoticeLevel"|_}}</label>
                         <div>
                             <select id="level" data-am-selected="{btnSize: 'sm'}" title="{{'NoticeLevel'|_}}">
-                                <option value="3" "{{ noticeDetails['notice_level']==3 ? 'selected' : null }}">临时信息</option>
-                                <option value="1" "{{ noticeDetails['notice_level']==1 ? 'selected' : null }}">紧急信息</option>
+                                <option value="3" {{ noticeDetails['notice_level']==3 ? 'selected' : null }}>临时信息</option>
+                                <option value="1" {{ noticeDetails['notice_level']==1 ? 'selected' : null }}>紧急信息</option>
                             </select>
                         </div>
                     </div>
@@ -55,9 +55,9 @@
                         <span style="margin-left: 30px;">(单位：秒)</span>
                         <input type="text" class="form-control" id="notice_timeout" maxlength="10" value="10" autocomplete="off" required="">
                     </div>
-                    <div class="am-checkbox">
-                        <label for="toMobile">
-                            <input type="checkbox" id="toMobile"> 同时推送至全部移动端
+                    <div class="am-form-group">
+                        <label class="am-checkbox am-secondary" for="toMobile">
+                            <input type="checkbox" id="toMobile" data-am-ucheck> 同时推送至全部移动端
                         </label>
                     </div>
                     <div class="am-form-group">
@@ -92,22 +92,24 @@
                                 }
                             }
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                         if (html==''){
-                            html='<option value="">没有相关设备</option>';
+                            html='<option value="0">没有相关设备</option>';
+                            $("#id").html(html);
+                        } else {
+                            $("#id").selected('enable').html(html);
                         }
-                        $("#id").selected('enable').html(html);
                     },
                     error: function()
                     {
-                        alert('服务器错误');
+                        layer.alert('服务器错误', {icon: 3});
                     },
                     complete:function(){
                     }
                 });
             }else{
-                $("#id").selected('disable').html('<option value="0">请先选择地图</option>');
+                $("#id").selected('disable').html('<option value="0">全部</option>');
             }
         }
 
@@ -115,55 +117,56 @@
             var map_id     = $.trim($('#map_id').val()),point_id = $.trim($('#id').val());
             var equipment_id = $('#id option:selected').attr('data-equipment');
             if (point_id>0 && !equipment_id){
-                alert('设备获取失败，请联系管理员!');
+                layer.alert('设备获取失败，请联系管理员!', {icon: 0});
                 return false;
             }
             var content_cn = $.trim($('#content_cn').val()),content_en = $.trim($('#content_en').val()),
                 level = $('#level').val();
             if (content_cn==''){
-                alert('请填写推送内容!')
+                layer.alert('请填写推送内容!', {icon: 0})
                 return false;
             }
             var timeout = parseInt($('#notice_timeout').val());
             if (isNaN(timeout) || timeout<=0){
-                alert('显示时间不正确');
+                layer.alert('显示时间不正确', {icon: 0});
                 return false;
             }
             var toMobile = $('#toMobile').prop('checked')?1:0;
             console.log(map_id , point_id , equipment_id , content_cn,content_en , level , toMobile,timeout);
-            $('#subBtn').attr('disabled', 'disabled');
-            if (confirm('确定推送信息？')){
+            layer.confirm('确定推送信息？', function () {
                 var l = Ladda.create(document.querySelector('#' + this.id));
                 l.start();
                 $.ajax('/notice/push', {
                     data: {
-                        equipment_id     : equipment_id,
-                        level     : level,
-                        content_cn     : content_cn,
-                        content_en     : content_en,
-                        map_id    : map_id,
-                        point_id   : point_id,
-                        toMobile   : toMobile,
-                        timeout   : timeout,
+                        equipment_id: equipment_id,
+                        level       : level,
+                        content_cn  : content_cn,
+                        content_en  : content_en,
+                        map_id      : map_id,
+                        point_id    : point_id,
+                        toMobile    : toMobile,
+                        timeout     : timeout,
                     },
                     type: 'post',
                     dataType: 'json',
                     success: function(data)
                     {
-                        alert(data.msg);
-                        if (data.code == 0 ){
-                            location.href='/notice/log';
-                        }
+                        layer.alert(data.msg, {
+                            yes: function () {
+                                if (data.code == 0 ){
+                                    location.href='/notice/log';
+                                }
+                            }
+                        });
                         l.stop();
                     },
                     error: function()
                     {
-                        alert('服务器错误');
+                        layer.alert('服务器错误', {icon: 3});
                         l.stop();
                     }
                 });
-            }
-            $('#subBtn').attr('disabled', false);
+            });
             return false;
         }
         jQuery(document).ready(function () {

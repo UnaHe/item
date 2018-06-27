@@ -2,6 +2,8 @@
 
 {% block content %}
 
+    {{stylesheet_link("leaflet/leaflet1.0.3.css")}}
+    {{stylesheet_link("leaflet/L.Icon.Pulse.css")}}
     <div class="tpl-content-page-title am-icon-exclamation">
         {{"MapWarning"|_}}
     </div>
@@ -14,7 +16,7 @@
             <div class="am-g">
                 <div class="am-u-sm-12 am-u-md-8 am-u-lg-8" id="map"></div>
                 <div class="am-u-sm-12 am-u-md-4 am-u-lg-4">
-                    <div class="am-panel am-panel-danger" id="ibeaconPanel">
+                    <div class="am-panel am-panel-danger" id="ibeaconPanel" style="height: 543px;overflow-y:auto;">
                         <div class="am-panel-hd">
                             <span class="am-icon-book"> 救援列表 </span>
                         </div>
@@ -26,7 +28,7 @@
                                     <td style="text-align: left;width:1%" nowrap="" class="small">{{date("Y-m-d H:i", i['warning_time'])}}</td>
                                     <td nowrap="">{%if i['warning_status']==0%}等待救援{%elseif i['warning_status']==1%}正在救援{%endif%}</td>
                                     <td nowrap style="width:1%">
-                                        <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius pull-right" data-id="{{i['warning_id']}}"> {{"View"|_}}</button>
+                                        <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius viewBtn" data-id="{{i['warning_id']}}"> {{"View"|_}}</button>
                                     </td>
                                 </tr>
                                 {%endfor%}
@@ -79,7 +81,7 @@
     function viewWarning(){
         console.log($(this).attr('data-id'));
         if (warningListJson[$(this).attr('data-id')]===undefined){
-            alert('数据读取失败，请刷新页面重试！');
+            layer.alert('数据读取失败，请刷新页面重试！', {icon: 0});
             return;
         }
         var data = warningListJson[$(this).attr('data-id')];
@@ -110,7 +112,7 @@
             if (msg.cmd==='warningUpdate'){
                 warningListJson[msg.context.warning_id] = msg.context;
                 console.log(msg.context);
-                $('#warningListTable tbody').append('<tr id="warning_'+msg.context.warning_id+'"><td style="text-align: left;width:1%" nowrap="" class="small">'+msg.context.warning_time+'</td><td nowrap="">等待救援</td><td nowrap style="width:1%"><button type="button" class="btn btn-info btn-xs viewBtn" data-id="'+msg.context.warning_id+'">{{"View"|_}}</button></td></tr>');
+                $('#warningListTable tbody').append('<tr id="warning_'+msg.context.warning_id+'"><td style="text-align: left;width:1%" nowrap="" class="small">'+msg.context.warning_time+'</td><td nowrap="">等待救援</td><td nowrap style="width:1%"><button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius viewBtn" data-id="'+msg.context.warning_id+'">{{"View"|_}}</button></td></tr>');
                 $('.viewBtn').unbind('click').bind('click',viewWarning);
             }
         });

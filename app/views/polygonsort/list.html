@@ -66,7 +66,7 @@
                 location.href = '/polygonsort/handle?id='+id;
             });
             $('#sendToEquipment').bind('click',function(){
-                if(confirm('确定更新设备排序？')) {
+                layer.confirm('确定更新设备排序？', function () {
                     $.ajax('https://apiequipment.signp.cn/polygonsort', {
                         data: {project_id: '{{user["project_id"]}}'},
                         type: 'post',
@@ -79,7 +79,7 @@
                             // console.log(xhr.status, thrownError);
                         }
                     });
-                }
+                });
             });
         });
     </script>

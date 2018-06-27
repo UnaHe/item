@@ -208,9 +208,9 @@ class ProjectModel extends ModelBase {
 
     /**
      * @param int $projectId
-     * @return object
+     * @return array|bool
      *
-     * */
+     */
     public function getDetailsByProjectIdBase($projectId)
     {
         $tag = CacheBase::makeTag(self::class . 'getDetailsByProjectIdBase', $projectId);

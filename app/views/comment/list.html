@@ -16,12 +16,16 @@
             <div class="portlet-title">
                 <div class="tpl-portlet-input tpl-fz-ml">
                     <div class="portlet-input input-inline">
-                        评论类型:
-                        <select title="请选择类型" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/comment/list?comment_obj='+this.value;">
-                            <option value=" ">请选择类型</option>
+                        <select title="请选择类型" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/comment/list?comment_obj='+this.value+'&comment_status={{ filter['comment_status'] }}';">
+                            <option value=" ">评论类型</option>
                             {%for key,i in typeList%}
-                            <option value="{{key}}" {%if filter['comment_obj']==key%} selected="selected"{%endif%}>{{i['type']}}</option>
+                            <option value="{{key}}" {{ filter['comment_obj']==key ? 'selected' : null }}>{{i['type']}}</option>
                             {%endfor%}
+                        </select>
+                        <select title="请选择状态" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/comment/list?comment_obj={{ filter['comment_obj'] }}&comment_status='+this.value;">
+                            <option value=" ">评论状态</option>
+                            <option value="1" {{ filter['comment_status']==='1' ? 'selected' : null }}>发布</option>
+                            <option value="0" {{ filter['comment_status']==='0' ? 'selected' : null }}>关闭</option>
                         </select>
                     </div>
                 </div>
@@ -48,7 +52,7 @@
                         <tr id="tr_{{i['comment_id']}}">
                             <td><img width="40px" src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/project/94/img/default-avatar.png" alt="">{{i['comment_created_image']}}</td>
                             <td>{{i['comment_created_name']}}</td>
-                            <td>{{typeList[i['comment_obj']]['type']}}</td>
+                            <td><span class="label {{ i['comment_obj'] == 'article' ? 'label-warning' : 'label-info' }}">{{typeList[i['comment_obj']]['type']}}</span></td>
                             <td>{{i[typeList[i['comment_obj']]['obj_name']]}}</td>
                             <td  class="comment_status">
                                 {%if i['comment_status']==1%}
@@ -88,7 +92,7 @@
             <div class="am-u-lg-12">
                 <div class="am-cf">
                     <div class="am-fr">
-                        <script language="JavaScript">
+                        <script type="text/javascript">
                             var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
                         </script>
                     </div>
@@ -111,11 +115,11 @@
                     if (data.code == 0) {
                         $('#tr_' + id).remove()
                     } else {
-                        alert(data.msg);
+                        layer.alert(data.msg, {icon: 2});
                     }
                 },
                 error: function () {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete: function () {
                     $('.btn').removeAttr('disabled');
@@ -127,16 +131,16 @@
             "use strict";
             $('.deleteBtn').each(function () {
                 $(this).on('click', function () {
-                    if (confirm("确定要删除此条评论吗？")) {
+                    layer.confirm("确定要删除此条评论吗？", function () {
                         $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg"  width="20" />');
-                        deleteComment($(this).attr('data-id'))
-                    }
+                        deleteComment($(this).attr('data-id'));
+                    });
                 });
-            })
+            });
 
             $(".checkBtn").click(function () {
                 var comment_id = $(this).data('id'), comment_status = $(this).data('status'), msg = comment_status ? '关闭' : '打开';
-                if (confirm("确定要" + msg + "此条评论吗？")) {
+                layer.confirm("确定要" + msg + "此条评论吗？", function () {
                     $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="loadImg" width="20" />');
                     $('.btn').attr('disabled', 'disabled');
                     $.ajax('/comment/ajaxchangestatus', {
@@ -150,19 +154,19 @@
                             if (data.code == 0) {
                                 location.reload();
                             } else {
-                                alert(data.msg);
+                                layer.alert(data.msg, {icon: 2});
                             }
                         },
                         error: function () {
-                            alert('服务器错误');
+                            layer.alert('服务器错误', {icon: 3});
                         },
                         complete: function () {
                             $('.btn').removeAttr('disabled');
                             $(".loadImg").remove();
                         }
                     });
-                }
-            })
+                });
+            });
         });
     </script>
 

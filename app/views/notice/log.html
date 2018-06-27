@@ -2,6 +2,14 @@
 
 {% block content %}
 
+    <style>
+        .text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+    </style>
     <script type="text/javascript" src="/client/pagers.js"></script>
     <div class="tpl-content-page-title am-icon-share-square">
         {{"NoticeLog"|_}}
@@ -13,44 +21,53 @@
     </ol>
     <div class="tpl-portlet-components">
         <div class="row">
-            <div class="am-g">
-                <div class="am-u-sm-12">
-                    <form class="am-form">
-                        <table class="am-table am-table-striped am-table-hover am-table-compact" style="font-size: 12px;">
-                            <thead>
-                            <tr>
-                                <th style="width: 8%">{{'NoticeLevel'|_}}</th>
-                                <th style="min-width: 30%">{{'ContentCN'|_}}</th>
-                                <th style="width: 8%">{{'ContentEN'|_}}</th>
-                                <th style="width: 10%">推送人</th>
-                                <th style="width: 12%">推送时间</th>
-                                <th style="width: 8%">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {%for i in noticeList%}
-                            <tr>
-                                <td>{%if i['notice_level']==1%}紧急信息{%elseif i['notice_level']==3%}临时信息{%endif%}</td>
-                                <td>{{i['notice_content_zh_CN']}} </td>
-                                <td>{{i['notice_content_en_US']}} </td>
-                                <td>{{i['client_realname']}} ( {{i['client_name']}} )</td>
-                                <td>{{date("Y-m-d H:i",i['notice_created_at'])}}</td>
-                                <td>
-                                    <button type="button" class="btn am-btn am-btn-warning am-btn-xs am-radius editBtn" data-id="{{i['notice_id']}}">{{"PushAgain"|_}}</button>
-                                </td>
-                            </tr>
-                            {%endfor%}
-                            </tbody>
-                        </table>
-                    </form>
-                    <div class="am-u-lg-12">
-                        <div class="am-cf">
-                            <div class="am-fr">
-                                <script language="JavaScript">
-                                    var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
-                                </script>
-                            </div>
-                        </div>
+            <div class="portlet-title">
+                <div class="tpl-portlet-input tpl-fz-ml">
+                    <div class="portlet-input input-inline">
+                        <select title="{{'NoticeLevel'|_}}" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="map_id" onchange="$('.btn').attr('disabled','disabled');location.href='/notice/log?notice_level='+this.value;">
+                            <option value=" ">{{'NoticeLevel'|_}}</option>
+                            <option value="3" {{ filter['notice_level'] == 3 ? 'selected' : null }}>临时信息</option>
+                            <option value="1" {{ filter['notice_level'] == 1 ? 'selected' : null }}>紧急信息</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <form class="am-form">
+                <fieldset>
+                    <table class="am-table am-table-striped am-table-hover am-table-compact" style="font-size: 12px;">
+                        <thead>
+                        <tr>
+                            <th style="width: 8%">{{'NoticeLevel'|_}}</th>
+                            <th style="min-width: 30%">{{'ContentCN'|_}}</th>
+                            <th style="width: 8%">{{'ContentEN'|_}}</th>
+                            <th style="width: 10%">推送人</th>
+                            <th style="width: 12%">推送时间</th>
+                            <th style="width: 8%">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in noticeList%}
+                        <tr>
+                            <td><span class="label {%if i['notice_level']==1%}label-danger{%elseif i['notice_level']==3%}label-warning{%endif%}">{%if i['notice_level']==1%}紧急信息{%elseif i['notice_level']==3%}临时信息{%endif%}</span></td>
+                            <td class="text" title="{{i['notice_content_zh_CN']}}">{{i['notice_content_zh_CN']}}</td>
+                            <td>{{i['notice_content_en_US']}}</td>
+                            <td>{{i['client_realname']}} ( {{ i['client_name'] ? i['client_name'] : 'admin' }} )</td>
+                            <td>{{date("Y-m-d H:i",i['notice_created_at'])}}</td>
+                            <td>
+                                <button type="button" class="btn am-btn am-btn-warning am-btn-xs am-radius editBtn" data-id="{{i['notice_id']}}">{{"PushAgain"|_}}</button>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
+            <div class="am-u-lg-12">
+                <div class="am-cf">
+                    <div class="am-fr">
+                        <script type="text/javascript">
+                            var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
+                        </script>
                     </div>
                 </div>
             </div>

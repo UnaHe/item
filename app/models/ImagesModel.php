@@ -30,21 +30,29 @@ class ImagesModel extends ModelBase
     /**
      * 图片列表.
      * @param $ProjectId
-     * @param $type
-     * @param $args
+     * @param null $type
+     * @param string $args
      * @return bool | array
      */
-    public function getList($ProjectId, $type ,$args = '*')
+    public function getList($ProjectId, $type = null, $args = '*')
     {
         $tag = CacheBase::makeTag(self::class . 'getList', json_encode($ProjectId.'|---|'.$type.'|---|'.$args));
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
-            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? AND images_type = ? ORDER BY images_id DESC';
+            if ($type) {
+                $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? AND images_type = ? ORDER BY images_id DESC';
+                $params[] = $ProjectId;
+                $params[] = $type;
+            } else {
+                $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? ORDER BY images_id DESC';
+                $params[] = $ProjectId;
+            }
+
             $sql = sprintf($sqlTemplate, $args);
             $data = new Phalcon\Mvc\Model\Resultset\Simple(
                 null,
                 $this,
-                $this->getReadConnection()->query($sql, [$ProjectId, $type])
+                $this->getReadConnection()->query($sql, $params)
             );
 
             $result = $data->valid() ? $data->toArray() : false;

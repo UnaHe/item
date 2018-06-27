@@ -9,6 +9,7 @@ class SellerController extends ControllerBase
     /**
      * MarkActionName(商家编辑)
      * @return mixed
+     * @throws \OSS\Core\OssException
      */
     public function sellerhandleAction(){
         if ($this->request->isPost() && $this->request->isAjax()) {
@@ -573,8 +574,7 @@ class SellerController extends ControllerBase
         $promotion = $promotionModel->getPromotionListByStatus($input);
         $this->view->promotionList = $promotion['data'];
         $this->view->pageCount = $promotion['pageCount'];
-        $this->view->promotion_status = $input['promotion_status'];
-        $this->view->expire = $input['expire'];
+        $this->view->filter = $input;
     }
 
     public function ajaxchangestatusAction(){

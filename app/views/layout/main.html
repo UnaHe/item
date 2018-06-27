@@ -11,11 +11,13 @@
     <link rel="icon" type="image/png" href="/assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="/assets/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="{{ get_title() }}" />
-    <link rel="stylesheet" href="/assets/css/amazeui.min.css" />
+    {#<link rel="stylesheet" href="/assets/css/amazeui.min.css" />#}
+    <link href="https://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/admin.css">
     <link rel="stylesheet" href="/assets/css/app.css">
 
-    <script src="/assets/js/jquery.min.js"></script>
+    {#<script type="text/javascript" src="/assets/js/jquery.min.js"></script>#}
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body data-type="index">
@@ -55,6 +57,16 @@
                     </a>
                 </li>
                 {%endif%}#}
+
+                {# 地图 #}
+                {%if (cpAclNew['resource']['map'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                <li class="tpl-left-nav-item">
+                    <a href="/map/warning" class="nav-link {{ controller == 'map' AND action == 'warning' ? 'active' : null }}">
+                        <i class="am-icon-map-marker"></i>
+                        <span >{{"MapWarning"|_}}</span>
+                    </a>
+                </li>
+                {%endif%}
 
                 {# 文章 #}
                 {%if ((cpAclNew['resource']['article'] is defined) AND ('list' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['article'] is defined) AND ('all' in cpAclNew['resource']['article'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
@@ -288,7 +300,7 @@
                 </li>
                 {%endif%}
 
-                {# 封面 #}
+                {# 图片 #}
                 {%if (cpAclNew['resource']['images'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
                     <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'images' ? 'active' : null }}">
@@ -476,9 +488,11 @@
 
 {{ partial("layout/footer") }}
 
-<script src="/assets/js/amazeui.min.js"></script>
-<script src="/assets/js/iscroll.js"></script>
-<script src="/assets/js/app.js"></script>
+{#<script type="text/javascript" src="/assets/js/amazeui.min.js"></script>#}
+<script type="text/javascript" src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
+<script type="text/javascript" src="/assets/js/iscroll.js"></script>
+<script type="text/javascript" src="/assets/js/app.js"></script>
+<script type="text/javascript" src="/layer/layer.js"></script>
 </body>
 
 </html>

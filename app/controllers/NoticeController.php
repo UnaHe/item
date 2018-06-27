@@ -148,7 +148,7 @@ class NoticeController extends ControllerBase
                 'notice_created_at' => time(),
                 'notice_content_en_US' => $input['content_en'],
                 'project_id' => $this->user['project_id'],
-                'client_id' => $this->user['client_id'],
+                'client_id' => $this->user['item_account_id'],
             ];
             $this->db->begin();
             try {
@@ -241,6 +241,14 @@ class NoticeController extends ControllerBase
                     'max_range' => 1
                 ),
                 'default' => 1
+            ),
+            'notice_level' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 1,
+                    'max_range' => 3
+                ),
+                'default' => null
             )
         );
         $filter = new FilterModel ($rules);
@@ -253,6 +261,7 @@ class NoticeController extends ControllerBase
         $notice = $noticeModel->getListSimple($input);
         $this->view->noticeList = $notice['data'];
         $this->view->pageCount = $notice['pageCount'];
+        $this->view->filter = $input;
         $this->tag->appendTitle($this->translate->_('NoticeLog'));
     }
 
@@ -333,7 +342,7 @@ class NoticeController extends ControllerBase
                 'notice_create_at' => time(),
                 'notice_content_en_US' => $input['content_en'],
                 'project_id' => $this->user['project_id'],
-                'client_id' => $this->user['client_id'],
+                'client_id' => $this->user['item_account_id'],
             ];
             $this->db->begin();
             try {

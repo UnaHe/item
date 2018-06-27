@@ -18,11 +18,10 @@
                 <div class="tpl-portlet-input tpl-fz-ml">
                     <div class="portlet-input input-inline">
                         <select title="全部账号" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/seller/sellerlist?seller_status='+this.value;">
-                            <!--<option value="" {%if status==''%} selected {%endif%}>全部账号</option>-->
-                            <option value="0" {%if status==0%} selected {%endif%}>未激活</option>
-                            <option value="1" {%if status==1%} selected {%endif%}>审核中</option>
-                            <option value="2" {%if status==2%} selected {%endif%}>审核通过</option>
-                            <option value="3" {%if status==3%} selected {%endif%}>审核未通过</option>
+                            <option value="0" {{ status==0 ? 'selected' : null }}>未激活</option>
+                            <option value="1" {{ status==1 ? 'selected' : null }}>审核中</option>
+                            <option value="2" {{ status==2 ? 'selected' : null }}>审核通过</option>
+                            <option value="3" {{ status==3 ? 'selected' : null }}>审核未通过</option>
                         </select>
                     </div>
                 </div>
@@ -35,7 +34,7 @@
                             <th>店铺头图</th>
                             <th>店铺名</th>
                             <th>店铺地址</th>
-                            <th>所在楼层</th>
+                            <th nowrap>所在楼层</th>
                             <th>地图点位名</th>
                             <th>初始点位账号</th>
                             <th>手机账号</th>
@@ -100,7 +99,7 @@
                     <div class="am-u-lg-12">
                         <div class="am-cf">
                             <div class="am-fr">
-                                <script language="JavaScript">
+                                <script type="text/javascript">
                                     var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
                                 </script>
                             </div>
@@ -111,7 +110,7 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         function recommend(id1,id2,seller_id) {
             $('.btn').attr('disabled','disabled');
@@ -127,14 +126,18 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('操作成功');
-                        $('#loadings').remove();
-                        location.reload();
+                        layer.alert('操作成功', {
+                            icon: 1,
+                            yes: function () {
+                                $('#loadings').remove();
+                                location.reload();
+                            }
+                        });
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -154,13 +157,13 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('重置成功');
+                        layer.alert('重置成功', {icon: 1});
                         $('#loadings').remove();
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -178,10 +181,10 @@
                     }else{
                         rst = '成为推荐商家?'
                     }
-                    if (confirm(rst)){
+                    layer.confirm(rst, function () {
                         $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        recommend(atrs,'',$(this).attr('data-id'))
-                    }
+                        recommend(atrs,'',$(this).attr('data-id'));
+                    });
                 });
             });
 
@@ -194,23 +197,23 @@
                     }else{
                         rst = '成为优惠商家?'
                     }
-                    if (confirm(rst)){
+                    layer.confirm(rst, function () {
                         $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        recommend('',atrs,$(this).attr('data-id'))
-                    }
+                        recommend('',atrs,$(this).attr('data-id'));
+                    });
                 });
             });
             
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    if (confirm("密码将重置为123456,确定吗？")){
+                    layer.confirm("密码将重置为123456,确定吗？", function () {
                         $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        repassword($(this).attr('data-id'))
-                    }
+                        repassword($(this).attr('data-id'));
+                    });
                 });
             });
 
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "paging": false,
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],

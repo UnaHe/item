@@ -55,6 +55,7 @@
     </div>
 
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     <script type="text/javascript">
         function submitHandler(){
             var name = $.trim($('#name').val());
@@ -77,19 +78,21 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('操作成功');
-                        location.reload();
-                    }
-                    else
-                    {
-                        alert(data.msg);
+                        layer.alert('操作成功', {
+                            icon: 1,
+                            yes: function () {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg, {icon: 2});
                     }
                     l.stop();
                 },
                 error: function(data)
                 {
                     l.stop();
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 }
             });
             return false;

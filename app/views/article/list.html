@@ -2,6 +2,7 @@
 
 {% block content %}
 
+    <script type="text/javascript" src="/client/pagers.js"></script>
     <div class="tpl-content-page-title am-icon-bookmark">
         {%if categoryDetails is defined%}{{categoryDetails['name']}}{%else%}{{"ArticleList"|_}}{%endif%}
     </div>
@@ -63,6 +64,15 @@
                     </table>
                 </fieldset>
             </form>
+            <div class="am-u-lg-12">
+                <div class="am-cf">
+                    <div class="am-fr">
+                        <script type="text/javascript">
+                            var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
+                        </script>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -80,13 +90,13 @@
                     if (data.code == 0)
                     {
                         $('#article_'+id).remove()
-                    }else{
-                        alert(data.msg);
+                    } else {
+                        layer.alert(data.msg, {icon: 2});
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -97,10 +107,10 @@
             "use strict";
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    if (confirm("确定要删除此文章？")){
+                    layer.confirm("确定要删除此文章？", function () {
                         $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" width="20" />');
-                        deleteArticle($(this).attr('data-id'))
-                    }
+                        deleteArticle($(this).attr('data-id'));
+                    });
                 });
             })
         });

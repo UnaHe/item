@@ -18,6 +18,14 @@ class CommentController extends ControllerBase
                 'filter' => FILTER_SANITIZE_STRING,
                 'default' => ''
             ),
+            'comment_status' => array(
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 0,
+                    'max_range' => 1
+                ),
+                'default' => null
+            ),
             'comment_score' => array(
                 'filter' => FILTER_VALIDATE_INT,
                 'default' => ''
@@ -67,14 +75,12 @@ class CommentController extends ControllerBase
             }
         }
 
-        if(!empty($input['comment_obj']) && array_key_exists($input['comment_obj'],$typeList) !== false){
-            $input['project_id'] = $this->user['project_id'];
-            $commentModel = new CommentModel();
-            $CommentList = $commentModel->getList($input);
+        $input['project_id'] = $this->user['project_id'];
+        $commentModel = new CommentModel();
+        $CommentList = $commentModel->getList($input);
 
-            $this->view->list = $CommentList['data'];
-            $this->view->pageCount = $CommentList['pageCount'];
-        }
+        $this->view->list = $CommentList['data'];
+        $this->view->pageCount = $CommentList['pageCount'];
 
         $this->view->typeList = $typeList;
         $this->view->filter = $input;

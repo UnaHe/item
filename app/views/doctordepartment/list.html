@@ -86,7 +86,7 @@
     {{javascript_include("leaflet/L.Icon.Pulse.js")}}
     {{javascript_include("leaflet/leaflet.polylineDecorator.js")}}
     {{javascript_include("leaflet/MovingMarker.js")}}
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         var department_id = "{{departmentList['data'][0]['department_id']}}",submit_flag = false;
         var image_type="{{imageType}}",minZoom = parseInt('{{clientMapSetting[0]}}'),maxZoom = parseInt('{{clientMapSetting[1]}}');
@@ -107,14 +107,14 @@
         var maxBounds = L.latLngBounds([-len*'{{clientMapSetting[3]}}',-len*'{{clientMapSetting[2]}}'], [len*'{{clientMapSetting[3]}}',len*'{{clientMapSetting[2]}}']);
     
         var params = {
-            minZoom: minZoom,
+            minZoom: minZoom+2,
             maxZoom: maxZoom,
             detectRetina: true,
             attribution: ""
         };
         var map = L.map('map', {
             center: center,
-            zoom: minZoom*1+1,
+            zoom: minZoom+2,
     //        maxBounds:maxBounds,
             zoomControl: true
         });
@@ -244,16 +244,19 @@
                 dataType: 'json',
                 success: function(data)
                 {
-                    alert(data.msg);
-                    if (data.code == 0)
-                    {
-                        location.reload();
-                    }
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code == 0)
+                            {
+                                location.reload();
+                            }
+                        }
+                    });
                     l.stop();
                 },
                 error: function(data)
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                     l.stop();
                 },
                 complete:function(){

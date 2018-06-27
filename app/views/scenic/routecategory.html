@@ -43,6 +43,7 @@
     </div>
 
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     <script type="text/javascript">
         function submitHandler() {
             var name = $.trim($('#name').val());
@@ -59,12 +60,15 @@
                 type: 'post',
                 dataType: 'json',
                 success: function (data) {
-                    alert(data.msg);
-                    if (data.code==0){location.reload();}
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code==0){location.reload();}
+                        }
+                    });
                     l.stop();
                 },
                 error: function () {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                     l.stop();
                 }
             });

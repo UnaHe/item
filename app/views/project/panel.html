@@ -110,7 +110,7 @@
             {%if (cpAclNew['resource']['doctor'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 {%if ((cpAclNew['resource']['doctor'] is defined) AND ('handle' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
-                    <div class="dashboard-stat" onclick="location.href='/{{routerProjectId}}/doctor/handle';" style="cursor: pointer; color: rgba(255,255,255,0.1); background-color: #659be0;">
+                    <div class="dashboard-stat" onclick="location.href='/doctor/handle';" style="cursor: pointer; color: rgba(255,255,255,0.1); background-color: #659be0;">
                         <div class="visual">
                             <i class="am-icon-user-plus"></i>
                         </div>
@@ -124,7 +124,7 @@
 
                 {%if ((cpAclNew['resource']['doctor'] is defined) AND ('list' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
-                    <div class="dashboard-stat blue" onclick="location.href='/{{routerProjectId}}/doctor/list';" style="cursor: pointer;">
+                    <div class="dashboard-stat blue" onclick="location.href='/doctor/list';" style="cursor: pointer;">
                         <div class="visual">
                             <i class="am-icon-list"></i>
                         </div>
@@ -138,7 +138,7 @@
 
                 {%if ((cpAclNew['resource']['doctor'] is defined) AND ('schedule' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
-                    <div class="dashboard-stat red" onclick="location.href='/{{routerProjectId}}/doctor/schedule';" style="cursor: pointer;">
+                    <div class="dashboard-stat red" onclick="location.href='/doctor/schedule';" style="cursor: pointer;">
                         <div class="visual">
                             <i class="am-icon-file"></i>
                         </div>
@@ -152,7 +152,7 @@
 
                 {%if ((cpAclNew['resource']['doctor'] is defined) AND ('job' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['doctor'] is defined) AND ('all' in cpAclNew['resource']['doctor'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
-                    <div class="dashboard-stat purple" onclick="location.href='/{{routerProjectId}}/doctor/job';" style="cursor: pointer;">
+                    <div class="dashboard-stat purple" onclick="location.href='/doctor/job';" style="cursor: pointer;">
                         <div class="visual">
                             <i class="am-icon-user-md"></i>
                         </div>
@@ -168,7 +168,7 @@
             {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <div class="am-u-lg-3 am-u-md-6 am-u-sm-12 u-float-left">
-                    <div class="dashboard-stat green" onclick="location.href='/{{routerProjectId}}/doctordepartment/department';" style="cursor: pointer;">
+                    <div class="dashboard-stat green" onclick="location.href='/doctordepartment/department';" style="cursor: pointer;">
                         <div class="visual">
                             <i class="am-icon-hospital-o"></i>
                         </div>
@@ -185,8 +185,9 @@
     </div>
 
     <!-- Theme Javascript -->
-    <script src="/assets/js/echarts.min.js"></script>
-    <script src="/assets/js/macarons.js"></script>
+    {#<script type="text/javascript" src="/assets/js/echarts.min.js"></script>#}
+    <script type="text/javascript" src="https://cdn.bootcss.com/echarts/4.1.0.rc2/echarts.min.js"></script>
+    <script type="text/javascript" src="/assets/js/macarons.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function () {
             "use strict";
@@ -200,10 +201,10 @@
                             location.href = '/project/panel';
                             return;
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg, {icon: 2});
                     },
                     error: function () {
-                        alert("验证异常，请刷新重试！");
+                        layer.alert("验证异常，请刷新重试！", {icon: 3});
                     },
                 });
             });
@@ -247,11 +248,11 @@
                             });
                             echarts_init(content, 'statistical-scan', '扫码', '#36c6d3')
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error: function() {
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 });
             });
@@ -292,11 +293,11 @@
                             });
                             echarts_init(content, 'statistical-navigation', '导航', '#ff7da1')
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error: function() {
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 });
             });
@@ -337,11 +338,11 @@
                             });
                             echarts_init(content, 'statistical-search', '搜索关键字', '#0e90d2')
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error: function() {
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 });
             });
@@ -382,11 +383,11 @@
                             });
                             echarts_init(content, 'statistical-destination', '导航目的地', '#f17608')
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error: function() {
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 });
             });

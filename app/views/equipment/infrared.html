@@ -16,7 +16,7 @@
             <div class="am-g">
                 <div class="tpl-table-images">
                     {%for i in equipment['data']%}
-                    <div class="am-u-sm-12 am-u-md-6 am-u-lg-3 u-float-left" data-am-scrollspy>
+                    <div class="am-u-sm-6 am-u-md-4 am-u-lg-2 u-float-left" data-am-scrollspy>
                         <div class="tpl-table-images-content">
                             <div class="tpl-table-images-content-i-time">{{ date('Y-h-d H:i:s', i['equipment_create_at']) }}</div>
                             <div class="tpl-i-title" title="{{i['equipment_code']}}">
@@ -24,7 +24,7 @@
                             </div>
                             <a href="javascript:void(null);" class="tpl-table-images-content-i">
                                 <span class="tpl-table-images-content-i-shadow"></span>
-                                <img src="/echo/images/blank.gif" data-echo="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="200px">
+                                <img src="/echo/images/blank.gif" data-echo="https://signposs1.oss-cn-shenzhen.aliyuncs.com/{{i['equipment_infrared_backgroundImage']}}" width="100%" height="180px" style="background: url('/echo/images/loading.gif') no-repeat 50%;">
                             </a>
                             <div class="tpl-table-images-content-block">
                                 <div class="tpl-i-font">
@@ -48,7 +48,7 @@
                     <div class="am-u-lg-12">
                         <div class="am-cf">
                             <div class="am-fr">
-                                <script language="JavaScript">
+                                <script type="text/javascript">
                                     var pg = new showPages('pg');pg.pageCount = {{equipment['pageCount']}};pg.printHtml();
                                 </script>
                             </div>
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.bootcss.com/echo.js/1.7.3/echo.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/echo.js/1.7.3/echo.min.js"></script>
     <script type="text/javascript">
         echo.init();
         $(document).ready(function(){
@@ -72,7 +72,7 @@
             });
 
             $('.equipmentUpdate').bind('click',function(){
-                if (confirm('确定更新此设备信息？')){
+                layer.confirm('确定更新此设备信息？', function () {
                     $('.btn').attr('disabled','disabled');
                     $.ajax('/equipment/ajaxequipmentupdate', {
                         data: {id:$(this).attr('data-id')},
@@ -80,16 +80,16 @@
                         dataType: 'json',
                         success: function(data)
                         {
-                            alert(data.msg);
+                            layer.alert(data.msg);
                             $('.btn').removeAttr('disabled');
                         },
                         error: function()
                         {
-                            alert('推送失败，请重试');
+                            layer.alert('推送失败，请重试', {icon: 3});
                             $('.btn').removeAttr('disabled');
                         },
                     });
-                }
+                });
             });
         });
     </script>

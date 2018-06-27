@@ -38,6 +38,11 @@ class NoticeModel extends ModelBase
                 $bindParams [] = $params ['project_id'];
             }
 
+            if (isset($params ['notice_level']) && !is_null($params ['notice_level'])) {
+                $where .= ($where == '' ? ' WHERE' : ' AND') . ' n.notice_level=?';
+                $bindParams [] = $params ['notice_level'];
+            }
+
             if (isset($params ['orderBy']) && !is_null($params ['orderBy'])) {
                 $orderBy = 'order by ' . $params ['orderBy'];
             }

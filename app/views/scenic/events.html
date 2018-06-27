@@ -46,7 +46,7 @@
             <div class="am-u-lg-12">
                 <div class="am-cf">
                     <div class="am-fr">
-                        <script language="JavaScript">
+                        <script type="text/javascript">
                             var pg = new showPages('pg');pg.pageCount = {{projectEvents['pageCount']}};pg.printHtml();
                         </script>
                     </div>
@@ -60,7 +60,7 @@
             "use strict";
             $('.deleteBtn').each(function () {
                 $(this).on('click', function () {
-                    if (confirm("确定要删除此活动？")) {
+                    layer.confirm("确定要删除此活动？", function () {
                         var id = $(this).attr('data-id');
                         var l = Ladda.create(document.querySelector('#' + this.id));
                         l.start();
@@ -71,18 +71,18 @@
                             type: 'post',
                             dataType: 'json',
                             success: function (data) {
-                                alert(data.msg);
+                                layer.alert(data.msg);
                                 if (data.code == 0) {
                                     $('#events_' + id).remove();
                                 }
                                 l.stop();
                             },
                             error: function () {
-                                alert('服务器错误');
+                                layer.alert('服务器错误', {icon: 3});
                                 l.stop();
                             },
                         });
-                    }
+                    });
                 });
             });
         });

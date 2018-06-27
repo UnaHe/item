@@ -4,7 +4,7 @@
 
     <link rel="stylesheet" href="/client/imgmap/imgmap.css" type="text/css">
     <link rel="stylesheet" href="/client/imgmap/js/colorPicker.css" type="text/css" />
-    <script language="javascript" type="text/javascript" src="/client/imgmap/js/jquery.colorPicker.js"></script>
+    <script type="text/javascript" src="/client/imgmap/js/jquery.colorPicker.js"></script>
 
     <div class="tpl-content-page-title am-icon-th-large">
         {{'equipmentInfraredAreaHandle'|_}}
@@ -34,7 +34,7 @@
                                 <select onchange="gui_zoom(this)" id="dd_zoom">
                                     <option value='0.25'>25%</option>
                                     <option value='0.5'>50%</option>
-                                    <option value='1' selected="1">100%</option>
+                                    <option value='1' selected>100%</option>
                                     <option value='2'>200%</option>
                                     <option value='3'>300%</option>
                                 </select>
@@ -196,7 +196,7 @@
             // FormData 对象
             var files = document.getElementById('screenImage2').files;
             if (files[0] === undefined) {
-                alert("No file chosen")
+                layer.alert("No file chosen", {icon: 0});
                 return;
             }
             var reader = new FileReader();
@@ -205,12 +205,12 @@
                 //加载图片获取图片真实宽度和高度
                 var image = new Image();
                 image.onerror = function (e) {
-                    alert('图片错误');
+                    layer.alert('图片错误', {icon: 0});
                     $('#screenImage2').val('');
                 };
                 image.onload = function () {
                     if (image.width !== infraredInfo.screenWidth || image.height !== infraredInfo.screenheight) {
-                        alert('图片分辨率不正确');
+                        layer.alert('图片分辨率不正确', {icon: 0});
                         $('#screenImage2').val('');
                         return;
                     }
@@ -237,7 +237,7 @@
                                 var idName = 'screenImage_' + xhr.responseText.replace(/[\/|.]/g, '');
                                 $("#screenImagePreview2").append('<div style="float: left;margin-right: 20px;border:1px dashed #ccc;" id="' + idName + '"><p align="center"><button type="button" class="am-btn am-btn-danger am-btn-xs" style="margin-left: 30px;" onclick="removeFile(\'' + xhr.responseText + '\',\'' + idName + '\',\'screenImage\')">X</button></p><a href="' + xhr.responseText + '" target="_blank"><img src="' + xhr.responseText + '" width="60" data-url="' + xhr.responseText.replace(/\//, '') + '"/></a></div>');
                             } else {
-                                alert('上传失败，请重试！');
+                                layer.alert('上传失败，请重试！', {icon: 0});
                             }
                             $("#screenImage2").val('').show();
                             $("#screenImageProgress2").width("0%");
@@ -254,7 +254,7 @@
 
             //        var totalBytes = files[0].size;
             //        if (totalBytes>102400){
-            //            alert('缩略图文件过大');
+            //            layer.alert('缩略图文件过大', {icon: 0});
             //            return;
             //        }
             // $("#userfile").attr("disabled","disabled");
@@ -265,25 +265,25 @@
             // FormData 对象
             var files = document.getElementById(part + '' + type).files;
             if (files[0] === undefined) {
-                alert("No file chosen")
+                layer.alert("No file chosen", {icon: 0});
                 return;
             }
             if (files[0].size > 1048576000) {
-                alert('文件过大，请限制在 1000 MB 内！');
+                layer.alert('文件过大，请限制在 1000 MB 内！', {icon: 0});
                 $('#' + part + '' + type).val('');
                 return;
             }
             switch (part) {
                 case 'musicFile':
                     if (files[0].type !== 'audio/mp3') {
-                        alert('文件格式不正确');
+                        layer.alert('文件格式不正确', {icon: 0});
                         $('#' + part + '' + type).val('');
                         return;
                     }
                     break;
                 case 'videoFile':
                     if (files[0].type !== 'video/mp4') {
-                        alert('文件格式不正确');
+                        layer.alert('文件格式不正确', {icon: 0});
                         $('#' + part + '' + type).val('');
                         return;
                     }
@@ -322,7 +322,7 @@
                         $('#' + part + '' + type).show().val('');
                         // fileInput.replaceWith(fileInput.val('').clone(true));
                     } else {
-                        alert(xhr.responseText);
+                        layer.alert(xhr.responseText);
                         $('#' + part + '' + type).val('').show();
                     }
 
@@ -334,7 +334,7 @@
         }
 
         function removeFile(url, part, type) {
-            if (confirm('确定删除此文件？ ')) {
+            layer.confirm('确定删除此文件？', function () {
                 switch (type) {
                     case '1':
                     case '3':
@@ -346,7 +346,7 @@
                         if (part === 'musicFile') $('#' + part + 'Preview' + type).html('');
                         break;
                 }
-            }
+            });
         }
 
         function removeArea(id) {
@@ -356,7 +356,7 @@
                 type: 'post',
                 dataType: 'json',
                 success: function (data) {
-                    alert(data.msg);
+                    layer.alert(data.msg);
                     if (data.code === 0) {
                         $('#areaTypeInput').hide();
                         myimgmap.removeArea(id);
@@ -365,7 +365,7 @@
                     }
                 },
                 error: function () {
-                    alert('请重试！');
+                    layer.alert('请重试！', {icon: 3});
                 }
             })
         }
@@ -408,12 +408,12 @@
             $('#typeBtn1').bind('click', function () {
                 var content = $.trim($('#content1').val());
                 if (content === '') {
-                    alert('请填写内容！');
+                    layer.alert('请填写内容！', {icon: 0});
                     return;
                 }
                 var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
                 if (coords === '') {
-                    alert('点击区域不正确！');
+                    layer.alert('点击区域不正确！', {icon: 0});
                     return;
                 }
                 var _postData = $.extend({}, postData);
@@ -438,11 +438,11 @@
                         if (data.code === 0) {
                             resetData(data);
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                         l.stop();
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 3});
                         l.stop();
                     }
                 });
@@ -455,16 +455,16 @@
                     imgCount++;
                 });
                 // if (imgCount > 5) {
-                //     alert('最多上传5张图片');
+                //     layer.alert('最多上传5张图片', {icon: 0});
                 //     return;
                 // }
                 if (_content === '') {
-                    alert('请上传图片文件');
+                    layer.alert('请上传图片文件', {icon: 0});
                     return;
                 }
                 var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
                 if (coords === '') {
-                    alert('点击区域不正确！');
+                    layer.alert('点击区域不正确！', {icon: 0});
                     return;
                 }
                 var _postData = $.extend({}, postData);
@@ -488,11 +488,11 @@
                         if (data.code === 0) {
                             resetData(data);
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                         l.stop();
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 0});
                         l.stop();
                     }
                 });
@@ -500,12 +500,12 @@
             $('#typeBtn3').bind('click', function () {
                 var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
                 if (coords === '') {
-                    alert('点击区域不正确！');
+                    layer.alert('点击区域不正确！', {icon: 0});
                     return;
                 }
                 var videoFile = $('#videoFilePreview3 video').attr('data-url');
                 if (videoFile === undefined) {
-                    alert('请上传视频文件！');
+                    layer.alert('请上传视频文件！', {icon: 0});
                     return;
                 }
                 var _postData = $.extend({}, postData);
@@ -528,11 +528,11 @@
                         if (data.code === 0) {
                             resetData(data);
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                         l.stop();
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 0});
                         l.stop();
                     }
                 });
@@ -540,12 +540,12 @@
             $('#typeBtn4').bind('click', function () {
                 var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
                 if (coords === '') {
-                    alert('点击区域不正确！');
+                    layer.alert('点击区域不正确！', {icon: 0});
                     return;
                 }
                 var mapGid = $('#mapGid').val();
                 if (!mapGid) {
-                    alert('请选择位置！');
+                    layer.alert('请选择位置！', {icon: 0});
                     return;
                 }
                 var _postData = $.extend({}, postData);
@@ -568,11 +568,11 @@
                         if (data.code === 0) {
                             resetData(data);
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                         l.stop();
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 3});
                         l.stop();
                     }
                 });
@@ -580,7 +580,7 @@
             $('#typeBtn5').bind('click', function () {
                 var coords = $.trim($('#img_coords' + myimgmap.currentid).val());
                 if (coords === '') {
-                    alert('点击区域不正确！');
+                    layer.alert('点击区域不正确！', {icon: 0});
                     return;
                 }
                 var _postData = $.extend({}, postData);
@@ -602,11 +602,11 @@
                         if (data.code === 0) {
                             resetData(data);
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                         l.stop();
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 3});
                         l.stop();
                     }
                 });
@@ -649,12 +649,12 @@
                                     mapGidHtml += '<option value="' + data.data[i].map_gid + '">' + data.data[i].name + '</option>';
                                 }
                             } else {
-                                alert(data.msg);
+                                layer.alert(data.msg, {icon: 2});
                             }
                             $('#mapGid').html(mapGidHtml);
                         },
                         error: function () {
-                            alert('请重试！');
+                            layer.alert('请重试！', {icon: 3});
                         }
                     });
                 }
@@ -665,15 +665,15 @@
                     type: 'post',
                     dataType: 'json',
                     success: function (data) {
-                        alert(data.msg + ' ' + data.data);
+                        layer.alert(data.msg + ' ' + data.data);
                     },
                     error: function () {
-                        alert('请重试！');
+                        layer.alert('请重试！', {icon: 3});
                     }
                 });
             });
             $('.deleteBtn').bind('click', function () {
-                if (confirm('确定删除此区域？')) {
+                layer.confirm('确定删除此区域？', function () {
                     var id = $(this).attr('data-id');
                     var l = Ladda.create(document.querySelector('#' + this.id));
                     l.start();
@@ -682,7 +682,7 @@
                         type: 'post',
                         dataType: 'json',
                         success: function (data) {
-                            alert(data.msg);
+                            layer.alert(data.msg);
                             if (data.code === 0) {
                                 $('#img_area_' + myimgmap.currentid).css('background', '').removeAttr('data-id');
                                 $('#img_active_' + myimgmap.currentid).attr('checked', false);
@@ -702,11 +702,11 @@
                             l.stop();
                         },
                         error: function () {
-                            alert('请重试！');
+                            layer.alert('请重试！', {icon: 3});
                             l.stop();
                         }
                     });
-                }
+                });
             });
         });
     </script>

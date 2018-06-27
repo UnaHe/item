@@ -58,12 +58,14 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('操作成功');
-                        location.reload();
-                    }
-                    else
-                    {
-                        alert(data.msg);
+                        layer.alert('操作成功', {
+                            icon: 1,
+                            yes: function () {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        layer.alert(data.msg, {icon: 2});
                         l.stop();
                     }
                     $('#subBtn').removeAttr('disabled');
@@ -71,7 +73,7 @@
                 error: function(data)
                 {
                     l.stop();
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                     $('#subBtn').removeAttr('disabled');
                 }
             });

@@ -53,10 +53,10 @@
                             location.href = '/project/panel';
                             return;
                         }
-                        alert(data.msg);
+                        layer.alert(data.msg);
                     },
                     error: function () {
-                        alert("验证异常，请刷新重试！");
+                        layer.alert("验证异常，请刷新重试！", {icon: 3});
                     },
                 });
             });

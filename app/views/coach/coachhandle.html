@@ -40,8 +40,8 @@
                         <label for="coach_gender">性别</label>
                         <div>
                             <select id="coach_gender" required data-am-selected="{btnSize:'sm'}">
-                                <option value="1"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==1 %} selected{%endif%}>男</option>
-                                <option value="2"{%if coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==2 %} selected{%endif%}>女</option>
+                                <option value="1" {{ coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==1 ? 'selected' : null }}>男</option>
+                                <option value="2"{{ coachDetails['coach_gender'] is defined AND coachDetails['coach_gender']==2 ? 'selected' : null }}>女</option>
                             </select>
                         </div>
                     </div>
@@ -70,6 +70,7 @@
     </div>
 
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     {{javascript_include('client/vendor/plugins/jquerymask/jquery.maskedinput.min.js')}}
     {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
     <script type="text/javascript">
@@ -80,7 +81,7 @@
             var formData = new FormData();
             var files = document.getElementById('thumbnail').files;
             if (files[0] ==undefined){
-                alert("No file chosen");
+                layer.alert("No file chosen", {icon: 0});
                 return;
             }
             var totalBytes = files[0].size;
@@ -106,7 +107,7 @@
                         $("#previewDiv").show();
                         // fileInput.replaceWith(fileInput.val('').clone(true));
                     }else{
-                        alert(xhr.responseText)
+                        layer.alert(xhr.responseText)
                     }
                 }
                 $("#thumbnailProgress").width("0%");
@@ -132,7 +133,7 @@
                 coach_name       = $.trim($('#doctor_name').val()),
                 coach_photo      = $.trim($('#doctor_photo').val());
             if (!coach_name){
-                alert('请填写姓名！');
+                layer.alert('请填写姓名！', {icon: 0});
                 return;
             }
             $('#subBtn').attr('disabled', 'disabled');
@@ -152,15 +153,18 @@
                 dataType: 'json',
                 success: function(data)
                 {
-                    alert(data.msg);
-                    if (data.code == 0)
-                    {
-                        location.replace('/coach/coachlist');
-                    }
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code == 0)
+                            {
+                                location.replace('/coach/coachlist');
+                            }
+                        }
+                    });
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('#subBtn').removeAttr('disabled');

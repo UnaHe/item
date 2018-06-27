@@ -256,10 +256,9 @@ class AccountController extends ControllerBase
             if (empty($data)) {
                 $this->db->begin();
                 try {
-                    $this->db->query("delete from " . DB_PREFIX . "access where project_id=".$this->user['project_id']." AND system='" . SYSTEM . "' AND role='" . $clientGroupDetails->client_group_role . "'");
+                    $this->db->query("delete from " . DB_PREFIX . "item_access where project_id=".$this->user['project_id']." AND role='" . $clientGroupDetails->client_group_role . "'");
                     $this->db->commit();
-                    $this->logger->addMessage("access cleared:" . json_encode($clientGroupDetails->toArray(),
-                            JSON_UNESCAPED_UNICODE));
+                    $this->logger->addMessage("access cleared:" . json_encode($clientGroupDetails->toArray(), JSON_UNESCAPED_UNICODE));
                 } catch (Exception $e) {
                     $this->db->rollback();
                     $this->logger->addMessage($e->getMessage() . ' ' . json_encode($input, JSON_UNESCAPED_UNICODE));

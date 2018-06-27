@@ -9,6 +9,7 @@ class ArticleController extends ControllerBase
     /**
      * MarkActionName(文章添加/编辑)
      * @return mixed
+     * @throws \OSS\Core\OssException
      */
     public function handleAction()
     {

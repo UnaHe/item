@@ -42,7 +42,8 @@
                 new_pass = $.trim($('#new_pass').val());
             $('#subBtn').attr('disabled', 'disabled');
             $('#subLoading').remove();
-            $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
+            var l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
             $.ajax('/passport/changepass', {
                 data: {
                     old_pass : old_pass,
@@ -52,26 +53,47 @@
                 dataType: 'json',
                 success: function(data)
                 {
-                    alert(data.msg);
-                    if (data.code == 0)
-                    {
-                        location.href = "/passport/logout";
-                    }
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code == 0)
+                            {
+                                location.href = "/passport/logout";
+                            }
+                        }
+                    });
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 2});
                 },
                 complete:function(){
+                    l.stop();
                     $('#subBtn').removeAttr('disabled');
-                    $('#subLoading').remove();
                 }
             });
             return false;
         }
         jQuery(document).ready(function () {
             "use strict";
-            $('#altForm').validate({submitHandler:submitHandler,ignore: []});
+            $.validator.addMethod('the_same',function(value, element){
+                return value !== $.trim($('#old_pass').val());
+            },'新旧密码不能相同');
+            $('#altForm').validate({
+                submitHandler:submitHandler,
+                rules: {
+                    new_pass: {
+                        the_same: true
+                    },
+                    comfirm_pass: {
+                        equalTo: '#new_pass'
+                    }
+                },
+                messages: {
+                    comfirm_pass: {
+                        equalTo: '两次输入不一致'
+                    }
+                }
+            });
         });
     </script>
 

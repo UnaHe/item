@@ -19,7 +19,7 @@
                         <select title="全部医生" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/doctor/list?department_id='+this.value;">
                             <option value="">全部医生</option>
                             {%for i in departmentList%}
-                            <option value="{{i['id']}}"{%if filter['department_id']==i['id']%}  selected="selected"{%endif%}>{{i['item']}}</option>
+                            <option value="{{i['id']}}" {{ filter['department_id']==i['id'] ? 'selected' : null }}>{{i['item']}}</option>
                             {%endfor%}
                         </select>
                     </div>
@@ -36,7 +36,7 @@
                             <th style="width:1%" nowrap="">科室</th>
                             <th style="width:1%" nowrap="">状态</th>
                             <th style="width:1%" nowrap="">入职时间</th>
-                            <th style="width:1%" class="hidden-xs">操作</th>
+                            <th style="width:1%">操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -72,8 +72,8 @@
                             </td>
                             <td nowrap>
                                 <div class="am-btn-group am-btn-group-xs">
-                                    <button type="button" class="btn am-btn am-btn-secondary am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/doctor/handle?doctor_id={{i['doctor_id']}}';" style="margin-left: 10px">{{"Edit"|_}}</button>
-                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['doctor_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                                    <button type="button" class="btn am-btn am-btn-secondary am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/doctor/handle?doctor_id={{i['doctor_id']}}';">{{"Edit"|_}}</button>
+                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['doctor_id']}}">{{"Delete"|_}}</button>
                                 </div>
                             </td>
                         </tr>
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         function deleteArticle(id){
             $('.btn').attr('disabled','disabled');
@@ -102,12 +102,12 @@
                     {
                         $('#doctor_'+id).remove()
                     }else{
-                        alert(data.msg);
+                        layer.alert(data.msg, {icon: 2});
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -118,14 +118,14 @@
             "use strict";
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    if (confirm("确定要删除此医生？")){
+                    layer.confirm("确定要删除此医生？", function () {
                         $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-                        deleteArticle($(this).attr('data-id'))
-                    }
+                        deleteArticle($(this).attr('data-id'));
+                    });
                 });
             });
 
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
             });

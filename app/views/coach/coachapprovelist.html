@@ -25,8 +25,8 @@
                             <th nowrap="">驾龄</th>
                             <th nowrap="">评分</th>
                             <th nowrap="">联系方式</th>
-                            <th style="width:120px" nowrap="">评价次数</th>
-                            <th style="width:1%" class="hidden-xs">操作</th>
+                            <th nowrap="">评价次数</th>
+                            <th style="width: 15%" class="hidden-xs">操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -41,8 +41,10 @@
                             <td>{{i['coach_tel']}}</td>
                             <td nowrap>{{i['evaluate_count']}}次</td>
                             <td nowrap>
-                                <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius" onclick="Allow({{i['coach_id']}})" style="margin-left: 10px">{{"Allow"|_}}</button>
-                                <button type="button" class="am-btn am-btn-danger am-btn-xs am-radius" onclick="Refuse({{i['coach_id']}})" style="margin-left: 10px">{{"Refuse"|_}}</button>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="am-btn am-btn-secondary am-radius" onclick="AllowOrRefuse({{i['coach_id']}}, 1)">{{"Allow"|_}}</button>
+                                    <button type="button" class="am-btn am-btn-danger am-radius" onclick="AllowOrRefuse({{i['coach_id']}}, 2)">{{"Refuse"|_}}</button>
+                                </div>
                             </td>
                         </tr>
                         {%endfor%}
@@ -53,67 +55,43 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
-        // 通过.
-        function Allow(coach_id)
+        // 通过OR拒绝.
+        function AllowOrRefuse(coach_id, status)
         {
-            var r = confirm('确定审批吗？');
-            if (r == true) {
+            var msg = status === 1 ? '审批' : '拒绝';
+            layer.confirm('确定'+msg+'吗？', function () {
                 $.ajax('/coach/coachapprove', {
                     type: "POST",
                     dataType: 'JSON',
                     data: {
                         'coach_id': coach_id,
-                        'approval_status': 1
+                        'approval_status': status
                     },
                     success:function(data){
                         if(data.code == 0) {
-                            alert(data.msg);
-                            $("#doctor_"+coach_id).remove();
-                            // location.reload();
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                yes: function () {
+                                    $("#doctor_"+coach_id).remove();
+                                    // location.reload();
+                                }
+                            });
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error:function(){
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 })
-            }
-        }
-
-        // 拒绝.
-        function Refuse(coach_id)
-        {
-            var r = confirm('确定拒绝吗？');
-            if (r == true) {
-                $.ajax('/coach/coachapprove', {
-                    type: "POST",
-                    dataType: 'JSON',
-                    data: {
-                        'coach_id': coach_id,
-                        'approval_status': 2
-                    },
-                    success:function(data){
-                        if(data.code == 0) {
-                            alert(data.msg);
-                            $("#doctor_"+coach_id).remove();
-                            // location.reload();
-                        }else{
-                            alert(data.msg);
-                        }
-                    },
-                    error:function(){
-                        alert('操作失败，请稍后重试！');
-                    }
-                })
-            }
+            });
         }
 
         jQuery(document).ready(function () {
             "use strict";
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
             });

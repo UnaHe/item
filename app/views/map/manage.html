@@ -33,7 +33,7 @@
                 <div class="portlet-title">
                     <div class="tpl-portlet-input tpl-fz-ml">
                         <div class="portlet-input input-inline">
-                            <select title="选择地图" id="department_id" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/{{routerProjectId}}/map/manage?map_id='+this.value;">
+                            <select title="选择地图" id="department_id" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}" onchange="$('.btn').attr('disabled','disabled');location.href='/map/manage?map_id='+this.value;">
                                 <option value="0">选择地图</option>
                                 {%for i in mapList%}
                                 <option value="{{i['map_id']}}"{%if filter['map_id']==i['map_id']%}selected{%endif%}>{{i['map_name']}}</option>
@@ -144,6 +144,7 @@
     {{javascript_include("leaflet/leaflet.polylineDecorator.js")}}
     {{javascript_include("leaflet/MovingMarker.js")}}
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
     <script type="text/javascript">
         var screenIconOnline = L.icon({
@@ -192,16 +193,16 @@
                 equipment_id = $('#equipment_id').val(),
                 timeout = parseInt($('#notice_timeout').val());
             if (!equipment_id){
-                alert('请选择设备');
+                layer.alert('请选择设备', {icon: 0});
                 return false;
             }
             if (isNaN(timeout) || timeout<=0){
-                alert('显示时间不正确');
+                layer.alert('显示时间不正确', {icon: 0});
                 return false;
             }
             $('.btn').attr('disabled', 'disabled');
             $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right" id="subLoading" />').insertAfter($('#subBtn'));
-            $.ajax('/{{routerProjectId}}/notice/ajaxsendnotice', {
+            $.ajax('/notice/ajaxsendnotice', {
                 data: {
                     equipment_id: equipment_id,
                     content_cn     : content_cn,
@@ -213,11 +214,11 @@
                 dataType: 'json',
                 success: function(data)
                 {
-                    alert(data.errmsg);
+                    layer.alert(data.msg);
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -358,7 +359,7 @@
             var contextContent = {context:context , context_status:status,id:id}
             $('#setPolygonBtn_'+id).attr('disabled','disabled');
             $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="subLoading" width="20" />').insertBefore($('#setPolygonBtn_'+id));
-            $.ajax('/{{routerProjectId}}/map/ajaxsetpolygon', {
+            $.ajax('/map/ajaxsetpolygon', {
                 data: {
                     id: id,
                     status:status,
@@ -427,7 +428,7 @@
             }
             $('#setPathBtn_'+id).attr('disabled','disabled');
             $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="subLoading" width="20" />').insertBefore($('#setPathBtn_'+id));
-            $.ajax('/{{routerProjectId}}/map/ajaxsetpath', {
+            $.ajax('/map/ajaxsetpath', {
                 data: {
                     id: id,
                     congestion_level:congestion_level
@@ -459,7 +460,7 @@
 
             // map.setMaxBounds(maxBounds);
             L.tileLayer('https://signposs1.oss-cn-shenzhen.aliyuncs.com/maps/'+mapId+'/zh_CN/{z}/{x}/{y}.jpg',params).addTo(map);
-            // $.ajax('/{{routerProjectId}}/polygon/ajaxgetbymapid', {
+            // $.ajax('/polygon/ajaxgetbymapid', {
             //         data: {
             //             mapId: '{{filter['map_id']}}'
             //         },
@@ -553,16 +554,16 @@
                 var rssi = $.trim($('#rssi').val())
                 var ibeacon_id = $.trim($('#ibeacon_id').val())
                 if (!ibeacon_id){
-                    alert('此设备不是蓝牙设备!');
+                    layer.alert('此设备不是蓝牙设备!', {icon: 0});
                     return
                 }
                 if (rssi<-80 || rssi>-40){
-                    alert('Rssi设置不正确');
+                    layer.alert('Rssi设置不正确', {icon: 0});
                     return
                 }
                 $('.btn').attr('disabled','disabled');
                 $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right subLoading" />').insertAfter($(this));
-                $.ajax('/{{routerProjectId}}/map/ajaxsetibeaconrssi', {
+                $.ajax('/map/ajaxsetibeaconrssi', {
                     data: {
                         ibeacon_id: ibeacon_id,
                         rssi      : rssi,
@@ -571,12 +572,12 @@
                     dataType: 'json',
                     success: function(data)
                     {
-                        alert(data.errmsg);
+                        layer.alert(data.msg);
                         $('.btn').removeAttr('disabled');
                     },
                     error: function()
                     {
-                        alert('服务器错误');
+                        layer.alert('服务器错误', {icon: 0});
                         $('.btn').removeAttr('disabled');
                     },
                     complete:function(){
@@ -588,16 +589,16 @@
                 var map_gid = $('#map_gid').val(),polygonId = $('#polygonId').val();
                 var content = $.trim(CKEDITOR.instances['introContent'].getData());
                 if (content==''){
-                    alert('请填写内容!');
+                    layer.('请填写内容!', {icon: 0});
                     return
                 }
                 if (map_gid=='' || polygonId==''){
-                    alert('没有要设置的项目');
+                    layer.alert('没有要设置的项目', {icon: 0});
                     return
                 }
                 $('.btn').attr('disabled','disabled');
                 $('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="pull-right subLoading" />').insertAfter($(this));
-                $.ajax('/{{routerProjectId}}/polygon/ajaxsetpolygoncontent', {
+                $.ajax('/polygon/ajaxsetpolygoncontent', {
                     data: {
                         map_gid:map_gid,
                         polygonId:polygonId,
@@ -607,14 +608,14 @@
                     dataType: 'json',
                     success: function(data)
                     {
-                        alert(data.errmsg);
+                        layer.alert(data.msg);
                         if (data.errcode==0){
                             $('.featurePanel').hide();
                             $('#introPanel').show();
                             $('#map_gid').val('');
                             $('#polygonId').val('');
                             CKEDITOR.instances['introContent'].setData('');
-                            $.ajax('/{{routerProjectId}}/polygon/ajaxgetbymapid', {
+                            $.ajax('/polygon/ajaxgetbymapid', {
                                 data: {
                                     mapId: '{{filter['map_id']}}'
                                 },
@@ -646,7 +647,7 @@
                     },
                     error: function()
                     {
-                        alert('服务器错误');
+                        layer.alert('服务器错误', {icon: 3});
                         $('.btn').removeAttr('disabled');
                     },
                     complete:function(){
@@ -656,7 +657,7 @@
             });
             CKEDITOR.replace( 'introContent');
             {%if filter['map_id']>0%}
-    //    $.ajax('/{{routerProjectId}}/map/ajaxlinestring', {
+    //    $.ajax('/map/ajaxlinestring', {
     //            data: {
     //                mapId: mapId
     //            },
@@ -669,7 +670,7 @@
     //            complete: function() {
     //            }
     //        })
-    //    $.ajax('/{{routerProjectId}}/map/ajaxgetpolygon', {
+    //    $.ajax('/map/ajaxgetpolygon', {
     //            data: {
     //                mapId: mapId
     //            },

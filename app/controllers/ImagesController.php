@@ -79,7 +79,7 @@ class ImagesController extends ControllerBase
         }
 
         // 查询.
-        $imageList = (new ImagesModel())->getList($project_id, 'cover');
+        $imageList = (new ImagesModel())->getList($project_id);
 
         $this->view->setVars([
             'ali_path' => 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/',

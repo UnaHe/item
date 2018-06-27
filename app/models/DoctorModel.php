@@ -76,6 +76,7 @@ class DoctorModel extends ModelBase
     }
 
     /**
+     * @param array $params
      * @return array
      */
 

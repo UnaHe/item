@@ -42,7 +42,7 @@ class CommentModel extends ModelBase
                 $where .= ($where == '' ? ' WHERE' : ' AND') . ' c.article_title LIKE ?';
                 $bindParams [] = '%' . $params ['keywords'] . '%';
             }
-            if (!empty($params ['comment_status'])) {
+            if (isset($params ['comment_status']) && !is_null($params ['comment_status'])) {
                 $where .= ($where == '' ? ' WHERE' : ' AND') . ' c.comment_status=?';
                 $bindParams [] = $params ['comment_status'];
             }
@@ -52,7 +52,11 @@ class CommentModel extends ModelBase
                 $bindParams [] = $params ['project_id'];
             }
             if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
-                $sqlCount = 'SELECT count(c.comment_id) FROM ' . $this->getSource() . ' as c JOIN ' . $type_table . ' ON c.'.$join_id.'=' . $type_table . '.' . $type_arr[$params ['comment_obj']]['obj_id']  . $where ;
+                if (!empty($params ['comment_obj'])) {
+                    $sqlCount = 'SELECT count(c.comment_id) FROM ' . $this->getSource() . ' as c JOIN ' . $type_table . ' ON c.'.$join_id.'=' . $type_table . '.' . $type_arr[$params ['comment_obj']]['obj_id']  . $where ;
+                } else {
+                    $sqlCount = 'SELECT count(c.comment_id) FROM ' . $this->getSource() . ' as c ' . $where ;
+                }
                 $countRes = new Phalcon\Mvc\Model\Resultset\Simple(null, $this, $this->getReadConnection()->query($sqlCount,$bindParams));
                 $count = $countRes->toArray()[0]['count'];
                 $pageCount = ceil($count / $params ['psize']);
@@ -62,11 +66,20 @@ class CommentModel extends ModelBase
                 $offset = ($params ['page'] - 1) * $params ['psize'];
                 $limit = ' limit ' . $params ['psize'] . ' OFFSET ' . $offset;
             }
-            $sql = 'SELECT %s FROM ' . $this->getSource() . ' as c JOIN ' . $type_table . ' ON c.'.$join_id.'=' . $type_table . '.' . $type_arr[$params ['comment_obj']]['obj_id']  . $where . ' order by c.comment_created_at DESC' . $limit;
+
+            if (!empty($params ['comment_obj'])) {
+                $sql = 'SELECT %s FROM ' . $this->getSource() . ' as c JOIN ' . $type_table . ' ON c.'.$join_id.'=' . $type_table . '.' . $type_arr[$params ['comment_obj']]['obj_id']  . $where . ' order by c.comment_created_at DESC' . $limit;
+            } else {
+                $sql = 'SELECT %s FROM ' . $this->getSource() . ' as c LEFT JOIN n_article ON c.comment_obj_id=n_article.article_id LEFT JOIN  n_map_polygon ON c.map_gid=n_map_polygon.map_gid' . $where . ' order by c.comment_created_at DESC' . $limit;
+            }
             if(isset($params['cols']) && !empty($params['cols'])){
                 $sql = sprintf($sql,$params['cols']);
             }else{
-                $sql = sprintf($sql,'c.*,'.$type_table.'.*');
+                if (!empty($params ['comment_obj'])) {
+                    $sql = sprintf($sql,'c.*,'.$type_table.'.*');
+                } else {
+                    $sql = sprintf($sql,'c.*,n_article.*,n_map_polygon.*');
+                }
             }
 //            echo $sql;exit;
             $data = new Phalcon\Mvc\Model\Resultset\Simple (null, $this,

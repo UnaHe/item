@@ -34,7 +34,7 @@ class EvacuateController extends ControllerBase
             }
 
             $projectModel = new ProjectModel();
-            $projectDetails = $projectModel->getDetailsByProjectId($this->user['project_id']);
+            $projectDetails = $projectModel->getDetailsByProjectIdBase($this->user['project_id']);
             $this->user['projectDetails']['project_emergency_evacuation'] = $this->user['projectDetails']['project_emergency_evacuation']==1?0:1;
             if ($projectDetails){
                 $cloneDetails = $projectModel::cloneResult($projectModel, $projectDetails);
@@ -79,6 +79,7 @@ class EvacuateController extends ControllerBase
             return $this->resultModel->output();
         }
 
+        $this->view->evacuation = $this->user['projectDetails']['project_emergency_evacuation'];
         $this->tag->setTitle($this->translate->_('evacuateOpt'));
     }
 }

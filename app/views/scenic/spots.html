@@ -16,17 +16,17 @@
             <div class="portlet-title">
                 <div class="tpl-portlet-input tpl-fz-ml">
                     <div class="portlet-input input-inline">
-                        <select title="{{'MapList'|_}}" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="map_id" onchange="$('.btn').attr('disabled','disabled');location.href='/scenic/spots?map_id='+this.value;">
-                            <option value="">{{'MapList'|_}}</option>
+                        <select title="{{'MapList'|_}}" placeholder="{{'MapList'|_}}" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="map_id" onchange="$('.btn').attr('disabled','disabled');location.href='/scenic/spots?map_id='+this.value;">
+                            <option value=""></option>
                             {%for i in mapList%}
-                            <option value="{{i['map_id']}}"{%if filter['map_id']==i['map_id']%}  selected="selected"{%endif%}>{{i['map_name']}}</option>
+                            <option value="{{i['map_id']}}" {{ filter['map_id']==i['map_id'] ? 'selected' : null }}>{{i['map_name']}}</option>
                             {%endfor%}
                         </select>
                         {%if filter['map_id'] is not empty%}
                         <select title="分类" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="category_id" onchange="$('.btn').attr('disabled','disabled');location.href='/scenic/spots?map_id='+$('#map_id').val()+'&category_id='+this.value;">
                             <option value="0">分类</option>
                             {%for i in categoryList%}
-                            <option value="{{i['map_polygon_category_id']}}"{%if filter['category_id']==i['map_polygon_category_id']%}  selected="selected"{%endif%}>{{i['map_polygon_category_name']}}</option>
+                            <option value="{{i['map_polygon_category_id']}}" {{ filter['category_id']==i['map_polygon_category_id'] ? 'selected' : null }}>{{i['map_polygon_category_name']}}</option>
                             {%endfor%}
                         </select>
                         <div class="am-u-sm-12 am-u-md-3" style="height: 32px; float: right;">
@@ -69,7 +69,7 @@
                                 {%endif%}
                             </td>
                             <td nowrap>
-                                {%if i['map_polygon_description_voice']%}<span class="label label-success">是</span>
+                                {%if i['map_polygon_image']%}<span class="label label-success">是</span>
                                 {%else%}<span class="label label-default">无</span>
                                 {%endif%}
                             </td>
@@ -97,7 +97,7 @@
             <div class="am-u-lg-12">
                 <div class="am-cf">
                     <div class="am-fr">
-                        <script language="JavaScript">
+                        <script type="text/javascript">
                             var pg = new showPages('pg');pg.pageCount = {{mapPolygon['pageCount']}};pg.printHtml();
                         </script>
                     </div>
@@ -110,7 +110,7 @@
     <script type="text/javascript">
         $(function(){
             $("input[type='search']").bind('keypress',function(event){
-                if (event.keyCode == "13") {
+                if (event.keyCode === 13) {
                     search();
                 }
             })
@@ -118,7 +118,7 @@
         function search() {
             var keywords = $("input[type='search']").val().trim();
             if (!keywords.length) {
-                alert('请输入搜索内容');
+                layer.alert('请输入搜索内容', {icon: 0});
                 return false;
             }
             location.href="/scenic/spots?map_id={{filter['map_id'] is defined ? filter['map_id'] : ''}}&category_id={{filter['category_id'] is defined ? filter['category_id'] : '' }}&keywords=" + keywords + "&page={{filter['page'] is defined ? filter['page'] : '' }}";

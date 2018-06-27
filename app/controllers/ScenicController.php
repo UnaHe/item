@@ -91,11 +91,10 @@ class ScenicController extends ControllerBase
         }
         $this->view->mapList = $mapList;
 
-        if (!is_null($input['map_id'])) {
-            $input['context'] = 'spots';
-            $mapPolygonModel = new MapPolygonModel();
-            $this->view->mapPolygon = $mapPolygonModel->getListSimple($input);
-        }
+        $input['project_id'] = $this->user['project_id'];
+        $input['context'] = 'spots';
+        $mapPolygonModel = new MapPolygonModel();
+        $this->view->mapPolygon = $mapPolygonModel->getListSimple($input);
         $this->view->base_url = 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/';
         $this->view->filter = $input;
     }

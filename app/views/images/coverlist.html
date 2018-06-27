@@ -18,26 +18,30 @@
                     <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
                         <thead>
                         <tr>
-                            <th nowrap="">图片</th>
-                            {#<th nowrap="">路径</th>#}
-                            <th nowrap="">是否为封面</th>
-                            <th nowrap="">上传时间</th>
-                            <th style="width:1%" class="hidden-xs">操作</th>
+                            <th>图片</th>
+                            <th>类型</th>
+                            <th>是否为封面</th>
+                            <th>上传时间</th>
+                            <th style="width: 17%">操作</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% if imageList is not empty %}
                         {%for i in imageList%}
                         <tr id="image_{{i['images_id']}}">
-                            <td nowrap="">{%if i['images_path'] is defined%}<img src="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}" height="96" width="54"/>{%else%}<img src="/client/crash.png " width="50"/>{%endif%}</td>
-                            {#<td class="text-left">{{i['images_path']}}</td>#}
-                            <td class="text-left">{{ i['images_main']==1 ? '是' : '否' }}</td>
-                            <td class="text-left">{{date('Y-m-d H:i:s', i['images_create_at'])}}</td>
+                            <td>{%if i['images_path'] is defined%}<a target="_blank" href="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}"><img src="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}" height="96" width="54"/></a>{%else%}<img src="/client/crash.png " width="50"/>{%endif%}</td>
+                            <td><span class="label {{ i['images_type'] == 'cover' ? 'label-warning' : 'label-info' }}">{{ i['images_type'] == 'cover' ? '封面图' : '轮播图' }}</span></td>
+                            <td><span class="label {{ i['images_type'] == 'cover' ? (i['images_main']==1 ? 'label-success' : 'label-danger') : 'label-default' }}">{{ i['images_type'] == 'cover' ? (i['images_main']==1 ? '是' : '否') : '不适用' }}</span></td>
+                            <td>{{date('Y-m-d H:i:s', i['images_create_at'])}}</td>
                             <td nowrap>
-                                <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius" onclick="SettingsCover({{i['images_id']}}, {{ i['images_main']==1 ? 0 : 1 }}, '{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}')" style="margin-left: 10px">{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}</button>
-                                {% if i['images_main']!=1 %}
-                                <button type="button" class="am-btn am-btn-danger am-btn-xs am-radius" onclick="DeleteImage({{i['images_id']}})" style="margin-left: 10px">{{"DeleteImage"|_}}</button>
-                                {% endif %}
+                                <div class="am-btn-group am-btn-group-xs">
+                                    {% if i['images_type'] == 'cover' %}
+                                    <button type="button" class="am-btn am-btn-secondary am-radius" onclick="SettingsCover({{i['images_id']}}, {{ i['images_main']==1 ? 0 : 1 }}, '{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}')">{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}</button>
+                                    {% endif %}
+                                    {% if i['images_main']!=1 %}
+                                    <button type="button" class="am-btn am-btn-danger am-radius" onclick="DeleteImage({{i['images_id']}})">{{"DeleteImage"|_}}</button>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {%endfor%}
@@ -49,13 +53,12 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         // 封面设置.
         function SettingsCover(images_id, images_main, msg)
         {
-            var r = confirm('确认'+msg+'吗?');
-            if (r == true) {
+            layer.confirm('确认'+msg+'吗?', function () {
                 $.ajax('/images/coverlist', {
                     type: "POST",
                     dataType: 'JSON',
@@ -65,24 +68,27 @@
                     },
                     success:function(data){
                         if(data.code == 0) {
-                            alert(data.msg);
-                            location.reload();
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                yes: function () {
+                                    location.reload();
+                                }
+                            });
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error:function(){
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 })
-            }
+            });
         }
 
         // 删除图片.
         function DeleteImage(images_id)
         {
-            var r = confirm('确认删除选择图片吗？');
-            if (r == true) {
+            layer.confirm('确认删除选择图片吗？', function () {
                 $.ajax('/images/deleteimage', {
                     type: "POST",
                     dataType: 'JSON',
@@ -91,26 +97,31 @@
                     },
                     success:function(data){
                         if(data.code == 0) {
-                            alert(data.msg);
-                            $("#image_"+images_id).remove();
-                            location.reload();
+                            layer.alert(data.msg, {
+                                icon: 1,
+                                yes: function () {
+                                    $("#image_"+images_id).remove();
+                                    location.reload();
+                                }
+                            });
                         }else if(data.code == 400){
-                            alert(data.data);
+                            layer.alert(data.data);
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                     },
                     error:function(){
-                        alert('操作失败，请稍后重试！');
+                        layer.alert('操作失败，请稍后重试！', {icon: 3});
                     }
                 })
-            }
+            });
         }
 
         jQuery(document).ready(function () {
             "use strict";
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "iDisplayLength": 10,
+                "order": [[ 3, "desc" ]],
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
             });
             $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");

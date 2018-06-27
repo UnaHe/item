@@ -17,16 +17,16 @@
             <div class="portlet-title">
                 <div class="tpl-portlet-input tpl-fz-ml">
                     <div class="portlet-input input-inline">
-                        <select title="全部" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_ids" onchange="$('.btn').attr('disabled','disabled');$('#department_ids').attr('disabled','disabled');location.href='/seller/promotionlist?expire='+this.value;">
+                        <select title="全部" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_ids" onchange="$('.btn').attr('disabled','disabled');$('#department_ids').attr('disabled','disabled');location.href='/seller/promotionlist?expire='+this.value+'&promotion_status={{ filter['promotion_status'] }}';">
                             <option value="">全部</option>
-                            <option value="1" {%if expire==1%} selected {%endif%}>未过期</option>
-                            <option value="2" {%if expire==2%} selected {%endif%}>已过期</option>
+                            <option value="1" {{ filter['expire']==1 ? 'selected' : null }}>未过期</option>
+                            <option value="2" {{ filter['expire']==2 ? 'selected' : null }}>已过期</option>
                         </select>
-                        <select title="全部账号" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/seller/promotionlist?promotion_status='+this.value;">
+                        <select title="全部账号" data-am-selected="{searchBox: 1, maxHeight: 280, btnSize:'sm'}" id="department_id" onchange="$('.btn').attr('disabled','disabled');$('#department_id').attr('disabled','disabled');location.href='/seller/promotionlist?expire={{ filter['expire'] }}&promotion_status='+this.value;">
                             <option value="">全部账号</option>
-                            <option value="1" {%if promotion_status==1%} selected {%endif%}>审核中</option>
-                            <option value="2" {%if promotion_status==2%} selected {%endif%}>审核通过</option>
-                            <option value="3" {%if promotion_status==3%} selected {%endif%}>审核未通过</option>
+                            <option value="1" {{ filter['promotion_status']==1 ? 'selected' : null }}>审核中</option>
+                            <option value="2" {{ filter['promotion_status']==2 ? 'selected' : null }}>审核通过</option>
+                            <option value="3" {{ filter['promotion_status']==3 ? 'selected' : null }}>审核未通过</option>
                         </select>
                     </div>
                 </div>
@@ -59,9 +59,9 @@
                             <td><span style="color: #00a6b6">{{i['promotion_discount']}}折</span></td>
                             <td>
                                 <select title id="department_id1" data-am-selected="{btnWidth:110, btnSize:'sm'}" onchange=changestatus({{i['wx_promotion_id']}})>
-                                    <option value="1" {%if i['promotion_status']==1%} selected {%endif%}>审核中</option>
-                                    <option value="2" {%if i['promotion_status']==2%} selected {%endif%}>审核通过</option>
-                                    <option value="3" {%if i['promotion_status']==3%} selected {%endif%}>审核不通过</option>
+                                    <option value="1" {{ i['promotion_status']==1 ? 'selected' : null }}>审核中</option>
+                                    <option value="2" {{ i['promotion_status']==2 ? 'selected' : null }}>审核通过</option>
+                                    <option value="3" {{ i['promotion_status']==3 ? 'selected' : null }}>审核不通过</option>
                                 </select>
                             </td>
                             <td class="detailes" data="{{i['promotion_detailes']}}" style="cursor:pointer;text-decoration:underline"></td>
@@ -78,7 +78,7 @@
                     <div class="am-u-lg-12">
                         <div class="am-cf">
                             <div class="am-fr">
-                                <script language="JavaScript">
+                                <script type="text/javascript">
                                     var pg = new showPages('pg');pg.pageCount = {{pageCount}};pg.printHtml();
                                 </script>
                             </div>
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         function changestatus(wx_promotion_id) {
             var promotion_status = $('#department_id1').find("option:selected").val();
@@ -107,13 +107,16 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('修改成功');
-                        location.href ='/seller/promotionlist?promotion_status='+promotion_status;
+                        layer.alert('修改成功', {
+                            yes: function () {
+                                location.href ='/seller/promotionlist?promotion_status='+promotion_status;
+                            }
+                        });
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
             });
         }
@@ -130,14 +133,18 @@
                 {
                     if (data.code == 0)
                     {
-                        alert('删除成功');
-                        location.href = location.href;
-                        $('#loadings').remove();
+                        layer.alert('删除成功', {
+                            icon: 1,
+                            yes: function () {
+                                $('#loadings').remove();
+                                location.reload();
+                            }
+                        });
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -165,13 +172,13 @@
             });
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    if (confirm("确定要删除？")){
+                    layer.confirm("确定要删除？", function () {
                         $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif",'id':'loadings' ,'width':'20')}}');
-                        deletepromotion($(this).attr('data-id'))
-                    }
+                        deletepromotion($(this).attr('data-id'));
+                    });
                 });
             });
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "paging": false,
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],

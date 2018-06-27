@@ -52,6 +52,7 @@
     </div>
 
     {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     <script type="text/javascript">
         var xhr_uploadVideo;
         function initialResource(map_id,pointId){
@@ -73,18 +74,18 @@
                     {
                         if (data.data.image.length>0){
                             for(var i=0;i<data.data.image.length;i++){
-                                imageHtml += '<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close am-close-spin" onclick="if (confirm(\'确定删除？\')){remove(\''+data.data.image[i]+'\');$(this).parent().remove();};return false;"></button><br /><a href="'+data.data.image[i]+'" target="_blank"><img style="width: 20%;height: 20%" src="'+data.data.image[i]+'" alt=""/></a></span>';
+                                imageHtml += '<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close am-close-spin" onclick="layer.confirm(\'确定删除？\', function() {remove(\''+data.data.image[i]+'\');$(this).parent().remove();});return false;"></button><br /><a href="'+data.data.image[i]+'" target="_blank"><img style="width: 20%;height: 20%" src="'+data.data.image[i]+'" alt=""/></a></span>';
                             }
                         }
                     }else{
-                        alert(data.msg);
+                        layer.alert(data.msg, {icon: 2});
                     }
                     if (imageHtml=='') imageHtml='没有相关图片';
                     $('#imagePreview').html(imageHtml);
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                 }
@@ -117,7 +118,7 @@
                                 // }
                             }
                         }else{
-                            alert(data.msg);
+                            layer.alert(data.msg, {icon: 2});
                         }
                         if (html==''){
                             html='<option value=" ">没有相关设备</option>';
@@ -130,7 +131,7 @@
                     },
                     error: function()
                     {
-                        alert('服务器错误');
+                        layer.alert('服务器错误', {icon: 3});
                     },
                     complete:function(){
                     }
@@ -165,7 +166,7 @@
             var formData = new FormData();
             var files = document.getElementById('thumbnail').files;
             if (files[0] ==undefined){
-                alert("No file chosen")
+                layer.alert("No file chosen", {icon: 0});
                 return;
             }
             var totalBytes = files[0].size;
@@ -186,11 +187,11 @@
                 if (xhr.readyState==4){
                     if (xhr.status == 200) {
                         console.log(xhr.responseText);
-                        $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close" onclick="if (confirm(\'确定删除？\')){remove(\''+xhr.responseText+'\');$(this).parent().remove();}return false;"></button><br /><a href="'+xhr.responseText+'" target="_blank"><img style="width: 20%;height: 20%" src="'+xhr.responseText+'" alt=""/></a></span>');
+                        $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close" onclick="layer.confirm(\'确定删除？\', function() {remove(\''+xhr.responseText+'\');$(this).parent().remove();});return false;"></button><br /><a href="'+xhr.responseText+'" target="_blank"><img style="width: 20%;height: 20%" src="'+xhr.responseText+'" alt=""/></a></span>');
                         $('#thumbnail').val('');
                         // fileInput.replaceWith(fileInput.val('').clone(true));
                     }else{
-                        alert(xhr.responseText)
+                        layer.alert(xhr.responseText)
                     }
                 }
                 $("#thumbnailProgress").width("0%");
@@ -204,7 +205,7 @@
             var map_id     = $.trim($('#map_id').val()),point_id = $.trim($('#map_gid').val());
             var equipment_id = $('#map_gid option:selected').attr('data-equipment');
             if (!equipment_id){
-                alert('设备获取失败，请联系管理员!')
+                layer.alert('设备获取失败，请联系管理员!', {icon: 0});
                 return false;
             }
             var imageSrc = '';
@@ -212,7 +213,7 @@
                 imageSrc += $(this).parent().attr('href')+'|';
             });
             if (imageSrc==''){
-                alert('必须含有图片资源')
+                layer.alert('必须含有图片资源', {icon: 0});
                 return false;
             }
             $('#subBtn').attr('disabled', 'disabled');
@@ -232,17 +233,17 @@
                     if (data.code == 0)
                     {
                         if (data.data!='ok'){
-                            alert('推送失败，可能原因（设备不在线），请重新提交！');
+                            layer.alert('推送失败，可能原因（设备不在线），请重新提交！', {icon: 2});
                             return;
                         }
                     }
                     l.stop();
-                    alert(data.msg);
+                    layer.alert(data.msg, {icon: 2});
                 },
                 error: function()
                 {
                     l.stop();
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     l.stop();

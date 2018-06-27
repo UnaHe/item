@@ -48,7 +48,7 @@
                         <label for="pid">上级科室</label>
                         <div>
                             <select id="pid" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
-                                <option value="0" selected="">---</option>
+                                <option value="0" selected>---</option>
                                 {%for i in departmentList%}
                                 <option value="{{i['id']}}">{{i['item']}}</option>
                                 {%endfor%}
@@ -94,16 +94,20 @@
                 dataType: 'json',
                 success: function(data)
                 {
-                    alert(data.msg);
-                    if (data.code == 0)
-                    {
-                        location.reload();
-                    }
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code == 0)
+                            {
+                                location.reload();
+                            }
+                        }
+                    });
+
                 },
                 error: function(data)
                 {
                     l.stop();
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     l.stop();
@@ -132,7 +136,7 @@
                 }
 
                 $('#delDepartment').css('display','inline').bind('click',function(){
-                    if (confirm('删除 '+cateList[_deparmentId]['name'] +' ? 其科室医生将处于无科室状态!')){
+                    layer.confirm('删除 '+cateList[_deparmentId]['name'] +' ? 其科室医生将处于无科室状态!', function () {
                         $('.btn').attr('disabled','disabled');
                         $('select').attr('disabled','disabled');
                         var l = Ladda.create(document.querySelector('#subBtn'));
@@ -145,16 +149,19 @@
                             dataType: 'json',
                             success: function(data)
                             {
-                                alert(data.msg);
-                                if (data.code == 0)
-                                {
-                                    location.reload();
-                                }
+                                layer.alert(data.msg, {
+                                    yes: function () {
+                                        if (data.code == 0)
+                                        {
+                                            location.reload();
+                                        }
+                                    }
+                                });
                             },
                             error: function(data)
                             {
                                 l.stop();
-                                alert('服务器错误');
+                                layer.alert('服务器错误', {icon: 3});
                             },
                             complete:function(){
                                 l.stop();
@@ -162,12 +169,20 @@
                                 $('select').removeAttr('disabled');
                             }
                         });
-                    }
+                    });
                 });
+
+                var pid = _deparmentId > 0 ? (cateList[_deparmentId]['pid']!==null ? cateList[_deparmentId]['pid'] : 0) : 0,
+                    map_id = _deparmentId > 0 ? cateList[_deparmentId]['map_id'] : 0;
+
+                $("#pid option:selected").removeAttr('selected');
+                $("#map_id option:selected").removeAttr('selected');
+
+                $("#pid option[value=" + pid + "]").attr('selected', true).trigger('changed.selected.amui');
+                $("#map_id option[value=" + map_id + "]").attr('selected', true).trigger('changed.selected.amui');
+
                 $('#name').val(_deparmentId > 0 ? cateList[_deparmentId]['name'] : '');
-                $('#pid').val(_deparmentId > 0 ? cateList[_deparmentId]['pid'] : 0);
-                $('#map_id').val(_deparmentId > 0 ? cateList[_deparmentId]['map_id'] : 0);
-                $('#intro').val(_deparmentId !='' ? CKEDITOR.instances['intro'].setData(cateList[_deparmentId]['intro']) : '');
+                $('#intro').val(_deparmentId !=='' ? CKEDITOR.instances['intro'].setData(cateList[_deparmentId]['intro']) : '');
             });
             CKEDITOR.replace( 'intro');
         });

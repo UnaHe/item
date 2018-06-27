@@ -41,8 +41,10 @@
                             <td>{{i['coach_tel']}}</td>
                             <td nowrap>{{i['evaluate_count']}}次</td>
                             <td nowrap>
-                                <button type="button" class="am-btn am-btn-secondary am-btn-xs am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/coach/coachhandle?coach_id={{i['coach_id']}}';" style="margin-left: 10px">{{"Edit"|_}}</button>
-                                <button type="button" class="am-btn am-btn-danger am-btn-xs am-radius deleteBtn" data-id="{{i['coach_id']}}" style="margin-left: 10px">{{"Delete"|_}}</button>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="am-btn am-btn-secondary am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/coach/coachhandle?coach_id={{i['coach_id']}}';">{{"Edit"|_}}</button>
+                                    <button type="button" class="am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['coach_id']}}">{{"Delete"|_}}</button>
+                                </div>
                             </td>
                         </tr>
                         {%endfor%}
@@ -53,7 +55,7 @@
         </div>
     </div>
 
-    <script src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         function deleteCoach(id){
             $('.btn').attr('disabled','disabled');
@@ -69,12 +71,12 @@
                     {
                         $('#doctor_'+id).remove();
                     }else{
-                        alert(data.msg);
+                        layer.alert(data.msg, {icon: 2});
                     }
                 },
                 error: function()
                 {
-                    alert('服务器错误');
+                    layer.alert('服务器错误', {icon: 3});
                 },
                 complete:function(){
                     $('.btn').removeAttr('disabled');
@@ -85,13 +87,13 @@
             "use strict";
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    if (confirm("确定要删除此教练？")){
+                    layer.confirm("确定要删除此教练？", function () {
                         $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-                        deleteCoach($(this).attr('data-id'))
-                    }
+                        deleteCoach($(this).attr('data-id'));
+                    });
                 });
             });
-            $('#datatable').dataTable({
+            $('#datatable').DataTable({
                 "iDisplayLength": 10,
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
             });
