@@ -301,11 +301,14 @@
         jQuery(document).ready(function () {
             "use strict";
             $('#delScheduleBtn').bind('click',function(){
-                var id = $(this).attr('data-id');
+                let id = $(this).attr('data-id');
                 console.log(id);
                 if (id>0){
-                    layer.confirm('确定删除此排班计划？', function () {
-                        var l = Ladda.create(this);
+                    let me = this;
+                    layer.confirm('确定删除此排班计划？', function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        let l = Ladda.create(me);
                         l.start();
                         $('.btn').attr('disabled','disabled');
                         $.ajax('/doctor/ajaxscheduledelete', {
@@ -412,8 +415,11 @@
             });
 
             $('.updateEquipment').bind('click',function(){
-                layer.confirm("确定更新排班显示屏？", function () {
-                    var l = Ladda.create(this);
+                let me = this;
+                layer.confirm("确定更新排班显示屏？", function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
+                    let l = Ladda.create(me);
                     l.start();
                     $('.btn').attr('disabled','disabled');
                     $.ajax('/doctor/ajaxscheduleequipmentupdate', {

@@ -54,7 +54,7 @@
     {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
     <script type="text/javascript">
         function savepath() {
-            var path = $.trim($('#cover_photo').val()),
+            let path = $.trim($('#cover_photo').val()),
                 type = $.trim($('#images_type').val());
     
             if (!path) {
@@ -62,7 +62,9 @@
                 return;
             }
 
-            layer.confirm('确定上传图片？', function () {
+            layer.confirm('确定上传图片？', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 $.ajax('/images/coverupload', {
                     type: "POST",
                     dataType: 'JSON',

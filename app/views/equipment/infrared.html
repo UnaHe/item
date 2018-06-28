@@ -72,10 +72,13 @@
             });
 
             $('.equipmentUpdate').bind('click',function(){
-                layer.confirm('确定更新此设备信息？', function () {
+                let me = this;
+                layer.confirm('确定更新此设备信息？', function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
                     $('.btn').attr('disabled','disabled');
                     $.ajax('/equipment/ajaxequipmentupdate', {
-                        data: {id:$(this).attr('data-id')},
+                        data: {id:$(me).attr('data-id')},
                         type: 'post',
                         dataType: 'json',
                         success: function(data)

@@ -87,9 +87,12 @@
             "use strict";
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    layer.confirm("确定要删除此教练？", function () {
-                        $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-                        deleteCoach($(this).attr('data-id'));
+                    let me = this;
+                    layer.confirm("确定要删除此教练？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
+                        deleteCoach($(me).attr('data-id'));
                     });
                 });
             });

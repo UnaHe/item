@@ -32,7 +32,7 @@
 
     <script type="text/javascript">
         function submitHandler() {
-            var postData = {
+            let postData = {
                 evacutePass: $.trim($('#evacutePass').val()),
                 remark: $.trim($('#remark').val()),
             };
@@ -40,12 +40,15 @@
                 layer.alert('请填写密码!', {icon: 0});
                 return false;
             }
-            var _text = '确定紧急疏散？';
+            let _text = '确定紧急疏散？';
             if (1 == '{{user["projectDetails"]["project_emergency_evacuation"]}}') {
                 _text = '确定撤销紧急疏散？';
             }
-            layer.confirm(_text, function () {
-                var l = Ladda.create(this);
+            let me = this;
+            layer.confirm(_text, function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
+                let l = Ladda.create(me);
                 l.start();
                 $.ajax('/evacuate/opt', {
                     data: postData,

@@ -47,15 +47,15 @@
     {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     <script type="text/javascript">
         function submitHandler(){
-            var id = $('#editDepart').val();
-            var name = $.trim($('#name').val());
-            var role = $.trim($('#role').val());
-            if (role=='administrator'){
+            let id = $('#editDepart').val(),
+                name = $.trim($('#name').val()),
+                role = $.trim($('#role').val());
+            if (role == 'administrator'){
                 layer.alert('管理员无法被编辑', {icon: 0});
                 return false;
             }
             $('#subBtn').attr('disabled', 'disabled');
-            var l = Ladda.create(document.querySelector('#subBtn'));
+            let l = Ladda.create(document.querySelector('#subBtn'));
             l.start();
             $.ajax('/account/group', {
                 data: {
@@ -90,15 +90,15 @@
             });
             return false;
         }
-        var cateList = {{cates}};
+        let cateList = {{cates}};
         jQuery(document).ready(function () {
             "use strict";
             jQuery.validator.addMethod("char", function(value, element) {
-                var tel =  /^[a-zA-Z]{1,20}$/;
+                let tel =  /^[a-zA-Z]{1,20}$/;
                 return this.optional(element) || (tel.test(value));
             }, "必须为英文字母 20位以内");
             $('#altForm').validate({submitHandler:submitHandler,ignore: []});
-            var depart = $('#editDepart');
+            let depart = $('#editDepart');
             depart.change(function(event)
             {
                 // Values
@@ -109,8 +109,6 @@
                 $('#name').val(this.value > 0 ? cateList[this.value]['client_group_name'] : '');
                 $('#role').val(this.value > 0 ? cateList[this.value]['client_group_role'] : '');
             });
-            // $('.multiselect').multiselect(multiselectConfig);
-
         });
     </script>
 

@@ -58,12 +58,12 @@
     {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
     <script type="text/javascript">
         function submitHandler(){
-            var name = $.trim($('#name').val());
-            var article_category_id = $('#editDepart').val();
-            var pid = $('#pid').val();
-            var sort_order = parseInt($('#sort_order').val());
+            let name = $.trim($('#name').val()),
+                article_category_id = $('#editDepart').val(),
+                pid = $('#pid').val(),
+                sort_order = parseInt($('#sort_order').val());
             $('#subBtn').attr('disabled','disabled');
-            var l = Ladda.create(document.querySelector('#subBtn'));
+            let l = Ladda.create(document.querySelector('#subBtn'));
             l.start();
             $.ajax('/article/category', {
                 data: {
@@ -89,7 +89,7 @@
                     }
                     l.stop();
                 },
-                error: function(data)
+                error: function()
                 {
                     l.stop();
                     layer.alert('服务器错误', {icon: 3});
@@ -97,12 +97,12 @@
             });
             return false;
         }
-        var cateList = {{cates}};
+        let cateList = {{cates}};
         jQuery(document).ready(function () {
             "use strict";
             $('#altForm').validate({submitHandler:submitHandler,ignore: []});
-            var depart = $('#editDepart');
-            depart.change(function(event)
+            let depart = $('#editDepart');
+            depart.change(function()
             {
                 // Values
                 if (this.value == 0) {

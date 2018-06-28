@@ -62,11 +62,13 @@
         jQuery(document).ready(function () {
             "use strict";
             $('.editBtn').bind('click',function(){
-                var id = $(this).attr('data-id');
+                let id = $(this).attr('data-id');
                 location.href = '/polygonsort/handle?id='+id;
             });
             $('#sendToEquipment').bind('click',function(){
-                layer.confirm('确定更新设备排序？', function () {
+                layer.confirm('确定更新设备排序？', function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
                     $.ajax('https://apiequipment.signp.cn/polygonsort', {
                         data: {project_id: '{{user["project_id"]}}'},
                         type: 'post',

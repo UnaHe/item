@@ -58,7 +58,9 @@
         // 封面设置.
         function SettingsCover(images_id, images_main, msg)
         {
-            layer.confirm('确认'+msg+'吗?', function () {
+            layer.confirm('确认'+msg+'吗?', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 $.ajax('/images/coverlist', {
                     type: "POST",
                     dataType: 'JSON',
@@ -88,7 +90,9 @@
         // 删除图片.
         function DeleteImage(images_id)
         {
-            layer.confirm('确认删除选择图片吗？', function () {
+            layer.confirm('确认删除选择图片吗？', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 $.ajax('/images/deleteimage', {
                     type: "POST",
                     dataType: 'JSON',

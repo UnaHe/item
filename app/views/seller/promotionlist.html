@@ -172,9 +172,12 @@
             });
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    layer.confirm("确定要删除？", function () {
-                        $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif",'id':'loadings' ,'width':'20')}}');
-                        deletepromotion($(this).attr('data-id'));
+                    let me = this;
+                    layer.confirm("确定要删除？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif",'id':'loadings' ,'width':'20')}}');
+                        deletepromotion($(me).attr('data-id'));
                     });
                 });
             });

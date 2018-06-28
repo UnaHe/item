@@ -291,7 +291,9 @@
         }
 
         function removeFile(part, id) {
-            layer.confirm('确定删除此文件？', function () {
+            layer.confirm('确定删除此文件？', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 switch (part) {
                     case 'point_resource_video':
                         $('#' + part + 'Preview').html('');
@@ -375,8 +377,11 @@
                 // $('#point_resource_imagePreview img').each(function () {
                 //     postData.images += $(this).attr('data-url') + ',';
                 // });
-                layer.confirm('确定保存设备信息？', function () {
-                    var l = Ladda.create(document.querySelector('#' + this.id));
+                let me = this;
+                layer.confirm('确定保存设备信息？', function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
+                    let l = Ladda.create(me);
                     l.start();
                     $.ajax('/equipment/infraredhandle', {
                         data: postData,

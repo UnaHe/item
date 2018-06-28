@@ -125,8 +125,9 @@
             depart.change(function(event)
             {
                 // Values
-                var _deparmentId = this.value;
-                $('#delDepartment').hide().unbind('click');
+                let _deparmentId = this.value,
+                    _delDepartment = $('#delDepartment');
+                _delDepartment.hide().unbind('click');
                 if (_deparmentId == 0) {
                     $('#altForm')[0].reset();
                     $('.btn').removeAttr('disabled');
@@ -135,11 +136,13 @@
                     return false;
                 }
 
-                $('#delDepartment').css('display','inline').bind('click',function(){
-                    layer.confirm('删除 '+cateList[_deparmentId]['name'] +' ? 其科室医生将处于无科室状态!', function () {
+                _delDepartment.css('display','inline').bind('click',function(){
+                    layer.confirm('删除 '+cateList[_deparmentId]['name'] +' ? 其科室医生将处于无科室状态!', function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
                         $('.btn').attr('disabled','disabled');
                         $('select').attr('disabled','disabled');
-                        var l = Ladda.create(document.querySelector('#subBtn'));
+                        let l = Ladda.create(document.querySelector('#subBtn'));
                         l.start();
                         $.ajax('/doctordepartment/ajaxdeletedepartment', {
                             data: {
@@ -172,7 +175,7 @@
                     });
                 });
 
-                var pid = _deparmentId > 0 ? (cateList[_deparmentId]['pid']!==null ? cateList[_deparmentId]['pid'] : 0) : 0,
+                let pid = _deparmentId > 0 ? (cateList[_deparmentId]['pid']!==null ? cateList[_deparmentId]['pid'] : 0) : 0,
                     map_id = _deparmentId > 0 ? cateList[_deparmentId]['map_id'] : 0;
 
                 $("#pid option:selected").removeAttr('selected');

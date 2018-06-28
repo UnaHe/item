@@ -334,7 +334,9 @@
         }
 
         function removeFile(url, part, type) {
-            layer.confirm('确定删除此文件？', function () {
+            layer.confirm('确定删除此文件？', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 switch (type) {
                     case '1':
                     case '3':
@@ -673,9 +675,12 @@
                 });
             });
             $('.deleteBtn').bind('click', function () {
-                layer.confirm('确定删除此区域？', function () {
-                    var id = $(this).attr('data-id');
-                    var l = Ladda.create(document.querySelector('#' + this.id));
+                let me = this;
+                layer.confirm('确定删除此区域？', function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
+                    let id = $(me).attr('data-id'),
+                        l = Ladda.create(me);
                     l.start();
                     $.ajax('/equipment/ajaxinfraredarearemove', {
                         data: { id: id },

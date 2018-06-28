@@ -174,41 +174,50 @@
             "use strict";
             $('.reconmd1').each(function(){
                 $(this).on('click',function(){
-                    var atrs = $(this).attr('atrs');
-                    var rst = '';
+                    let atrs = $(this).attr('atrs'),
+                        rst = '',
+                        me = this;
                     if(atrs == 0){
                         rst = '取消推荐商家?'
                     }else{
                         rst = '成为推荐商家?'
                     }
-                    layer.confirm(rst, function () {
-                        $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        recommend(atrs,'',$(this).attr('data-id'));
+                    layer.confirm(rst, function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
+                        recommend(atrs,'',$(me).attr('data-id'));
                     });
                 });
             });
 
             $('.reconmd2').each(function(){
                 $(this).on('click',function(){
-                    var atrs = $(this).attr('atrs');
-                    var rst = '';
+                    let atrs = $(this).attr('atrs'),
+                        rst = '',
+                        me = this;
                     if(atrs == 0){
                         rst = '取消优惠商家?'
                     }else{
                         rst = '成为优惠商家?'
                     }
-                    layer.confirm(rst, function () {
-                        $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        recommend('',atrs,$(this).attr('data-id'));
+                    layer.confirm(rst, function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
+                        recommend('',atrs,$(me).attr('data-id'));
                     });
                 });
             });
             
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    layer.confirm("密码将重置为123456,确定吗？", function () {
-                        $(this).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
-                        repassword($(this).attr('data-id'));
+                    let me = this;
+                    layer.confirm("密码将重置为123456,确定吗？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif","id":"loadings" ,"width":20)}}');
+                        repassword($(me).attr('data-id'));
                     });
                 });
             });

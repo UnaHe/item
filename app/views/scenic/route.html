@@ -72,9 +72,12 @@
             "use strict";
             $('.deleteBtn').each(function () {
                 $(this).on('click', function () {
-                    layer.confirm("确定要删除此方案？", function () {
-                        var id = $(this).attr('data-id');
-                        var l = Ladda.create(document.querySelector('#' + this.id));
+                    let me = this;
+                    layer.confirm("确定要删除此方案？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        let id = $(me).attr('data-id'),
+                            l = Ladda.create(me);
                         l.start();
                         $.ajax('/scenic/routedelete', {
                             data: {

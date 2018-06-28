@@ -73,7 +73,7 @@
     <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
     <script type="text/javascript">
         function pendingHandle(id_ok,id_delete) {
-            var coachid='';
+            let coachid='';
             {%if filter['coach_id'] is defined%}
             coachid={{filter['coach_id']}};
             {%endif%}
@@ -110,9 +110,12 @@
             "use strict";
             $('.deleteBtn').each(function(){
                 $(this).on('click',function(){
-                    layer.confirm("确定要删除此评分？", function () {
-                        $(this).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
-                        pendingHandle('',$(this).attr('data-id'));
+                    let me = this;
+                    layer.confirm("确定要删除此评分？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('{{image("oss/Images/Icons/Load/load-7.gif" , 'width':'20')}}');
+                        pendingHandle('',$(me).attr('data-id'));
                     });
                 });
             });

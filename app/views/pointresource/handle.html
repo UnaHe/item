@@ -74,7 +74,7 @@
                     {
                         if (data.data.image.length>0){
                             for(var i=0;i<data.data.image.length;i++){
-                                imageHtml += '<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close am-close-spin" onclick="layer.confirm(\'确定删除？\', function() {remove(\''+data.data.image[i]+'\');$(this).parent().remove();});return false;"></button><br /><a href="'+data.data.image[i]+'" target="_blank"><img style="width: 20%;height: 20%" src="'+data.data.image[i]+'" alt=""/></a></span>';
+                                imageHtml += '<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close am-close-spin" onclick="let me = this;layer.confirm(\'确定删除？\', function(index) {$(\'.layui-layer-btn0\').css(\'pointer-events\', \'none\'); layer.close(index);remove(\''+data.data.image[i]+'\');$(me).parent().remove();});return false;"></button><br /><a href="'+data.data.image[i]+'" target="_blank"><img style="width: 20%;height: 20%" src="'+data.data.image[i]+'" alt=""/></a></span>';
                             }
                         }
                     }else{
@@ -187,7 +187,7 @@
                 if (xhr.readyState==4){
                     if (xhr.status == 200) {
                         console.log(xhr.responseText);
-                        $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close" onclick="layer.confirm(\'确定删除？\', function() {remove(\''+xhr.responseText+'\');$(this).parent().remove();});return false;"></button><br /><a href="'+xhr.responseText+'" target="_blank"><img style="width: 20%;height: 20%" src="'+xhr.responseText+'" alt=""/></a></span>');
+                        $('#imagePreview').append('<span style="float:left;display:inline;"><button class="btn am-close am-close-alt am-icon-close" onclick="let me = this;layer.confirm(\'确定删除？\', function(index) {$(\'.layui-layer-btn0\').css(\'pointer-events\', \'none\'); layer.close(index);remove(\''+xhr.responseText+'\');$(me).parent().remove();});return false;"></button><br /><a href="'+xhr.responseText+'" target="_blank"><img style="width: 20%;height: 20%" src="'+xhr.responseText+'" alt=""/></a></span>');
                         $('#thumbnail').val('');
                         // fileInput.replaceWith(fileInput.val('').clone(true));
                     }else{

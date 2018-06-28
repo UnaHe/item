@@ -131,17 +131,25 @@
             "use strict";
             $('.deleteBtn').each(function () {
                 $(this).on('click', function () {
-                    layer.confirm("确定要删除此条评论吗？", function () {
-                        $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg"  width="20" />');
-                        deleteComment($(this).attr('data-id'));
+                    let me = this;
+                    layer.confirm("确定要删除此条评论吗？", function (index) {
+                        $('.layui-layer-btn0').css('pointer-events', 'none');
+                        layer.close(index);
+                        $(me).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif" class="loadImg"  width="20" />');
+                        deleteComment($(me).attr('data-id'));
                     });
                 });
             });
 
             $(".checkBtn").click(function () {
-                var comment_id = $(this).data('id'), comment_status = $(this).data('status'), msg = comment_status ? '关闭' : '打开';
-                layer.confirm("确定要" + msg + "此条评论吗？", function () {
-                    $(this).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="loadImg" width="20" />');
+                let comment_id = $(this).data('id'),
+                    comment_status = $(this).data('status'),
+                    msg = comment_status ? '关闭' : '打开',
+                    me = this;
+                layer.confirm("确定要" + msg + "此条评论吗？", function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
+                    $(me).parent().append('<img src="https://signposs1.oss-cn-shenzhen.aliyuncs.com/oss/Images/Icons/Load/load-7.gif"  class="loadImg" width="20" />');
                     $('.btn').attr('disabled', 'disabled');
                     $.ajax('/comment/ajaxchangestatus', {
                         data: {

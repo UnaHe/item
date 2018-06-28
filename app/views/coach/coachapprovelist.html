@@ -60,8 +60,10 @@
         // 通过OR拒绝.
         function AllowOrRefuse(coach_id, status)
         {
-            var msg = status === 1 ? '审批' : '拒绝';
-            layer.confirm('确定'+msg+'吗？', function () {
+            let msg = status === 1 ? '审批' : '拒绝';
+            layer.confirm('确定'+msg+'吗？', function (index) {
+                $('.layui-layer-btn0').css('pointer-events', 'none');
+                layer.close(index);
                 $.ajax('/coach/coachapprove', {
                     type: "POST",
                     dataType: 'JSON',
