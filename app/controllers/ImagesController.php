@@ -223,4 +223,64 @@ class ImagesController extends ControllerBase
         return true;
     }
 
+    /**
+     * 轮播图排序.
+     */
+    public function sortAction()
+    {
+        if ($this->request->isPost() && $this->request->isAjax()) {
+            $rules = [
+                'images_id' => [
+                    'filter' => FILTER_SANITIZE_NUMBER_INT,
+                    'required',
+                ],
+                'images_sort' => [
+                    'filter' => FILTER_SANITIZE_NUMBER_INT,
+                    'default' => NULL,
+                ],
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+
+            //获取参数.
+            $input = $filter->getResult();
+            $input['project_id'] = $this->user['project_id'];
+
+            $Images = new ImagesModel();
+
+            // 查询是否存在排序.
+            $image = $Images->getIsSort($input, 'round');
+            if ($image) {
+                $this->resultModel->setResult('400', '该排序已使用,请更换');
+                return $this->resultModel->output();
+            }
+
+            $newImage = $Images->getImageByImagesId($input['images_id']);
+            if (!$newImage) {
+                $this->resultModel->setResult('-1');
+                return $this->resultModel->output();
+            }
+            $cloneImage = $Images::cloneResult($Images, $newImage);
+
+            $this->db->begin();
+            try {
+                //更新排序.
+                $cloneImage->update($input);
+
+                $this->db->commit();
+                $this->resultModel->setResult('0');
+                return $this->resultModel->output();
+            } catch (Exception $e) {
+                $this->db->rollback();
+                $this->resultModel->setResult('102');
+                return $this->resultModel->output();
+            }
+        }
+
+        return false;
+    }
+
 }

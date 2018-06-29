@@ -39,14 +39,19 @@ class ImagesModel extends ModelBase
         $tag = CacheBase::makeTag(self::class . 'getList', json_encode($ProjectId.'|---|'.$type.'|---|'.$args));
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
-            if ($type) {
-                $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? AND images_type = ? ORDER BY images_id DESC';
-                $params[] = $ProjectId;
-                $params[] = $type;
-            } else {
-                $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? ORDER BY images_id DESC';
+            $where = '';
+            $params = [];
+
+            if (isset($ProjectId) && $ProjectId > 0) {
+                $where .= (empty($where) ? ' WHERE' : ' AND') . ' images_project_id=?';
                 $params[] = $ProjectId;
             }
+            if (isset($type) && $type !== '') {
+                $where .= (empty($where) ? ' WHERE' : ' AND') . ' images_type=? ';
+                $params[] = $type;
+            }
+
+            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . $where . ' ORDER BY images_id DESC';
 
             $sql = sprintf($sqlTemplate, $args);
             $data = new Phalcon\Mvc\Model\Resultset\Simple(
@@ -107,6 +112,32 @@ class ImagesModel extends ModelBase
                 $this->getReadConnection()->query($sql, [$ImagesId])
             );
             $result = $data->valid() ? $data->toArray()[0] : false;
+            if (CACHING) {
+                $this->cache->save($tag, $result);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 排序是否存在.
+     * @param $input
+     * @param $type
+     * @return bool | array
+     */
+    public function getIsSort($input, $type)
+    {
+        $tag = CacheBase::makeTag(self::class . 'getIsSort', json_encode($input).json_encode($type));
+        $result = CACHING ? $this->cache->get($tag) : false;
+        if (!$result) {
+            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_id <> ? AND images_project_id = ? AND images_sort = ? AND images_type = ?';
+            $sql = sprintf($sqlTemplate, "*");
+            $data = new Phalcon\Mvc\Model\Resultset\Simple(
+                null,
+                $this,
+                $this->getReadConnection()->query($sql, [$input['images_id'], $input['project_id'], $input['images_sort'], $type])
+            );
+            $result = $data->valid() ? true : false;
             if (CACHING) {
                 $this->cache->save($tag, $result);
             }

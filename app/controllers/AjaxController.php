@@ -94,6 +94,7 @@ class AjaxController extends ControllerBase
 
     /**
      * 获取点位扫码次数(前十).
+     * @return bool|object
      */
     public function getScanTopAction()
     {
@@ -128,6 +129,10 @@ class AjaxController extends ControllerBase
         return false;
     }
 
+    /**
+     * 获取导航次数(前十).
+     * @return bool|object
+     */
     public function getNavigationTopAction()
     {
         if ($this->request->isAjax() && $this->request->isPost()) {
@@ -161,6 +166,10 @@ class AjaxController extends ControllerBase
         return false;
     }
 
+    /**
+     * 获取关键字搜索次数(前十).
+     * @return bool|object
+     */
     public function getSearchTopAction()
     {
         if ($this->request->isAjax() && $this->request->isPost()) {
@@ -194,6 +203,10 @@ class AjaxController extends ControllerBase
         return false;
     }
 
+    /**
+     * 获取导航目的地次数(前十).
+     * @return bool|object
+     */
     public function getDestinationTopAction()
     {
         if ($this->request->isAjax() && $this->request->isPost()) {
@@ -227,6 +240,11 @@ class AjaxController extends ControllerBase
         return false;
     }
 
+    /**
+     * 获取时间.
+     * @param $type
+     * @return array
+     */
     public function getTime($type)
     {
         $year = date('Y');

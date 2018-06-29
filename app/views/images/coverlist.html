@@ -15,12 +15,13 @@
         <div class="row">
             <form class="am-form">
                 <fieldset>
-                    <table class="am-table am-table-striped am-table-hover am-table-compact" id="datatable">
+                    <table class="am-table am-table-hover am-table-compact" id="datatable">
                         <thead>
                         <tr>
                             <th>图片</th>
                             <th>类型</th>
                             <th>是否为封面</th>
+                            <th style="width: 10%;">轮播图排序</th>
                             <th>上传时间</th>
                             <th style="width: 17%">操作</th>
                         </tr>
@@ -32,6 +33,13 @@
                             <td>{%if i['images_path'] is defined%}<a target="_blank" href="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}"><img src="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}" height="96" width="54"/></a>{%else%}<img src="/client/crash.png " width="50"/>{%endif%}</td>
                             <td><span class="label {{ i['images_type'] == 'cover' ? 'label-warning' : 'label-info' }}">{{ i['images_type'] == 'cover' ? '封面图' : '轮播图' }}</span></td>
                             <td><span class="label {{ i['images_type'] == 'cover' ? (i['images_main']==1 ? 'label-success' : 'label-danger') : 'label-default' }}">{{ i['images_type'] == 'cover' ? (i['images_main']==1 ? '是' : '否') : '不适用' }}</span></td>
+                            <td>
+                                {% if i['images_type'] == 'cover' %}
+                                <span class="label label-default">不适用</span>
+                                {% elseif i['images_type'] == 'round' %}
+                                <input title="sort" type="number" class="sort form-control" id="{{ i['images_id'] }}" value="{{ i['images_sort'] }}" data-sort="{{ i['images_sort'] }}" onblur="sort(this.id, this.value);" />
+                                {% endif %}
+                            </td>
                             <td>{{date('Y-m-d H:i:s', i['images_create_at'])}}</td>
                             <td nowrap>
                                 <div class="am-btn-group am-btn-group-xs">
@@ -109,7 +117,7 @@
                                 }
                             });
                         }else if(data.code == 400){
-                            layer.alert(data.data);
+                            layer.alert(data.data, {icon: 2});
                         }else{
                             layer.alert(data.msg, {icon: 2});
                         }
@@ -121,11 +129,51 @@
             });
         }
 
+        // 轮播图排序.
+        function sort(id, sort) {
+            let images_id = $.trim(id),
+                images_sort = $.trim(sort);
+            if (!images_id) {
+                layer.alert('参数错误', {icon: 0});
+                return;
+            }
+            let old_sort = $('#'+images_id).attr('data-sort');
+            if(old_sort === sort) {
+                return;
+            }
+
+            $.ajax('/images/sort', {
+                type: "POST",
+                dataType: 'JSON',
+                data: {
+                    'images_id': images_id,
+                    'images_sort': images_sort,
+                },
+                success:function(data){
+                    if(data.code == 0) {
+                        layer.alert(data.msg, {
+                            icon: 1,
+                            yes: function () {
+                                location.reload();
+                            }
+                        });
+                    }else if(data.code == 400){
+                        layer.alert(data.data, {icon: 2});
+                    }else{
+                        layer.alert(data.msg, {icon: 2});
+                    }
+                },
+                error:function(){
+                    layer.alert('操作失败，请稍后重试！', {icon: 3});
+                }
+            })
+        }
+
         jQuery(document).ready(function () {
             "use strict";
             $('#datatable').DataTable({
                 "iDisplayLength": 10,
-                "order": [[ 3, "desc" ]],
+                "order": [[ 4, "desc" ]],
                 "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
             });
             $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
