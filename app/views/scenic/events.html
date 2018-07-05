@@ -35,7 +35,7 @@
                             <td nowrap="">{{i['map_polygon_name']}}</td>
                             <td nowrap>
                                 <button type="button" class="am-btn am-btn-secondary am-btn-xs" onclick="location.href ='/scenic/eventshandle?id={{i['project_events_id']}}';">{{"Edit"|_}}</button>
-                                <button type="button" class="am-btn am-btn-danger am-btn-xs deleteBtn" data-id="{{i['project_events_id']}}" id="deleteBtn_{{i['project_events_id']}}" style="margin-left: 10px" data-style="expand-left">{{"Delete"|_}}</button>
+                                <button type="button" class="am-btn am-btn-danger am-btn-xs deleteBtn" data-id="{{i['project_events_id']}}" id="deleteBtn_{{i['project_events_id']}}" data-style="expand-left">{{"Delete"|_}}</button>
                             </td>
                         </tr>
                         {%endfor%}

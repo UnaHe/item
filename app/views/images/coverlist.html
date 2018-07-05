@@ -23,28 +23,37 @@
                             <th>是否为封面</th>
                             <th style="width: 10%;">轮播图排序</th>
                             <th>上传时间</th>
-                            <th style="width: 17%">操作</th>
+                            <th style="width: 23%">操作</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% if imageList is not empty %}
                         {%for i in imageList%}
                         <tr id="image_{{i['images_id']}}">
-                            <td>{%if i['images_path'] is defined%}<a target="_blank" href="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}"><img src="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}" height="96" width="54"/></a>{%else%}<img src="/client/crash.png " width="50"/>{%endif%}</td>
+                            <td>
+                                {%if i['images_path'] is defined%}
+                                <a target="_blank" href="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}">
+                                    <img src="{{ i['images_path_source']=='oss' ? ali_path ~ i['images_path'] : i['images_path'] }}" height="96" width="54"/>
+                                </a>
+                                {%else%}
+                                    <img src="/client/crash.png " width="50"/>
+                                {%endif%}
+                            </td>
                             <td><span class="label {{ i['images_type'] == 'cover' ? 'label-warning' : 'label-info' }}">{{ i['images_type'] == 'cover' ? '封面图' : '轮播图' }}</span></td>
                             <td><span class="label {{ i['images_type'] == 'cover' ? (i['images_main']==1 ? 'label-success' : 'label-danger') : 'label-default' }}">{{ i['images_type'] == 'cover' ? (i['images_main']==1 ? '是' : '否') : '不适用' }}</span></td>
                             <td>
                                 {% if i['images_type'] == 'cover' %}
                                 <span class="label label-default">不适用</span>
                                 {% elseif i['images_type'] == 'round' %}
-                                <input title="sort" type="number" class="sort form-control" id="{{ i['images_id'] }}" value="{{ i['images_sort'] }}" data-sort="{{ i['images_sort'] }}" onblur="sort(this.id, this.value);" />
+                                <input title="sort" type="number" min="0" class="sort form-control" id="{{ i['images_id'] }}" value="{{ i['images_sort'] }}" data-sort="{{ i['images_sort'] }}" onblur="sort(this.id, this.value);" />
                                 {% endif %}
                             </td>
                             <td>{{date('Y-m-d H:i:s', i['images_create_at'])}}</td>
-                            <td nowrap>
+                            <td>
                                 <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="am-btn am-btn-success am-radius" onclick="location.href = '/images/coverupload?images_id={{i['images_id']}}'">{{"EditImage"|_}}</button>
                                     {% if i['images_type'] == 'cover' %}
-                                    <button type="button" class="am-btn am-btn-secondary am-radius" onclick="SettingsCover({{i['images_id']}}, {{ i['images_main']==1 ? 0 : 1 }}, '{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}')">{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}</button>
+                                    <button type="button" class="am-btn {{ i['images_main']==1 ? 'am-btn-warning' : 'am-btn-secondary' }} am-radius" onclick="SettingsCover({{i['images_id']}}, {{ i['images_main']==1 ? 0 : 1 }}, '{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}')">{{ i['images_main']==1 ? "NoSettingsCover"|_ : "SettingsCover"|_ }}</button>
                                     {% endif %}
                                     {% if i['images_main']!=1 %}
                                     <button type="button" class="am-btn am-btn-danger am-radius" onclick="DeleteImage({{i['images_id']}})">{{"DeleteImage"|_}}</button>

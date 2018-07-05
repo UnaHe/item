@@ -1,0 +1,136 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <div class="tpl-content-page-title am-icon-building-o">
+        {{"DepartmentHandle"|_}}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"DepartmentManage"|_}}</li>
+        <li class="am-active"><a href="/department/handle" >{{"DepartmentHandle"|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components">
+        <div class="row">
+            <form class="am-form" id="altForm">
+                <fieldset>
+                    <div class="am-form-group">
+                        <label for="editDepart">要编辑的科室 </label>
+                        <p align="right" style="display: none; margin: 0;" id="delDepartment">
+                            <input class="am-btn am-btn-danger am-btn-xs am-radius" type="button" id="delBtn" value="{{'Delete'|_}}">
+                        </p>
+                        <div>
+                            <select id="editDepart" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                <option value="0"></option>
+                                {%for i in departmentList%}
+                                    <option value="{{i['id']}}" {{ departmentDetails is defined and departmentDetails['department_id'] === i['id'] ? 'selected' : null }}>{{i['item']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-alert am-alert-danger">不选择编辑的科室则为添加科室!</div>
+                    <div class="am-form-group">
+                        <label for="map_id">{{'MapName'|_}} </label>
+                        <div>
+                            <select id="map_id" required data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                <option value="0"></option>
+                                {%for i in mapList%}
+                                    <option value="{{i['map_id']}}" {{ departmentDetails is defined and departmentDetails['map_id'] === i['map_id'] ? 'selected' : null }}>{{i['map_name']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="name">{{"DoctorDepartmentName"|_}}</label>
+                        <input id="name" name="name" type="text" class="form-control" autocomplete="off" required value="{{ departmentDetails is defined ? departmentDetails['department_name'] : null }}">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="pid">上级科室</label>
+                        <div>
+                            <select id="pid" data-am-selected="{searchBox: 1, maxHeight: 250, btnSize:'sm'}">
+                                <option value="0" selected>---</option>
+                                {%for i in departmentList%}
+                                    <option value="{{i['id']}}" {{ departmentDetails is defined and departmentDetails['department_pid'] === i['id'] ? 'selected' : null }}>{{i['item']}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <label for="intro">{{"Intro"|_}}</label>
+                        <textarea id="intro" name="intro" class="form-control" required></textarea>
+                    </div>
+                    <div class="am-form-group">
+                        <button type="submit" class="am-btn am-btn-secondary am-btn-sm am-radius pull-right" id="subBtn"> {{'Submit'|_}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    {{javascript_include('client/vendor/editors/ckeditor/ckeditor.js')}}
+    {{javascript_include('client/vendor/plugins/validate/jquery.validate.js')}}
+    {{javascript_include('client/vendor/plugins/validate/messages_zh.min.js')}}
+    <script type="text/javascript">
+        function submitHandler(){
+            let name = $.trim($('#name').val()),
+                department_id = $('#editDepart').val(),
+                map_id = $('#map_id').val(),
+                pid = $('#pid').val(),
+                intro = $.trim(CKEDITOR.instances['intro'].getData());
+
+            $('.btn').attr('disabled','disabled');
+            $('select').attr('disabled','disabled');
+            let l = Ladda.create(document.querySelector('#subBtn'));
+            l.start();
+            $.ajax('/department/handle', {
+                data: {
+                    department_name: name,
+                    department_id: department_id,
+                    department_pid: pid,
+                    department_intro: intro,
+                    map_id: map_id,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(data)
+                {
+                    layer.alert(data.msg, {
+                        yes: function () {
+                            if (data.code == 0)
+                            {
+                                location.reload();
+                            }
+                        }
+                    });
+
+                },
+                error: function(data)
+                {
+                    l.stop();
+                    layer.alert('服务器错误', {icon: 3});
+                },
+                complete:function(){
+                    l.stop();
+                    $('.btn').removeAttr('disabled');
+                    $('select').removeAttr('disabled');
+                }
+            });
+            return false;
+        }
+
+        jQuery(document).ready(function () {
+            "use strict";
+            $('#altForm').validate({submitHandler:submitHandler,ignore: []});
+
+            $('#editDepart').change(function () {
+                location.href = '/department/handle?department_id=' + this.value;
+            });
+
+            CKEDITOR.replace('intro');
+            {% if departmentDetails is defined %}
+            CKEDITOR.instances['intro'].setData('{{ departmentDetails['department_intro'] }}');
+            {% endif %}
+        });
+    </script>
+
+{% endblock %}

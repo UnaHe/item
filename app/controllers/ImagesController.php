@@ -79,7 +79,7 @@ class ImagesController extends ControllerBase
         }
 
         // 查询.
-        $imageList = (new ImagesModel())->getList($project_id);
+        $imageList = (new ImagesModel())->getList(['project_id' => $project_id]);
 
         $this->view->setVars([
             'ali_path' => 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/',
@@ -161,6 +161,13 @@ class ImagesController extends ControllerBase
 
         if ($this->request->isPost() && $this->request->isAjax()) {
             $rules = [
+                'images_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => array(
+                        'min_range' => 0
+                    ),
+                    'default' => 0
+                ],
                 'images_type' => [
                     'filter' => FILTER_SANITIZE_STRING,
                     'required',
@@ -168,6 +175,21 @@ class ImagesController extends ControllerBase
                 'images_path' => [
                     'filter' => FILTER_SANITIZE_STRING,
                     'default' => '',
+                ],
+                'images_sort' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'options' => array(
+                        'min_range' => 0
+                    ),
+                    'default' => 0
+                ],
+                'images_main' => [
+                    'filter' => FILTER_SANITIZE_STRING,
+                    'options' => array(
+                        'min_range' => 0,
+                        'max_range' => 1
+                    ),
+                    'default' => 0
                 ],
             ];
             $filter = new FilterModel ($rules);
@@ -201,14 +223,41 @@ class ImagesController extends ControllerBase
 
             // 模型.
             $Images = new ImagesModel();
-            $cloneImages = $Images::cloneResult($Images, []);
+
+            // 更新还是创建.
+            if (!empty($input['images_id'])) {
+                $image = (new ImagesModel())->getImageByImagesId($input['images_id']);
+                if (!$image) {
+                    $this->resultModel->setResult('-1');
+                    return $this->resultModel->output();
+                }
+                $cloneImages = $Images::cloneResult($Images, $image);
+            } else {
+                $cloneImages = $Images::cloneResult($Images, []);
+            }
 
             $this->db->begin();
             try {
-                $input['images_project_id']= $project_id;
+                // 是否设置主图.
+                if ($input['images_main'] == 1) {
+                    // 获取旧的主图.
+                    $oldImages = $Images->getImageByProjectId($project_id, 'cover');
+                    // 更换主图.
+                    if ($oldImages !== false) {
+                        $cloneOldImages = $Images::cloneResult($Images, $oldImages);
+                        $cloneOldImages->update(['images_main' => 0]);
+                    }
+                }
 
-                //创建.
-                $cloneImages->create($input);
+                if (!empty($input['images_id'])) {
+                    // 更新.
+                    $cloneImages->update($input);
+                } else {
+                    $input['images_project_id']= $project_id;
+
+                    // 创建.
+                    $cloneImages->create($input);
+                }
 
                 $this->db->commit();
                 $this->resultModel->setResult('0');
@@ -220,7 +269,31 @@ class ImagesController extends ControllerBase
             }
         }
 
-        return true;
+        $rules = [
+            'images_id' => [
+                'filter' => FILTER_VALIDATE_INT,
+                'options' => array(
+                    'min_range' => 0
+                ),
+                'default' => 0
+            ],
+        ];
+        $filter = new FilterModel ($rules);
+        if (!$filter->isValid($this->request->getQuery())) {
+            $this->resultModel->setResult('101');
+            return $this->resultModel->output();
+        }
+
+        //获取参数.
+        $input = $filter->getResult();
+
+        if (!empty($input['images_id'])) {
+            $image = (new ImagesModel())->getImageByImagesId($input['images_id']);
+            $this->view->setVars([
+                'ali_path' => 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/',
+                'image' => $image,
+            ]);
+        }
     }
 
     /**
@@ -231,12 +304,15 @@ class ImagesController extends ControllerBase
         if ($this->request->isPost() && $this->request->isAjax()) {
             $rules = [
                 'images_id' => [
-                    'filter' => FILTER_SANITIZE_NUMBER_INT,
+                    'filter' => FILTER_VALIDATE_INT,
                     'required',
                 ],
                 'images_sort' => [
-                    'filter' => FILTER_SANITIZE_NUMBER_INT,
-                    'default' => NULL,
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                    ],
+                    'default' => 0,
                 ],
             ];
             $filter = new FilterModel ($rules);
@@ -250,13 +326,6 @@ class ImagesController extends ControllerBase
             $input['project_id'] = $this->user['project_id'];
 
             $Images = new ImagesModel();
-
-            // 查询是否存在排序.
-            $image = $Images->getIsSort($input, 'round');
-            if ($image) {
-                $this->resultModel->setResult('400', '该排序已使用,请更换');
-                return $this->resultModel->output();
-            }
 
             $newImage = $Images->getImageByImagesId($input['images_id']);
             if (!$newImage) {

@@ -209,6 +209,34 @@
                 </li>
                 {%endif%}
 
+                {# 部门管理 #}
+                {%if (cpAclNew['resource']['department'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                    <li class="tpl-left-nav-item">
+                        <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'department' ? 'active' : null }}">
+                            <i class="am-icon-building"></i>
+                            <span>{{"DepartmentManage"|_}}</span>
+                            <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
+                        </a>
+                        <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'department' ? 'display:block;' : null }}">
+                            <li>
+                                {%if ((cpAclNew['resource']['department'] is defined) AND ('list' in cpAclNew['resource']['department'])) OR ((cpAclNew['resource']['department'] is defined) AND ('all' in cpAclNew['resource']['department'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                                    <a href="/department/list" class="{{ controller == 'department' AND action == 'list' ? 'active' : null}}">
+                                        <i class="am-icon-angle-right"></i>
+                                        <span>{{'DepartmentList'|_}}</span>
+                                    </a>
+                                {%endif%}
+
+                                {%if ((cpAclNew['resource']['department'] is defined) AND ('handle' in cpAclNew['resource']['department'])) OR ((cpAclNew['resource']['department'] is defined) AND ('all' in cpAclNew['resource']['department'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
+                                    <a href="/department/handle" class="{{ controller == 'department' AND action == 'handle' ? 'active' : null}}">
+                                        <i class="am-icon-angle-right"></i>
+                                        <span>{{"DepartmentHandle"|_}}</span>
+                                    </a>
+                                {%endif%}
+                            </li>
+                        </ul>
+                    </li>
+                {%endif%}
+
                 {# 消息 #}
                 {%if (cpAclNew['resource']['notice'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
                 <li class="tpl-left-nav-item">
@@ -490,7 +518,7 @@
 
 {#<script type="text/javascript" src="/assets/js/amazeui.min.js"></script>#}
 <script type="text/javascript" src="https://cdn.bootcss.com/amazeui/2.7.2/js/amazeui.min.js"></script>
-<script type="text/javascript" src="/assets/js/iscroll.js"></script>
+{#<script type="text/javascript" src="/assets/js/iscroll.js"></script>#}
 <script type="text/javascript" src="/assets/js/app.js"></script>
 <script type="text/javascript" src="/layer/layer.js"></script>
 </body>

@@ -229,7 +229,7 @@ return [
     'Refuse' => '拒绝',
     'CoverManage' => '图片管理',
     'CoverList' => '图片列表',
-    'CoverUpload' => '新增图片',
+    'CoverUpload' => '新增/编辑图片',
     'SettingsCover' => '设为封面',
     'NoSettingsCover' => '取消封面',
     'DeleteImage' => '删除图片',
@@ -241,4 +241,8 @@ return [
     'CommentManage' => '评论管理',
     'DoctorDepartmentList' => '科室列表',
     'Save' => '保存',
+    'DepartmentManage' => '部门管理',
+    'DepartmentList' => '部门列表',
+    'DepartmentHandle' => '部门信息',
+    'EditImage' => '编辑图片',
 ];

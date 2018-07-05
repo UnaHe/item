@@ -29,35 +29,38 @@ class ImagesModel extends ModelBase
 
     /**
      * 图片列表.
-     * @param $ProjectId
-     * @param null $type
+     * @param array $params
      * @param string $args
      * @return bool | array
      */
-    public function getList($ProjectId, $type = null, $args = '*')
+    public function getList($params = [], $args = '*')
     {
-        $tag = CacheBase::makeTag(self::class . 'getList', json_encode($ProjectId.'|---|'.$type.'|---|'.$args));
+        $tag = CacheBase::makeTag(self::class . 'getList', [$params, $args]);
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
             $where = '';
-            $params = [];
+            $orders = ' ORDER BY images_sort DESC, images_id DESC';
+            $bindParams = [];
 
-            if (isset($ProjectId) && $ProjectId > 0) {
+            if (isset($params['project_id']) && $params['project_id'] > 0) {
                 $where .= (empty($where) ? ' WHERE' : ' AND') . ' images_project_id=?';
-                $params[] = $ProjectId;
+                $bindParams[] = $params['project_id'];
             }
-            if (isset($type) && $type !== '') {
+            if (isset($params['type']) && $params['type'] !== '') {
                 $where .= (empty($where) ? ' WHERE' : ' AND') . ' images_type=? ';
-                $params[] = $type;
+                $bindParams[] = $params['type'];
+            }
+            if (isset($params['order']) && $params['order'] !== '') {
+                $orders = ' ORDER BY ' . $params['order'];
             }
 
-            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . $where . ' ORDER BY images_id DESC';
+            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . $where . $orders;
 
             $sql = sprintf($sqlTemplate, $args);
             $data = new Phalcon\Mvc\Model\Resultset\Simple(
                 null,
                 $this,
-                $this->getReadConnection()->query($sql, $params)
+                $this->getReadConnection()->query($sql, $bindParams)
             );
 
             $result = $data->valid() ? $data->toArray() : false;
@@ -76,7 +79,7 @@ class ImagesModel extends ModelBase
      */
     public function getImageByProjectId($ProjectId, $type)
     {
-        $tag = CacheBase::makeTag(self::class . 'getImageByProjectId', json_encode($ProjectId.'|---|'.$type));
+        $tag = CacheBase::makeTag(self::class . 'getImageByProjectId', [$ProjectId, $type]);
         $result = CACHING ? $this->cache->get($tag) : false;
         if (!$result) {
             $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_project_id = ? AND images_type = ? AND images_main = 1';
@@ -112,32 +115,6 @@ class ImagesModel extends ModelBase
                 $this->getReadConnection()->query($sql, [$ImagesId])
             );
             $result = $data->valid() ? $data->toArray()[0] : false;
-            if (CACHING) {
-                $this->cache->save($tag, $result);
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * 排序是否存在.
-     * @param $input
-     * @param $type
-     * @return bool | array
-     */
-    public function getIsSort($input, $type)
-    {
-        $tag = CacheBase::makeTag(self::class . 'getIsSort', json_encode($input).json_encode($type));
-        $result = CACHING ? $this->cache->get($tag) : false;
-        if (!$result) {
-            $sqlTemplate = 'SELECT %s FROM ' . $this->getSource() . ' WHERE images_id <> ? AND images_project_id = ? AND images_sort = ? AND images_type = ?';
-            $sql = sprintf($sqlTemplate, "*");
-            $data = new Phalcon\Mvc\Model\Resultset\Simple(
-                null,
-                $this,
-                $this->getReadConnection()->query($sql, [$input['images_id'], $input['project_id'], $input['images_sort'], $type])
-            );
-            $result = $data->valid() ? true : false;
             if (CACHING) {
                 $this->cache->save($tag, $result);
             }

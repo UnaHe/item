@@ -1,0 +1,103 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="/amazeuidatatables/amazeui.datatables.css"/>
+    <div class="tpl-content-page-title am-icon-building-o">
+        {{"DepartmentList"|_}}
+    </div>
+    <ol class="am-breadcrumb">
+        <li><a href="/" class="am-icon-home homePage">首页</a></li>
+        <li>{{"DepartmentManage"|_}}</li>
+        <li class="am-active"><a href="/department/list" >{{'DepartmentList'|_}}</a></li>
+    </ol>
+    <div class="tpl-portlet-components" style="overflow: visible">
+        <div class="row" style="overflow: visible">
+            <form class="am-form">
+                <fieldset>
+                    <table class="am-table am-table-hover am-table-compact" id="datatable">
+                        <thead>
+                        <tr>
+                            <th>部门名称</th>
+                            <th>部门介绍</th>
+                            <th>所在地图</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {%for i in departmentList['data']%}
+                        <tr>
+                            <td id="{{i['department_id']}}">{{ i['department_name'] }}</td>
+                            <td>{{ i['department_intro'] }}</td>
+                            <td>{{ i['map_name'] }}</td>
+                            <td>
+                                <div class="am-btn-group am-btn-group-xs">
+                                    <button type="button" class="btn am-btn am-btn-secondary am-radius" onclick="$('.btn').attr('disabled','disabled');location.href ='/department/handle?department_id={{i['department_id']}}';">{{"Edit"|_}}</button>
+                                    <button type="button" class="btn am-btn am-btn-danger am-radius deleteBtn" data-id="{{i['department_id']}}">{{"Delete"|_}}</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/amazeuidatatables/amazeui.datatables.min.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            "use strict";
+            $('.deleteBtn').click(function () {
+                let department_id = $(this).attr('data-id'),
+                    department_name = $('#'+department_id).text(),
+                    me = this;
+                layer.confirm('删除 '+ department_name +' ? 其科室医生将处于无科室状态!', function (index) {
+                    $('.layui-layer-btn0').css('pointer-events', 'none');
+                    layer.close(index);
+                    $('.btn').attr('disabled','disabled');
+                    $('select').attr('disabled','disabled');
+                    let l = Ladda.create(me);
+                    l.start();
+                    $.ajax('/department/list', {
+                        data: {
+                            department_id: department_id,
+                        },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function(data)
+                        {
+                            layer.alert(data.msg, {
+                                yes: function () {
+                                    if (data.code == 0)
+                                    {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                        },
+                        error: function(data)
+                        {
+                            l.stop();
+                            layer.alert('服务器错误', {icon: 3});
+                        },
+                        complete:function(){
+                            l.stop();
+                            $('.btn').removeAttr('disabled');
+                            $('select').removeAttr('disabled');
+                        }
+                    });
+                });
+            });
+
+            $('#datatable').DataTable({
+                "iDisplayLength": 10,
+                "aLengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            });
+            $('.dataTables_length select').attr('data-am-selected', "{btnWidth: '38%', btnSize: 'sm'}");
+            $('.dataTables_filter input').attr("placeholder", "搜索");
+        });
+    </script>
+
+{% endblock %}
