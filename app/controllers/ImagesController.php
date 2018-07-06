@@ -166,7 +166,7 @@ class ImagesController extends ControllerBase
                     'options' => array(
                         'min_range' => 0
                     ),
-                    'default' => 0
+                    'default' => null
                 ],
                 'images_type' => [
                     'filter' => FILTER_SANITIZE_STRING,
@@ -225,7 +225,7 @@ class ImagesController extends ControllerBase
             $Images = new ImagesModel();
 
             // 更新还是创建.
-            if (!empty($input['images_id'])) {
+            if (!is_null($input['images_id'])) {
                 $image = (new ImagesModel())->getImageByImagesId($input['images_id']);
                 if (!$image) {
                     $this->resultModel->setResult('-1');
@@ -249,7 +249,7 @@ class ImagesController extends ControllerBase
                     }
                 }
 
-                if (!empty($input['images_id'])) {
+                if (!is_null($input['images_id'])) {
                     // 更新.
                     $cloneImages->update($input);
                 } else {
@@ -275,7 +275,7 @@ class ImagesController extends ControllerBase
                 'options' => array(
                     'min_range' => 0
                 ),
-                'default' => 0
+                'default' => null
             ],
         ];
         $filter = new FilterModel ($rules);
@@ -287,7 +287,7 @@ class ImagesController extends ControllerBase
         //获取参数.
         $input = $filter->getResult();
 
-        if (!empty($input['images_id'])) {
+        if (!is_null($input['images_id'])) {
             $image = (new ImagesModel())->getImageByImagesId($input['images_id']);
             $this->view->setVars([
                 'ali_path' => 'https://signposs1.oss-cn-shenzhen.aliyuncs.com/',
