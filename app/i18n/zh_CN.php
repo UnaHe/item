@@ -241,8 +241,8 @@ return [
     'CommentManage' => '评论管理',
     'DoctorDepartmentList' => '科室列表',
     'Save' => '保存',
-    'DepartmentManage' => '部门管理',
-    'DepartmentList' => '部门列表',
-    'DepartmentHandle' => '部门信息',
+    'DepartmentManage' => '科室管理',
+    'DepartmentList' => '科室列表',
+    'DepartmentHandle' => '新增/编辑科室',
     'EditImage' => '编辑图片',
 ];

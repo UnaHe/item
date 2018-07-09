@@ -182,32 +182,32 @@
                 {%endif%}
 
                 {# 医生部门 #}
-                {%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-                <li class="tpl-left-nav-item">
-                    <a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'doctordepartment' ? 'active' : null }}">
-                        <i class="am-icon-building"></i>
-                        <span>{{"DoctorDepartmentManage"|_}}</span>
-                        <i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>
-                    </a>
-                    <ul class="tpl-left-nav-sub-menu" style="{{ controller == 'doctordepartment' ? 'display:block;' : null }}">
-                        <li>
-                            {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('list' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-                            <a href="/doctordepartment/list" class="{{ controller == 'doctordepartment' AND action == 'list' ? 'active' : null}}">
-                                <i class="am-icon-angle-right"></i>
-                                <span>{{"DoctorDepartmentList"|_}}</span>
-                            </a>
-                            {%endif%}
+                {#{%if (cpAclNew['resource']['doctordepartment'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}#}
+                {#<li class="tpl-left-nav-item">#}
+                    {#<a href="javascript:void(null);" class="nav-link tpl-left-nav-link-list {{ controller == 'doctordepartment' ? 'active' : null }}">#}
+                        {#<i class="am-icon-building"></i>#}
+                        {#<span>{{"DoctorDepartmentManage"|_}}</span>#}
+                        {#<i class="am-icon-angle-right tpl-left-nav-more-ico am-fr am-margin-right tpl-left-nav-more-ico-rotate"></i>#}
+                    {#</a>#}
+                    {#<ul class="tpl-left-nav-sub-menu" style="{{ controller == 'doctordepartment' ? 'display:block;' : null }}">#}
+                        {#<li>#}
+                            {#{%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('list' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}#}
+                            {#<a href="/doctordepartment/list" class="{{ controller == 'doctordepartment' AND action == 'list' ? 'active' : null}}">#}
+                                {#<i class="am-icon-angle-right"></i>#}
+                                {#<span>{{"DoctorDepartmentList"|_}}</span>#}
+                            {#</a>#}
+                            {#{%endif%}#}
 
-                            {%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
-                            <a href="/doctordepartment/department" class="{{ controller == 'doctordepartment' AND action == 'department' ? 'active' : null}}">
-                                <i class="am-icon-angle-right"></i>
-                                <span>{{"DoctorDepartmentInfo"|_}}</span>
-                            </a>
-                            {%endif%}
-                        </li>
-                    </ul>
-                </li>
-                {%endif%}
+                            {#{%if ((cpAclNew['resource']['doctordepartment'] is defined) AND ('department' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['doctordepartment'] is defined) AND ('all' in cpAclNew['resource']['doctordepartment'])) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}#}
+                            {#<a href="/doctordepartment/department" class="{{ controller == 'doctordepartment' AND action == 'department' ? 'active' : null}}">#}
+                                {#<i class="am-icon-angle-right"></i>#}
+                                {#<span>{{"DoctorDepartmentInfo"|_}}</span>#}
+                            {#</a>#}
+                            {#{%endif%}#}
+                        {#</li>#}
+                    {#</ul>#}
+                {#</li>#}
+                {#{%endif%}#}
 
                 {# 部门管理 #}
                 {%if (cpAclNew['resource']['department'] is defined) OR ((cpAclNew['resource']['all'] is defined) AND ('all' in cpAclNew['resource']['all']))%}
