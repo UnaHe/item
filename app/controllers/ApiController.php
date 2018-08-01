@@ -87,6 +87,10 @@ class ApiController extends ControllerBase
         echo 'xxxx';
     }
 
+    /**
+     * 获取项目列表.
+     * @return string
+     */
     public function wxGetProjectListAction()
     {
         if ($this->request->isPost()) {
@@ -131,6 +135,10 @@ class ApiController extends ControllerBase
         return 'Request Method Error';
     }
 
+    /**
+     * 获取项目URL.
+     * @return string
+     */
     public function wxGetForwardDetailsAction()
     {
         if ($this->request->isPost()) {

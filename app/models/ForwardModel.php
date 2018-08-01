@@ -136,6 +136,11 @@ class ForwardModel extends ModelBase
         return DB_PREFIX . 'forward';
     }
 
+    /**
+     * 获取项目列表.
+     * @param array $params
+     * @return bool
+     */
     public function wxGetProjectList($params = [])
     {
         $tag = CacheBase::makeTag(self::class . 'wxGetProjectList', $params);
