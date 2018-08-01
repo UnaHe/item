@@ -128,9 +128,10 @@
                     {
                         layer.alert('操作成功', {
                             icon: 1,
-                            yes: function () {
+                            yes: function (index) {
                                 $('#loadings').remove();
                                 location.reload();
+                                layer.close(index);
                             }
                         });
                     }

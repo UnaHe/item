@@ -114,8 +114,9 @@
                         if(data.code == 0) {
                             layer.alert(data.msg, {
                                 icon: 1,
-                                yes: function () {
+                                yes: function (index) {
                                     window.location.replace('/images/coverlist');
+                                    layer.close(index);
                                 }
                             });
                         }else if(data.code == 400){

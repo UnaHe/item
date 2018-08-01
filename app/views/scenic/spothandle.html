@@ -346,8 +346,9 @@
                     if (data.code == 0) {
                         layer.alert('操作成功', {
                             icon: 1,
-                            yes: function () {
+                            yes: function (index) {
                                 location.replace('/scenic/spots?map_id={{mapPolygonDetails["map_id"]}}');
+                                layer.close(index);
                             }
                         });
                     } else {

@@ -171,11 +171,12 @@
                 {
                     console.log(data)
                     layer.alert(data.msg, {
-                        yes: function () {
+                        yes: function (index) {
                             if (data.code == 0)
                             {
                                 location.replace('/doctor/list');
                             }
+                            layer.close(index);
                         }
                     });
                 },

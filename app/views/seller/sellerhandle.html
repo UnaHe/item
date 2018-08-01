@@ -188,8 +188,9 @@
                     {
                         layer.alert('操作成功', {
                             icon: 1,
-                            yes: function () {
+                            yes: function (index) {
                                 location.replace('/seller/sellerlist?seller_status='+seller_status);
+                                layer.close(index);
                             }
                         });
                     }

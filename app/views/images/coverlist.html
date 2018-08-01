@@ -89,8 +89,9 @@
                         if(data.code == 0) {
                             layer.alert(data.msg, {
                                 icon: 1,
-                                yes: function () {
+                                yes: function (index) {
                                     location.reload();
+                                    layer.close(index);
                                 }
                             });
                         }else{
@@ -120,9 +121,10 @@
                         if(data.code == 0) {
                             layer.alert(data.msg, {
                                 icon: 1,
-                                yes: function () {
+                                yes: function (index) {
                                     $("#image_"+images_id).remove();
                                     location.reload();
+                                    layer.close(index);
                                 }
                             });
                         }else if(data.code == 400){
@@ -162,8 +164,9 @@
                     if(data.code == 0) {
                         layer.alert(data.msg, {
                             icon: 1,
-                            yes: function () {
+                            yes: function (index) {
                                 location.reload();
+                                layer.close(index);
                             }
                         });
                     }else if(data.code == 400){

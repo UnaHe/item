@@ -135,4 +135,46 @@ class ForwardModel extends ModelBase
     {
         return DB_PREFIX . 'forward';
     }
+
+    public function wxGetProjectList($params = [])
+    {
+        $tag = CacheBase::makeTag(self::class . 'wxGetProjectList', $params);
+        $result = CACHING ? $this->cache->get($tag) : false;
+        if (!$result) {
+            $pageCount = 1;
+
+            $where = '';
+            $orders = ' ORDER BY p.project_id DESC';
+            $bindParams = [];
+            $sqlTemplate = 'SELECT %s FROM (
+                                SELECT m.project_id AS m_project_id, max(f.forward_id) AS f_forward_id 
+                                FROM ' . $this->getSource() . ' AS f 
+                                INNER JOIN n_map AS m ON f.map_id = m.map_id 
+                                GROUP BY m.project_id) AS a 
+                            LEFT JOIN n_project AS p ON a.m_project_id = p.project_id';
+
+            if (isset($params['order']) && $params['order'] !== '') {
+                $orders = ' ORDER BY ' . $params['order'];
+            }
+            if (isset ($params ['usePage']) && $params ['usePage'] == 1) {
+                $res = $this->sqlLimit($sqlTemplate , 'COUNT(p.project_id)' , $where , $bindParams, $params['page'],$params['psize']);
+                $limit = $res['limit'];
+                $pageCount = $res['pageCount'];
+            }
+
+            $sql = sprintf($sqlTemplate, 'a.f_forward_id, p.project_id, p.project_name') . $where . $orders . $limit;
+            $data = new Phalcon\Mvc\Model\Resultset\Simple(null, $this, $this->getReadConnection()->query($sql, $bindParams));
+
+            $result['data'] = $data->valid() ? $data->toArray() : false;
+            $result['pageCount'] = $pageCount;
+
+            if (CACHING) {
+                $this->cache->save($tag, $result, 864000, null, array(
+                    self::class . 'wxGetProjectList',
+                ));
+            }
+        }
+        return $result;
+    }
+
 }

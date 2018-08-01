@@ -75,9 +75,10 @@
                         if(data.code == 0) {
                             layer.alert(data.msg, {
                                 icon: 1,
-                                yes: function () {
+                                yes: function (index) {
                                     $("#doctor_"+coach_id).remove();
                                     // location.reload();
+                                    layer.close(index);
                                 }
                             });
                         }else{

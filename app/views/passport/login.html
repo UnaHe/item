@@ -132,8 +132,9 @@
                         }
                         layer.alert(data.msg, {
                             icon: 2,
-                            yes: function () {
+                            yes: function (index) {
                                 location.reload();
+                                layer.close(index);
                             }
                         });
                     },

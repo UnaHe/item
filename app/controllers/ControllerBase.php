@@ -1,5 +1,6 @@
 <?php
 use Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Dispatcher;
 
 class ControllerBase extends Controller
 {
@@ -16,14 +17,20 @@ class ControllerBase extends Controller
     const SourceOss = 'oss';
     const SourceLocale = 'locale';
 
-    public function beforeExecuteRoute($dispatcher)
+    public function beforeExecuteRoute(Dispatcher $dispatcher)
     {
         $this->user = $this->view->user = $this->session->get('user') ? $this->session->get('user') : [
             'item_account_locale' => 'zh_CN',
         ];
 
-        $this->logger->setLogFile(LOG_FILE_DIR . $dispatcher->getControllerName() . '.txt');
-        $this->logger->setTitle('item_account_id:' . intval($this->user['item_account_id']) . ' [' . $this->request->getMethod() . ' '.$dispatcher->getControllerName().'/' . $dispatcher->getActionName().']');
+        $controllerName = $dispatcher->getControllerName();
+
+        if ($controllerName === 'api') {
+            $this->user['item_account_id'] = 0;
+        }
+
+        $this->logger->setLogFile(LOG_FILE_DIR . $controllerName . '.txt');
+        $this->logger->setTitle('item_account_id:' . intval($this->user['item_account_id']) . ' [' . $this->request->getMethod() . ' '.$controllerName.'/' . $dispatcher->getActionName().']');
     }
 
     public function initialize()

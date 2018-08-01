@@ -16,7 +16,12 @@
                 <fieldset>
                     <div class="am-form-group">
                         <label for="remark">情况说明</label>
-                        <input type="text" class="postData form-control" id="remark" {{ evacuation == 1 ? 'readonly' : null }} value="{{ evacuation == 1 ? '取消紧急疏散' : '紧急通知：女士们先生们，现在医院发生火警，请您从最近的消防通道疏散到一楼，请不要乘坐电梯，听从医院服务人员的指挥，感谢您的配合！' }}">
+                        <input type="text" class="postData form-control" id="remark" {{ evacuation == 1 ? 'readonly' : null }} value="{{ evacuation == 1 ? '撤销紧急疏散' : '紧急通知：女士们先生们，现在医院发生火警，请您从最近的消防通道疏散到一楼，请不要乘坐电梯，听从医院服务人员的指挥，感谢您的配合！' }}">
+                    </div>
+                    <div class="am-form-group" style="{{ evacuation == 1 ? 'display: none;' : null }}">
+                        <label for="timeout">播报时间</label>
+                        <span>(单位：秒)</span>
+                        <input title="播报时间" type="number" class="form-control" id="timeout" min="0" value="0" autocomplete="off" required>
                     </div>
                     <div class="am-form-group">
                         <label for="evacutePass">请输入密码</label>
@@ -35,13 +40,14 @@
             let postData = {
                 evacutePass: $.trim($('#evacutePass').val()),
                 remark: $.trim($('#remark').val()),
+                timeout: $.trim($('#timeout').val()),
             };
             if (postData.evacutePass === '') {
                 layer.alert('请填写密码!', {icon: 0});
                 return false;
             }
-            let _text = '确定紧急疏散？';
-            if (1 == '{{user["projectDetails"]["project_emergency_evacuation"]}}') {
+            let _text = '确定推送紧急疏散？';
+            if ('1' === '{{evacuation}}') {
                 _text = '确定撤销紧急疏散？';
             }
             let me = this;
@@ -56,10 +62,11 @@
                     dataType: 'json',
                     success: function (data) {
                         layer.alert(data.msg, {
-                            yes: function () {
+                            yes: function (index) {
                                 if (data.code == 0) {
-                                    location.href = '/';
+                                    location.href = '/evacuate/opt';
                                 }
+                                layer.close(index);
                             }
                         });
                         l.stop();

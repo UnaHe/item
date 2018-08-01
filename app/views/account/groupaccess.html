@@ -89,13 +89,14 @@
                 success: function(data)
                 {
                     layer.alert(data.msg, {
-                        yes: function () {
+                        yes: function (index) {
                             if (data.code == 0)
                             {
                                 location.reload();
                             }else{
                                 $('.btn').removeAttr('disabled');
                             }
+                            layer.close(index);
                         }
                     });
                     l.stop();

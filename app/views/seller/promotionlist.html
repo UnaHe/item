@@ -108,8 +108,9 @@
                     if (data.code == 0)
                     {
                         layer.alert('修改成功', {
-                            yes: function () {
+                            yes: function (index) {
                                 location.href ='/seller/promotionlist?promotion_status='+promotion_status;
+                                layer.close(index);
                             }
                         });
                     }
@@ -135,9 +136,10 @@
                     {
                         layer.alert('删除成功', {
                             icon: 1,
-                            yes: function () {
+                            yes: function (index) {
                                 $('#loadings').remove();
                                 location.reload();
+                                layer.close(index);
                             }
                         });
                     }

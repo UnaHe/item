@@ -87,4 +87,77 @@ class ApiController extends ControllerBase
         echo 'xxxx';
     }
 
+    public function wxGetProjectListAction()
+    {
+        if ($this->request->isPost()) {
+            $rules = [
+                'page' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                    'default' => 1
+                ],
+                'psize' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                    'default' => 10
+                ],
+                'usePage' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 0,
+                        'max_range' => 1
+                    ],
+                    'default' => 1
+                ],
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $ForwardModel = new ForwardModel();
+            $forwardList = $ForwardModel->wxGetProjectList($input);
+
+            $this->resultModel->setResult('0', $forwardList);
+            return $this->resultModel->output();
+        }
+
+        return 'Request Method Error';
+    }
+
+    public function wxGetForwardDetailsAction()
+    {
+        if ($this->request->isPost()) {
+            $rules = [
+                'forward_id' => [
+                    'filter' => FILTER_VALIDATE_INT,
+                    'options' => [
+                        'min_range' => 1
+                    ],
+                    'required',
+                ]
+            ];
+            $filter = new FilterModel ($rules);
+            if (!$filter->isValid($this->request->getPost())) {
+                $this->resultModel->setResult('101');
+                return $this->resultModel->output();
+            }
+            $input = $filter->getResult();
+
+            $ForwardModel = new ForwardModel();
+            $forwardDetails = $ForwardModel->getDetailsById($input['forward_id']);
+
+            $this->resultModel->setResult('0', $forwardDetails);
+            return $this->resultModel->output();
+        }
+
+        return 'Request Method Error';
+    }
+
 }

@@ -389,10 +389,11 @@
                         dataType: 'json',
                         success: function (data) {
                             layer.alert(data.msg + ' ' + data.data, {
-                                yes: function () {
+                                yes: function (index) {
                                     if (data.code === 0) {
                                         location.href = '/equipment/infrared';
                                     }
+                                    layer.close(index);
                                 }
                             });
                             l.stop();

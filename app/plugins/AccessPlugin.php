@@ -29,7 +29,9 @@ class AccessPlugin extends Plugin
             'show500'
         ],
         'api'=>[
-            'ajaxinfraredareaupdate'
+            'ajaxinfraredareaupdate',
+            'wxGetProjectList',
+            'wxGetForwardDetails',
         ]
     ];
 
