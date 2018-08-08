@@ -23,7 +23,7 @@ class ProjectController extends ControllerBase
             $itemProjectModel = new ItemProjectModel();
             $itemProject = $itemProjectModel->getDetailsByProjectIdAndAccountId($input['project_id'],$this->user['item_account_id']);
 
-            $this->user['project_id'] = 59;
+            $this->user['project_id'] = $input['project_id'];
             $this->user['item_account_group_id'] = $itemProject['item_account_group_id'];
             $this->user['item_account_group_name'] = $itemProject['item_account_group_name'];
             $this->user['item_account_group_role'] = $itemProject['item_account_group_role'];
